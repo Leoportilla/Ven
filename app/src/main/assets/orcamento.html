@@ -803,15 +803,27 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
 </div>
 <div id="product-overlay" role="dialog" aria-modal="true" aria-labelledby="productTitle">
  <section id="product-box">
-  <h2 id="productTitle">Cadastrar produto</h2><p>Cadastre produtos próprios mesmo quando o catálogo estiver vazio. O custo será guardado para futuras funções de vendas e relatórios.</p>
+  <h2 id="productTitle">Cadastrar produto</h2><p>Cadastre produtos, materiais, serviços com preço fixo ou mão de obra por hora. Adicione campos personalizados para o seu tipo de negócio.</p>
   <div class="product-form-grid">
-   <label class="settings-field full">Nome do produto<input id="prodName" maxlength="180" placeholder="Ex.: Disjuntor bipolar 20A" required></label>
-   <label class="settings-field">Código interno<input id="prodCode" maxlength="60" placeholder="Ex.: DISJ-020"></label>
-   <label class="settings-field">Código de barras<input id="prodBarcode" maxlength="80" inputmode="numeric" placeholder="EAN / GTIN"></label>
-   <label class="settings-field">Preço de custo (R$)<input id="prodCost" type="number" min="0" step="0.01" value="0"></label>
-   <label class="settings-field">Preço de venda (R$)<input id="prodPrice" type="number" min="0" step="0.01" value="0" required></label>
-   <label class="settings-field">Estoque atual<input id="prodStock" type="number" step="any" value="0"></label>
-   <label class="settings-field">Localização / categoria<input id="prodLocation" maxlength="100" placeholder="Prateleira, setor…"></label>
+   <label class="settings-field full">O que deseja cadastrar?
+    <select id="prodKind"><option value="product">Produto / material</option><option value="service">Serviço / mão de obra</option></select>
+   </label>
+   <label class="settings-field full">Nome <input id="prodName" maxlength="180" placeholder="Ex.: Cabo elétrico, instalação, limpeza" required></label>
+   <div id="serviceOptions" class="product-form-grid full" style="display:none">
+    <label class="settings-field">Tipo de serviço
+     <select id="prodServiceType"><option value="fixed">Mão de obra com valor fixo</option><option value="hourly">Mão de obra por hora trabalhada</option></select>
+    </label>
+    <label class="settings-field">Unidade de cobrança
+     <select id="prodUnit"><option value="un">Unidade / serviço</option><option value="h">Hora</option><option value="dia">Diária</option><option value="m2">m²</option><option value="m">Metro</option><option value="km">Quilômetro</option></select>
+    </label>
+   </div>
+   <label class="settings-field">Código interno<input id="prodCode" maxlength="60" placeholder="Ex.: ITEM-001"></label>
+   <label class="settings-field" id="barcodeField">Código de barras<input id="prodBarcode" maxlength="80" inputmode="numeric" placeholder="EAN / GTIN"></label>
+   <label class="settings-field" id="costField">Preço de custo (R$)<input id="prodCost" type="number" min="0" step="0.01" value="0"></label>
+   <label class="settings-field"><span id="prodPriceLabel">Preço de venda (R$)</span><input id="prodPrice" type="number" min="0" step="0.01" value="0" required></label>
+   <label class="settings-field" id="stockField">Estoque atual<input id="prodStock" type="number" step="any" value="0"></label>
+   <label class="settings-field">Categoria / setor<input id="prodLocation" maxlength="100" placeholder="Ex.: Elétrica, impressão, confeitaria"></label>
+   <label class="settings-field full">Campos personalizados (opcional)<textarea id="prodCustomFields" rows="2" placeholder="Ex.: Cor=Azul; Tamanho=GG; Material=Alumínio"></textarea><small>Use Nome=Valor e separe cada campo com ponto e vírgula. Ideal para características próprias de cada negócio.</small></label>
    <label class="settings-field full">Link da imagem (opcional)<input id="prodImageUrl" type="url" placeholder="https://…"></label>
    <label class="settings-field full">Ou escolher foto do computador/celular<input id="prodImageFile" type="file" accept="image/png,image/jpeg,image/webp"></label>
   </div>
@@ -959,7 +971,7 @@ function construirCatalogo(prodText,codText){
 const catalogoSalvo=store.get('ven_catalogoImportado',null);
 const bancoLimpoInicial=store.get('ven_catalogoLimpo',false)===true;
 const ven_produtosManuaisIniciais=store.get('ven_produtosManuais',[]);
-function normalizarProduto(p){return {...p,id:String(p.id),d:String(p.d||''),c:Number(p.c)||0,p:Number(p.p)||0,q:Number(p.q)||0,l:p.l||'',b:Array.isArray(p.b)?p.b:(p.b?[String(p.b)]:[]),img:p.img||'',manual:!!p.manual,key:p.key||String(p.id),s:(typeof p.s==='string'&&p.s)?p.s:norm((p.d||'')+' '+p.id+' '+(p.b||[]).join(' '))}}
+function normalizarProduto(p){const kind=p.kind==='service'?'service':'product';const serviceType=p.serviceType==='hourly'?'hourly':'fixed';const unit=String(p.unit||(kind==='service'?(serviceType==='hourly'?'h':'un'):'un'));const attrs=p.attrs&&typeof p.attrs==='object'&&!Array.isArray(p.attrs)?p.attrs:{};return {...p,id:String(p.id),d:String(p.d||''),c:Number(p.c)||0,p:Number(p.p)||0,q:Number(p.q)||0,l:p.l||'',b:Array.isArray(p.b)?p.b:(p.b?[String(p.b)]:[]),img:p.img||'',manual:!!p.manual,key:p.key||String(p.id),kind,serviceType,unit,attrs,s:norm((p.d||'')+' '+p.id+' '+(p.b||[]).join(' ')+' '+Object.entries(attrs).map(([k,v])=>k+' '+v).join(' '))}}
 // Catálogo inicia vazio em uma instalação nova. Produtos só entram por importação
 // explícita dos arquivos TXT ou por cadastro manual. Em atualizações, preserva
 // o catálogo que o usuário já salvou no aparelho.
@@ -1003,7 +1015,7 @@ function fecharEscolhaGravacao(){ $('#order-save-overlay').style.display='none';
 function salvarOrcamento(destino='quote'){
  if(!cart.length){notificar('Adicione produtos antes de gravar o pedido.','error');return null}
  const t=totais();
- const snapshot={cli:cfg.cli||'',desc:cfg.desc||'',tipo:cfg.tipo||'%',obs:cfg.obs||'',itens:cart.map(i=>({id:i.id,d:nomeItem(i),q:Number(i.q)||0,p:Number(i.p)||0})),subtotal:t.sub,desconto:t.d,total:t.total,tipoRegistro:destino==='sale'?'venda_pendente':'orcamento'};
+ const snapshot={cli:cfg.cli||'',desc:cfg.desc||'',tipo:cfg.tipo||'%',obs:cfg.obs||'',itens:cart.map(i=>{const p=byId.get(String(i.id))||{};return {id:i.id,d:nomeItem(i),q:Number(i.q)||0,p:Number(i.p)||0,kind:p.kind||'product',serviceType:p.serviceType||'fixed',unit:p.unit||'un'}}),subtotal:t.sub,desconto:t.d,total:t.total,tipoRegistro:destino==='sale'?'venda_pendente':'orcamento'};
  let seq;
  if(editingOrderNumber!==null && orcamentos.some(x=>Number(x.numero)===Number(editingOrderNumber))){
    seq=Number(editingOrderNumber);
@@ -1149,17 +1161,17 @@ function buscar(){
 
 function renderProdutos(){
   const r = buscar();
-  let h = `<section class="screen-head"><div class="screen-kicker">Catálogo da loja</div><div class="screen-title-row"><div><h2 class="screen-title">Produtos</h2><p class="screen-desc">Consulte, pesquise e gerencie os produtos do seu catálogo.</p></div><span class="screen-count">${prods.length.toLocaleString('pt-BR')}</span></div></section><div class="screen-tools"><span class="screen-tools-label">${r.length.toLocaleString('pt-BR')} resultado(s)${$('#q').value.trim()?' para “'+esc($('#q').value.trim())+'”':''}</span><span class="screen-tools-label">Catálogo de produtos</span></div>`;
+  let h = `<section class="screen-head"><div class="screen-kicker">Catálogo da loja</div><div class="screen-title-row"><div><h2 class="screen-title">Produtos e serviços</h2><p class="screen-desc">Gerencie materiais, produtos, mão de obra e serviços.</p></div><span class="screen-count">${prods.length.toLocaleString('pt-BR')}</span></div></section><div class="screen-tools"><span class="screen-tools-label">${r.length.toLocaleString('pt-BR')} resultado(s)${$('#q').value.trim()?' para “'+esc($('#q').value.trim())+'”':''}</span><span class="screen-tools-label">Catálogo de produtos</span></div>`;
   r.slice(0,limite).forEach(p=>{
-    const est = p.q>0 ? `Estoque: ${p.q}` : '<span class="sem">Sem estoque</span>';
+    const est = p.kind==='service' ? (p.serviceType==='hourly'?'Mão de obra · por hora':'Serviço · valor fixo') : (p.q>0 ? `Estoque: ${p.q}` : '<span class="sem">Sem estoque</span>');
     const img=p.img?`<img class="product-thumb" src="${esc(p.img)}" alt="" loading="lazy" onerror="this.style.display='none'">`:'';
-    h += `<div class="item">${img}<div class="info"><div class="nm">${esc(p.d)}</div>
-      <div class="meta">Cód. ${esc(p.id)}${p.b&&p.b.length?' · Barras: '+esc(p.b.join(', ')):''} · ${est}${p.l?' · '+esc(p.l):''}</div><div class="product-admin-actions"><button class="btn" data-edit-product="${esc(p.id)}">Editar produto</button></div></div>
+    h += `<div class="item">${img}<div class="info"><div class="nm">${p.kind==='service'?'🛠 ':''}${esc(p.d)}</div>
+      <div class="meta">${p.kind==='service'?'Serviço':'Produto'} · Cód. ${esc(p.id)}${p.b&&p.b.length?' · Barras: '+esc(p.b.join(', ')):''} · ${est}${p.l?' · '+esc(p.l):''}${p.attrs&&Object.keys(p.attrs).length?' · '+esc(Object.entries(p.attrs).map(([k,v])=>k+': '+v).join(' · ')):''}</div><div class="product-admin-actions"><button class="btn" data-edit-product="${esc(p.id)}">Editar item</button></div></div>
       <div><div class="pr">${brl(p.p)}</div></div></div>`;
   });
   if(!r.length) {
     if(prods.length===0 && !$('#q').value.trim()) {
-      h += '<div class="empty catalog-empty-state"><div style="font-size:30px;margin-bottom:10px;color:var(--pri)">＋</div><strong style="display:block;color:var(--tx);font-size:17px;margin-bottom:6px">Seu catálogo está vazio</strong><div style="margin-bottom:16px">Comece cadastrando seu primeiro produto ou importe seu banco de dados para carregar os produtos e códigos de barras.</div><button type="button" class="btn pri" id="startFirstProduct">＋ Cadastrar primeiro produto</button><div style="font-size:12px;margin-top:12px">Para importar vários itens, abra o menu ☰ e escolha <b>Importar banco de dados</b>.</div></div>';
+      h += '<div class="empty catalog-empty-state"><div style="font-size:30px;margin-bottom:10px;color:var(--pri)">＋</div><strong style="display:block;color:var(--tx);font-size:17px;margin-bottom:6px">Seu catálogo está vazio</strong><div style="margin-bottom:16px">Cadastre seu primeiro produto, material ou serviço para começar.</div><button type="button" class="btn pri" id="startFirstProduct">＋ Cadastrar primeiro produto</button></div>';
     } else {
       h += '<div class="empty">Nenhum produto encontrado.<br>Confira a busca ou limpe o texto pesquisado.</div>';
     }
@@ -1174,12 +1186,12 @@ function renderOrc(){
   const produtosParaOrc=prods.filter(p=>!termo||p.s.includes(termo)).slice(0,30);
   let h=`<section class="screen-head"><div class="screen-kicker">PEDIDOS</div><div class="screen-title-row"><div><h2 class="screen-title">${editingOrderNumber!==null?'Editar pedido #'+String(editingOrderNumber).padStart(4,'0'):'Novo pedido'}</h2><p class="screen-desc">Adicione produtos, revise quantidades e escolha como registrar o pedido.</p></div><span class="screen-count">${cart.length}</span></div></section>
   <section class="quote-product-picker"><label class="screen-tools-label" for="quoteProductSearch">Adicionar produtos ao orçamento</label><div class="quote-search-row"><input id="quoteProductSearch" type="search" placeholder="Buscar produto por nome, código ou barras…" value="${esc($('#quoteProductSearch')?.value||'')}" autocomplete="off"><button type="button" id="quoteScan" class="quote-scan-btn" aria-label="Ler código de barras" title="Ler código de barras">▦</button></div>
-  <div class="quote-product-results">${produtosParaOrc.length?produtosParaOrc.map(p=>`<div class="quote-pick-row"><div class="info"><div class="nm">${esc(p.d)}</div><div class="meta">Cód. ${esc(p.id)}${p.b&&p.b.length?' · Barras: '+esc(p.b.join(', ')):''}</div></div><strong class="pr">${brl(p.p)}</strong><button type="button" class="add" data-add="${esc(p.id)}" aria-label="Adicionar ${esc(p.d)}">+</button></div>`).join(''):(prods.length?'Nenhum produto corresponde à busca.':'Seu catálogo está vazio. Cadastre ou importe produtos pelo menu para começar.')}</div></section>`;
+  <div class="quote-product-results">${produtosParaOrc.length?produtosParaOrc.map(p=>`<div class="quote-pick-row"><div class="info"><div class="nm">${esc(p.d)}</div><div class="meta">Cód. ${esc(p.id)}${p.b&&p.b.length?' · Barras: '+esc(p.b.join(', ')):''}</div></div><strong class="pr">${brl(p.p)}${p.kind==='service'&&p.serviceType==='hourly'?' / hora':(p.kind==='service'&&p.unit&&p.unit!=='un'?' / '+esc(p.unit):'')}</strong><button type="button" class="add" data-add="${esc(p.id)}" aria-label="Adicionar ${esc(p.d)}">+</button></div>`).join(''):(prods.length?'Nenhum produto corresponde à busca.':'Seu catálogo está vazio. Cadastre produtos, materiais ou serviços para começar.')}</div></section>`;
   if(!cart.length){ h+='<div class="empty">Seu orçamento está vazio.<br>Pesquise um produto acima e toque em <b>+</b> para adicioná-lo.</div>'; $('#main').innerHTML=h; const t0=$('#main .screen-head'); if(t0 && persistentTabs) t0.insertAdjacentElement('afterend',persistentTabs); return; }
-  h+=`<div class="screen-tools"><span class="screen-tools-label">${cart.reduce((a,i)=>a+(Number(i.q)||0),0).toLocaleString('pt-BR')} unidade(s) no orçamento</span><span class="screen-tools-label">${cart.length} item(ns)</span></div>`;
+  h+=`<div class="screen-tools"><span class="screen-tools-label">${cart.reduce((a,i)=>a+(Number(i.q)||0),0).toLocaleString('pt-BR')} unidade(s)/hora(s) no orçamento</span><span class="screen-tools-label">${cart.length} item(ns)</span></div>`;
   cart.forEach((i,ix)=>{
-    h += `<div class="quote-line-card"><div class="quote-line-top"><div class="nm">${esc(nomeItem(i))}</div><button class="quote-remove" data-del="${ix}" aria-label="Remover item">×</button></div>
-      <div class="qline"><button data-m="${ix}" aria-label="Diminuir quantidade">−</button><input type="number" inputmode="decimal" min="0" step="any" value="${i.q}" data-q="${ix}" aria-label="Quantidade">
+    h += `<div class="quote-line-card"><div class="quote-line-top"><div class="nm">${esc(nomeItem(i))}${byId.get(String(i.id))?.kind==='service'?' · '+(byId.get(String(i.id))?.serviceType==='hourly'?'mão de obra por hora':'serviço'):''}</div><button class="quote-remove" data-del="${ix}" aria-label="Remover item">×</button></div>
+      <div class="qline"><button data-m="${ix}" aria-label="Diminuir quantidade">−</button><input type="number" inputmode="decimal" min="0" step="any" value="${i.q}" data-q="${ix}" aria-label="${byId.get(String(i.id))?.kind==='service'&&byId.get(String(i.id))?.serviceType==='hourly'?'Horas trabalhadas':'Quantidade'}">
         <button data-p="${ix}" aria-label="Aumentar quantidade">+</button><span class="meta">×</span><input class="pu" type="number" inputmode="decimal" min="0" step="0.01" value="${i.p}" data-pu="${ix}" aria-label="Preço unitário"><span class="tot">${brl(i.q*i.p)}</span></div></div>`;
   });
   const t=totais();
@@ -1277,7 +1289,7 @@ function texto(){
   const t=totais(); let s=`*${EMPRESA.nome}*\nCNPJ ${EMPRESA.cnpj}\n${EMPRESA.end}\n\n`;
   if(cfg.cli) s+=`Cliente: ${cfg.cli}\n`;
   s+=`Data: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
-  cart.forEach(i=>{const p=byId.get(i.id); s+=`${i.q}x ${nomeItem(i)}\n   ${brl(i.p)} = ${brl(i.q*i.p)}\n`;});
+  cart.forEach(i=>{const p=byId.get(String(i.id))||{};const un=p.kind==='service'?(p.serviceType==='hourly'?' hora(s)':(p.unit&&p.unit!=='un'?' '+p.unit:'')):' un.';s+=`${i.q}${un} ${nomeItem(i)}\n   ${brl(i.p)} = ${brl(i.q*i.p)}\n`;});
   s+=`\nSubtotal: ${brl(t.sub)}\n`;
   if(t.d>0) s+=`Desconto: − ${brl(t.d)}\n`;
   s+=`*Total: ${brl(t.total)}*`;
@@ -1286,7 +1298,7 @@ function texto(){
 }
 function imprimir(){
   const t=totais();
-  let rows=cart.map(i=>{const p=byId.get(i.id);const im=p&&p.img?'<img src="'+esc(p.img)+'" style="width:54px;height:44px;object-fit:contain">':'';return `<tr><td>${im}</td><td>${p?esc(p.id):esc(i.id)}</td><td>${esc(nomeItem(i))}</td><td class="r">${i.q}</td><td class="r">${brl(i.p)}</td><td class="r">${brl(i.q*i.p)}</td></tr>`}).join('');
+  let rows=cart.map(i=>{const p=byId.get(i.id);const im=p&&p.img?'<img src="'+esc(p.img)+'" style="width:54px;height:44px;object-fit:contain">':'';return `<tr><td>${im}</td><td>${p?esc(p.id):esc(i.id)}</td><td>${esc(nomeItem(i))}</td><td class="r">${i.q}${p&&p.kind==='service'?(p.serviceType==='hourly'?' h':(p.unit&&p.unit!=='un'?' '+esc(p.unit):'')):''}</td><td class="r">${brl(i.p)}${p&&p.kind==='service'&&p.serviceType==='hourly'?' / h':''}</td><td class="r">${brl(i.q*i.p)}</td></tr>`}).join('');
   $('#imp').innerHTML=`${EMPRESA.logo?'<img src="'+EMPRESA.logo+'" style="max-width:110px;max-height:60px;object-fit:contain"><br>':''}<h2>${esc(EMPRESA.fantasia||EMPRESA.nome)}</h2><div>${EMPRESA.cnpj?'CNPJ/CPF '+esc(EMPRESA.cnpj)+' · ':''}${esc(EMPRESA.end||'')}${EMPRESA.telefone?' · '+esc(EMPRESA.telefone):''}${EMPRESA.email?' · '+esc(EMPRESA.email):''}</div><div style="margin-top:6px"><b>Orçamento</b> · ${new Date().toLocaleDateString('pt-BR')}${cfg.cli?' · Cliente: '+esc(cfg.cli):''}</div>
   <table><thead><tr><th>Foto</th><th>Cód.</th><th>Produto</th><th class="r">Qtd</th><th class="r">Unit.</th><th class="r">Total</th></tr></thead><tbody>${rows}</tbody></table>
   <div class="sum">Subtotal: ${brl(t.sub)}<br>${t.d>0?'Desconto: − '+brl(t.d)+'<br>':''}<b style="font-size:18px">Total: ${brl(t.total)}</b></div>
@@ -1486,12 +1498,17 @@ let editingProductId=null, pendingProductImage='';
 function abrirCadastroProduto(id=null){
  fecharMenu();editingProductId=id;pendingProductImage='';
  const p=id?prods.find(x=>String(x.id)===String(id)):null;
- $('#productTitle').textContent=p?'Editar produto':'Cadastrar produto';
+ $('#productTitle').textContent=p?'Editar item':'Cadastrar produto ou serviço';
+ $('#prodKind').value=p?.kind||'product';$('#prodServiceType').value=p?.serviceType||'fixed';$('#prodUnit').value=p?.unit||'un';
  $('#prodName').value=p?.d||'';$('#prodCode').value=p?.manual?p.id:(p?.id||'');$('#prodBarcode').value=(p?.b||[]).join(', ');
- $('#prodCost').value=Number(p?.c)||0;$('#prodPrice').value=Number(p?.p)||0;$('#prodStock').value=Number(p?.q)||0;$('#prodLocation').value=p?.l||'';$('#prodImageUrl').value=p?.img&&!p.img.startsWith('data:')?p.img:'';
+ $('#prodCost').value=Number(p?.c)||0;$('#prodPrice').value=Number(p?.p)||0;$('#prodStock').value=Number(p?.q)||0;$('#prodLocation').value=p?.l||'';$('#prodCustomFields').value=Object.entries(p?.attrs||{}).map(([k,v])=>k+'='+v).join('; ');$('#prodImageUrl').value=p?.img&&!p.img.startsWith('data:')?p.img:'';
+ atualizarCamposCadastro();
  const preview=$('#productImagePreview');const img=p?.img||'';if(img){preview.src=img;preview.style.display='block';pendingProductImage=img}else{preview.removeAttribute('src');preview.style.display='none'}
  $('#prodImageFile').value='';productOverlay.style.display='flex';
 }
+function atualizarCamposCadastro(){const service=$('#prodKind').value==='service';const hourly=$('#prodServiceType').value==='hourly';$('#serviceOptions').style.display=service?'grid':'none';$('#barcodeField').style.display=service?'none':'';$('#stockField').style.display=service?'none':'';$('#costField').style.display=service?'none':'';$('#prodUnit').value=service?(hourly?'h':($('#prodUnit').value==='h'?'un':$('#prodUnit').value)):'un';$('#prodPriceLabel').textContent=service?'Valor cobrado (R$)':'Preço de venda (R$)'}
+$('#prodKind').addEventListener('change',atualizarCamposCadastro);$('#prodServiceType').addEventListener('change',()=>{if($('#prodServiceType').value==='hourly')$('#prodUnit').value='h';else if($('#prodUnit').value==='h')$('#prodUnit').value='un';atualizarCamposCadastro()});
+function parseCamposPersonalizados(text){const out={};String(text||'').split(';').forEach(part=>{const i=part.indexOf('=');if(i>0){const k=part.slice(0,i).trim().slice(0,50),v=part.slice(i+1).trim().slice(0,150);if(k&&v)out[k]=v}});return out}
 function fecharCadastroProduto(){productOverlay.style.display='none';editingProductId=null;pendingProductImage=''}
 document.addEventListener('click',e=>{if(e.target.closest('#startFirstProduct'))abrirCadastroProduto()});
 $('#cancelProduct').addEventListener('click',fecharCadastroProduto);
@@ -1507,9 +1524,9 @@ $('#saveProduct').addEventListener('click',()=>{
  if(editingProductId!==null){id=String(editingProductId)}else{id=$('#prodCode').value.trim()||proximoCodigoManual();if(byId.has(id)){notificar('Já existe um produto com esse código. Informe outro código interno.','error');return}}
  const existing=prods.find(p=>String(p.id)===id);const isManual=existing?!!existing.manual:true;
  const img=$('#prodImageUrl').value.trim()||pendingProductImage||'';
- const product=normalizarProduto({id,d:name,c:Math.max(0,Number($('#prodCost').value)||0),p:Math.max(0,Number($('#prodPrice').value)||0),q:Number($('#prodStock').value)||0,l:$('#prodLocation').value.trim(),b:bar,img,manual:isManual,key:id});
+ const kind=$('#prodKind').value==='service'?'service':'product';const serviceType=$('#prodServiceType').value==='hourly'?'hourly':'fixed';const unit=kind==='service'?($('#prodUnit').value|| (serviceType==='hourly'?'h':'un')):'un';const product=normalizarProduto({id,d:name,c:kind==='service'?0:Math.max(0,Number($('#prodCost').value)||0),p:Math.max(0,Number($('#prodPrice').value)||0),q:kind==='service'?0:(Number($('#prodStock').value)||0),l:$('#prodLocation').value.trim(),b:kind==='service'?[]:bar,img,manual:isManual,key:id,kind,serviceType,unit,attrs:parseCamposPersonalizados($('#prodCustomFields').value)});
  if(existing&&existing.manual){ven_produtosManuais=ven_produtosManuais.filter(x=>String(x.id)!==id);ven_produtosManuais.push(product)}else if(existing){produtosImportados=produtosImportados.map(x=>String(x.id)===id?{...x,...product,manual:false}:x);const cat=store.get('ven_catalogoImportado',null);if(cat&&Array.isArray(cat.products)){cat.products=produtosImportados;store.set('ven_catalogoImportado',cat)}}else ven_produtosManuais.push(product);
- reconstruirProdutos();salvar();fecharCadastroProduto();view='prod';render();notificar(existing?'Produto atualizado.':'Produto cadastrado.');
+ reconstruirProdutos();salvar();fecharCadastroProduto();view='prod';render();notificar(existing?'Cadastro atualizado.':(kind==='service'?'Serviço cadastrado.':'Produto cadastrado.'));
 });
 $('#clearCatalog').addEventListener('click',()=>{fecharMenu();confirmar('Limpar banco de produtos?','Serão apagados os produtos importados e os cadastrados manualmente deste celular. Os orçamentos salvos serão mantidos. Esta ação não pode ser desfeita.',()=>{store.set('ven_catalogoImportado',null);store.set('ven_produtosManuais',[]);store.set('ven_catalogoLimpo',true);produtosImportados=[];ven_produtosManuais=[];reconstruirProdutos();cart=[];salvar();view='prod';$('#q').value='';render();notificar('Banco de produtos limpo. Os orçamentos salvos foram mantidos.','success')})});
 $('#resetAppData').addEventListener('click',()=>{fecharMenu();confirmar('Zerar todos os dados comerciais?', `Esta ação apagará definitivamente:
