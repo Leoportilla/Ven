@@ -57,7 +57,16 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
+        // Tela fixa: sem zoom por pinça, sem botões de zoom, texto não ampliado pelo sistema e sem barra/elástico de rolagem.
+        settings.setSupportZoom(false);
+        settings.setBuiltInZoomControls(false);
+        settings.setDisplayZoomControls(false);
+        settings.setTextZoom(100);
+        webView.setOverScrollMode(android.view.View.OVER_SCROLL_NEVER);
+        webView.setVerticalScrollBarEnabled(false);
+        webView.setHorizontalScrollBarEnabled(false);
         webView.addJavascriptInterface(new AndroidBridge(), "Android");
+        webView.addJavascriptInterface(new BancoBridge(this), "AndroidDB");
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {

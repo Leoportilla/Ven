@@ -2,11 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>VEN — Vendas sem complicação</title>
 <script>
 /* Define o tema salvo antes do primeiro desenho da página: evita flash do tema padrão. */
-(function(){try{var v=JSON.parse(localStorage.getItem('ven_visual')||'{}');var t=v.theme==='dark'?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.dataset.accent=t==='dark'?'orange':'blue';}catch(e){document.documentElement.dataset.theme='light';document.documentElement.dataset.accent='blue';}})();
+(function(){try{var v=JSON.parse((window.AndroidDB&&AndroidDB.obter?AndroidDB.obter('ven_visual'):dbRaw.get('ven_visual'))||'{}');var t=v.theme==='dark'?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.dataset.accent=t==='dark'?'orange':'blue';}catch(e){document.documentElement.dataset.theme='light';document.documentElement.dataset.accent='blue';}})();
 </script>
 <style>
 :root{--bg:#101216;--card:#1a1d22;--tx:#f5f7fa;--mut:#a3acb8;--pri:#ff922b;--pri-tx:#171717;--bd:#303640;--warn:#ff7168;color-scheme:dark}
@@ -124,8 +124,10 @@ header{border-bottom:1px solid #292929}
 :root[data-theme="light"] .drawer-head,:root[data-theme="light"] .menu-action{color:#20252b}
 :root[data-theme="light"] #import-box,:root[data-theme="light"] #company-box,:root[data-theme="light"] #visual-box{background:#fff;color:#20252b;border-color:#d9e0e7}
 :root[data-theme="light"] .filepick,:root[data-theme="light"] .import-note{background:#f5f7f9;color:#303943;border-color:#d9e0e7}
-#settings-overlay{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:16px;background:#000b;backdrop-filter:blur(4px)}
-.settings-box{width:100%;max-width:440px;max-height:90vh;overflow:auto;background:var(--card);border:1px solid #333;border-radius:22px;padding:20px;box-shadow:0 18px 60px #000a}
+#settings-overlay{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;box-sizing:border-box;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));background:#000b;backdrop-filter:blur(4px)}
+.settings-box{width:100%;max-width:440px;max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--card);border:1px solid #333;border-radius:22px;padding:20px;box-shadow:0 18px 60px #000a}
+body.settings-overlay-open #home-nav{display:none!important}
+body.settings-overlay-open{overflow:hidden}
 .settings-box h2{font-size:20px;margin:0 0 6px}
 .settings-box p{font-size:13px;line-height:1.45;color:var(--mut);margin:0 0 14px}
 .settings-field{display:grid;gap:5px;margin:11px 0;font-size:13px;color:var(--mut)}
@@ -642,7 +644,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:.65}
 @media(max-width:520px){
  .pk-backdrop{padding:16px}
  .pk-sheet{width:100%;max-height:calc(100dvh - 48px);border-radius:22px;padding:13px 14px 16px}
- .crm-modal,#import-overlay,#settings-overlay,#product-overlay,#order-save-overlay{padding:16px!important}
+ .crm-modal,#import-overlay,#product-overlay,#order-save-overlay{padding:16px!important}
+ #settings-overlay{padding:calc(10px + env(safe-area-inset-top)) 10px calc(10px + env(safe-area-inset-bottom))!important}
+ .settings-box{max-height:calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding:16px}
 }
 
 /* v1.59 — layout inicial mais leve e consistente */
@@ -665,6 +669,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:.65}
 .hm-tile{border-radius:18px!important;box-shadow:none!important}
 .hm-foot{padding-top:14px!important;opacity:.65}
 @media(max-width:380px){.hm-meta{margin-left:12px!important;margin-right:12px!important}.hm-open-orders,.hm-agenda{margin-left:12px!important;margin-right:12px!important}.hm-agenda-breakdown{font-size:10px!important}}
+/* alpha.2 — tela fixa: sem zoom, sem "elástico" e sem barra de rolagem visível */
+html{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
+html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+input,select,textarea{font-size:16px}
+html,body,*{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none;width:0;height:0}
 </style>
 </head>
 <body>
@@ -717,7 +727,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:.65}
   <div><div class="mg-kicker">AJUSTES</div><h2>Configurações</h2><p>Aparência, catálogo e backup</p></div>
   <button id="menuClose" aria-label="Fechar menu">×</button>
  </div>
-  <div class="mg-title">APARÊNCIA E EMPRESA</div><div class="mg "><button class="menu-action" id="openVisual"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z"/></svg></span><span>Visual<small>Cores e modo claro ou escuro</small></span></button><button class="menu-action" id="openCompany"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span><span>Dados da empresa<small>Nome, CNPJ, endereço e logotipo</small></span></button></div><div class="mg-title">CATÁLOGO DE PRODUTOS</div><div class="mg "><button class="menu-action" id="openImport"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5"/><path d="M5 17v3h14v-3"/></svg></span><span>Importar produtos e códigos de barras<small>Importação de catálogo TXT (recurso legado)</small></span></button></div><div class="mg-title">BACKUP E SEGURANÇA</div><div class="mg "><button class="menu-action" id="exportBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m-5 5 5-5 5 5"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg></span><span>Baixar backup<small>Salvar catálogo, clientes e pedidos em arquivo</small></span></button><button class="menu-action" id="importBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m-5-5 5 5 5-5"/><path d="M4 16v4h16v-4"/></svg></span><span>Restaurar backup<small>Recuperar dados de um arquivo salvo</small></span></button><button class="menu-action" id="backupInfo"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><span>Dados e segurança<small>Onde ficam os orçamentos</small></span></button></div><div class="mg-title">SOBRE O APLICATIVO</div><div class="mg"><button class="menu-action" id="openAbout" type="button"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></svg></span><span>Sobre o VEN<small>Autoria, contato e versão</small></span></button></div><div class="mg-title">ZONA DE RISCO</div><div class="mg mg-danger"><button class="menu-action" id="clearCatalog"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M6 5v14h12V5M9 9v6m6-6v6"/><path d="M9 2h6"/></svg></span><span>Limpar banco de dados<small>Apagar produtos importados e cadastrados</small></span></button><button class="menu-action reset-app-action" id="resetAppData"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 1 1 2 6"/><path d="M4 5v6h6"/></svg></span><span>Zerar dados do aplicativo<small>Apagar produtos, clientes, orçamentos e vendas</small></span></button></div><input type="file" id="backupFile" accept=".json,application/json" hidden>
+  <div class="mg-title">APARÊNCIA E EMPRESA</div><div class="mg "><button class="menu-action" id="openVisual"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z"/></svg></span><span>Visual<small>Cores e modo claro ou escuro</small></span></button><button class="menu-action" id="openCompany"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span><span>Dados da empresa<small>Nome, CNPJ, endereço e logotipo</small></span></button></div><div class="mg-title">BACKUP E SEGURANÇA</div><div class="mg "><button class="menu-action" id="exportBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m-5 5 5-5 5 5"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg></span><span>Baixar backup<small>Salvar catálogo, clientes e pedidos em arquivo</small></span></button><button class="menu-action" id="importBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m-5-5 5 5 5-5"/><path d="M4 16v4h16v-4"/></svg></span><span>Restaurar backup<small>Recuperar dados de um arquivo salvo</small></span></button><button class="menu-action" id="backupInfo"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><span>Dados e segurança<small>Onde ficam os orçamentos</small></span></button></div><div class="mg-title">SOBRE O APLICATIVO</div><div class="mg"><button class="menu-action" id="openAbout" type="button"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></svg></span><span>Sobre o VEN<small>Autoria, contato e versão</small></span></button></div><div class="mg-title">ZONA DE RISCO</div><div class="mg mg-danger"><button class="menu-action" id="clearCatalog"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M6 5v14h12V5M9 9v6m6-6v6"/><path d="M9 2h6"/></svg></span><span>Limpar banco de dados<small>Apagar produtos importados e cadastrados</small></span></button><button class="menu-action reset-app-action" id="resetAppData"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 1 1 2 6"/><path d="M4 5v6h6"/></svg></span><span>Zerar dados do aplicativo<small>Apagar produtos, clientes, orçamentos e vendas</small></span></button></div><input type="file" id="backupFile" accept=".json,application/json" hidden>
  </aside>
 </div>
 <div id="settings-overlay" role="dialog" aria-modal="true" aria-label="Configurações de personalização">
@@ -812,6 +822,53 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:.65}
 </div>
 
 <script>
+/* ===== alpha.2: armazenamento em SQLite (Android) com migração segura do localStorage ===== */
+const dbRaw=(function(){
+ const N=window.AndroidDB;
+ const local={
+  get:k=>localStorage.getItem(k),
+  set:(k,v)=>{localStorage.setItem(k,v);return true},
+  del:k=>localStorage.removeItem(k),
+  tudo:()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);o[k]=localStorage.getItem(k)}return o},
+  substituir:o=>{localStorage.clear();Object.entries(o).forEach(([k,v])=>localStorage.setItem(k,v));return true},
+  modo:'localStorage'
+ };
+ if(!N)return local;
+ let cache;
+ try{cache=JSON.parse(N.carregarTudo())}catch(e){return local}
+ if(!cache||typeof cache!=='object')return local;
+ const aviso=(m,t)=>setTimeout(()=>{try{notificar(m,t)}catch(e){}},900);
+ // Migração única: copia o que existe no localStorage para o banco, confere e só então marca como migrado.
+ if(!cache.__migrado){
+  try{
+   const todo=local.tudo();const antigo={};Object.keys(todo).forEach(k=>{if(k.startsWith('ven_'))antigo[k]=todo[k]});const chaves=Object.keys(antigo);
+   if(chaves.length){
+    try{const d=new Date(),p=n=>String(n).padStart(2,'0');
+     N.salvarBackup('VEN_PRE_MIGRACAO_'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes())+'.json',JSON.stringify({app:'VEN Vendas',format:1,createdAt:d.toISOString(),origin:'pre-migracao',storage:antigo}))}catch(e){}
+    chaves.forEach(k=>{if(!N.gravar(k,antigo[k]))throw new Error('gravar '+k)});
+    const conf=JSON.parse(N.carregarTudo());
+    chaves.forEach(k=>{if(conf[k]!==antigo[k])throw new Error('conferir '+k)});
+    cache=conf;
+   }
+   if(!N.gravar('__migrado',new Date().toISOString()))throw new Error('marca');
+   cache.__migrado='1';
+   if(chaves.length)aviso('Dados migrados para o banco SQLite ('+chaves.length+' grupos). Uma cópia foi salva em Downloads/VEN.','success');
+  }catch(e){
+   aviso('Não foi possível migrar para o banco. Usando o armazenamento antigo; seus dados estão preservados.','error');
+   return local;
+  }
+ }
+ return {
+  get:k=>Object.prototype.hasOwnProperty.call(cache,k)?cache[k]:null,
+  set:(k,v)=>{v=String(v);if(!N.gravar(k,v)){aviso('Falha ao gravar no banco. Verifique o espaço do aparelho.','error');return false}cache[k]=v;return true},
+  del:k=>{N.apagar(k);delete cache[k]},
+  tudo:()=>{const o={};Object.keys(cache).forEach(k=>{if(!k.startsWith('__'))o[k]=cache[k]});return o},
+  substituir:o=>{if(!N.substituirTudo(JSON.stringify(o)))return false;return true},
+  salvarBackup:(nome,json)=>N.salvarBackup(nome,json),
+  modo:'sqlite'
+ };
+})();
+
 
 function notificar(mensagem,tipo='success'){
   const host=document.getElementById('toast-host');
@@ -845,11 +902,11 @@ document.getElementById('confirm-ok').addEventListener('click',()=>fecharConfirm
 document.getElementById('confirm-overlay').addEventListener('click',e=>{if(e.target.id==='confirm-overlay')fecharConfirmacao(false)});
 
 const EMPRESA_PADRAO = {nome:"", fantasia:"", cnpj:"", end:"", telefone:"", email:"", logo:""};
-let EMPRESA = {...EMPRESA_PADRAO, ...(JSON.parse(localStorage.getItem('ven_empresa')||'{}'))};
+let EMPRESA = {...EMPRESA_PADRAO, ...(JSON.parse(dbRaw.get('ven_empresa')||'{}'))};
 let VISUAL = storeSafeVisual();
-function storeSafeVisual(){try{return JSON.parse(localStorage.getItem('ven_visual')||'{"accent":"blue","theme":"light"}')}catch(e){return {accent:'blue',theme:'light'}}}
-function aplicarVisual(){VISUAL.theme=VISUAL.theme==='dark'?'dark':'light';VISUAL.accent=VISUAL.theme==='light'?'blue':'orange';document.documentElement.dataset.accent=VISUAL.accent;document.documentElement.dataset.theme=VISUAL.theme;document.querySelectorAll('[data-theme-choice]').forEach(b=>b.classList.toggle('active',b.dataset.themeChoice===VISUAL.theme));try{localStorage.setItem('ven_visual',JSON.stringify(VISUAL))}catch(e){}try{if(window.Android&&Android.setTema)Android.setTema(getComputedStyle(document.documentElement).getPropertyValue('--chrome').trim()||'#10151b')}catch(e){}}
-function carregarEmpresa(){try{EMPRESA={...EMPRESA_PADRAO,...JSON.parse(localStorage.getItem('ven_empresa')||'{}')}}catch(e){EMPRESA={...EMPRESA_PADRAO}}}
+function storeSafeVisual(){try{return JSON.parse(dbRaw.get('ven_visual')||'{"accent":"blue","theme":"light"}')}catch(e){return {accent:'blue',theme:'light'}}}
+function aplicarVisual(){VISUAL.theme=VISUAL.theme==='dark'?'dark':'light';VISUAL.accent=VISUAL.theme==='light'?'blue':'orange';document.documentElement.dataset.accent=VISUAL.accent;document.documentElement.dataset.theme=VISUAL.theme;document.querySelectorAll('[data-theme-choice]').forEach(b=>b.classList.toggle('active',b.dataset.themeChoice===VISUAL.theme));try{dbRaw.set('ven_visual',JSON.stringify(VISUAL))}catch(e){}try{if(window.Android&&Android.setTema)Android.setTema(getComputedStyle(document.documentElement).getPropertyValue('--chrome').trim()||'#10151b')}catch(e){}}
+function carregarEmpresa(){try{EMPRESA={...EMPRESA_PADRAO,...JSON.parse(dbRaw.get('ven_empresa')||'{}')}}catch(e){EMPRESA={...EMPRESA_PADRAO}}}
 
 
 const $ = s => document.querySelector(s);
@@ -861,8 +918,8 @@ const brl = n => (n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}
 const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const store = {
-  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  get(k,d){try{const v=dbRaw.get(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{dbRaw.set(k,JSON.stringify(v))}catch(e){}}
 };
 
 function normalizaCampo(v){return norm(String(v||'')).replace(/[^a-z0-9]/g,'')}
@@ -1342,23 +1399,29 @@ settingsOverlay.addEventListener('click',e=>{if(e.target===settingsOverlay)fecha
 document.querySelectorAll('[data-theme-choice]').forEach(b=>b.addEventListener('click',()=>{VISUAL.theme=b.dataset.themeChoice;aplicarVisual()}));
 document.getElementById('companyLogoFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(f.size>900000){notificar('Escolha um logotipo com menos de 900 KB.','error');e.target.value='';return}if(!/^image\/(png|jpeg|webp)$/.test(f.type)){notificar('Use uma imagem PNG, JPG ou WebP.','error');e.target.value='';return}const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(f)});const p=document.getElementById('companyLogoPreview');p.src=data;p.style.display='block';p.dataset.pendingLogo=data});
 document.getElementById('removeCompanyLogo').addEventListener('click',()=>{document.getElementById('companyLogoPreview').removeAttribute('src');document.getElementById('companyLogoPreview').style.display='none';document.getElementById('companyLogoPreview').dataset.pendingLogo='';document.getElementById('companyLogoFile').value=''});
-document.getElementById('saveCompany').addEventListener('click',()=>{const preview=document.getElementById('companyLogoPreview');const previous=EMPRESA.logo||'';EMPRESA={nome:document.getElementById('companyName').value.trim()||EMPRESA_PADRAO.nome,fantasia:document.getElementById('companyTrade').value.trim(),cnpj:document.getElementById('companyTax').value.trim(),end:document.getElementById('companyAddress').value.trim(),telefone:document.getElementById('companyPhone').value.trim(),email:document.getElementById('companyEmail').value.trim(),logo:preview.dataset.pendingLogo!==undefined?preview.dataset.pendingLogo:(preview.getAttribute('src')||previous)};try{localStorage.setItem('ven_empresa',JSON.stringify(EMPRESA))}catch(e){notificar('Não foi possível salvar. A imagem pode ser muito grande.','error');return}fecharSettings();notificar('Dados da empresa salvos neste celular.')});
+document.getElementById('saveCompany').addEventListener('click',()=>{const preview=document.getElementById('companyLogoPreview');const previous=EMPRESA.logo||'';EMPRESA={nome:document.getElementById('companyName').value.trim()||EMPRESA_PADRAO.nome,fantasia:document.getElementById('companyTrade').value.trim(),cnpj:document.getElementById('companyTax').value.trim(),end:document.getElementById('companyAddress').value.trim(),telefone:document.getElementById('companyPhone').value.trim(),email:document.getElementById('companyEmail').value.trim(),logo:preview.dataset.pendingLogo!==undefined?preview.dataset.pendingLogo:(preview.getAttribute('src')||previous)};try{if(!dbRaw.set('ven_empresa',JSON.stringify(EMPRESA)))throw new Error('db')}catch(e){notificar('Não foi possível salvar. A imagem pode ser muito grande.','error');return}fecharSettings();notificar('Dados da empresa salvos neste celular.')});
 function abrirMenu(){fecharSettings();drawerBackdrop.style.display='block';document.body.classList.add('settings-menu-open')}
 function fecharMenu(){drawerBackdrop.style.display='none';document.body.classList.remove('settings-menu-open')}
 function abrirImportacao(){fecharMenu();$('#import-status').textContent='';$('#productsFile').value='';$('#codesFile').value='';importOverlay.style.display='flex'}
 function fecharImportacao(){importOverlay.style.display='none'}
 $('#menuClose').addEventListener('click',fecharMenu);
 drawerBackdrop.addEventListener('click',e=>{if(e.target===drawerBackdrop)fecharMenu()});
-$('#openImport').addEventListener('click',abrirImportacao);$('#cancelImport').addEventListener('click',fecharImportacao);
+$('#cancelImport').addEventListener('click',fecharImportacao);
 
 function baixarBackupVen(){
  try{
-  const dados={app:'VEN Vendas',format:1,createdAt:new Date().toISOString(),origin:location.href,storage:{}};
-  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ven_'))dados.storage[k]=localStorage.getItem(k)}
-  const blob=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
+  const dados={app:'VEN Vendas',format:1,createdAt:new Date().toISOString(),origin:dbRaw.modo,storage:{}};
+  const tudo=dbRaw.tudo();Object.keys(tudo).forEach(k=>{if(k.startsWith('ven_'))dados.storage[k]=tudo[k]});
+  const d=new Date(),stamp=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')+'_'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0');
+  const nome='VEN_BACKUP_'+stamp+'.json',json=JSON.stringify(dados,null,2);
+  if(dbRaw.salvarBackup){
+   const onde=dbRaw.salvarBackup(nome,json);
+   if(!onde)throw new Error('sem destino');
+   fecharMenu();notificar('Backup salvo em '+onde+'. Guarde uma cópia fora do celular.','success');return;
+  }
+  const blob=new Blob([json],{type:'application/json'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');
-  const d=new Date(),stamp=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
-  a.href=url;a.download='VEN_BACKUP_'+stamp+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+  a.href=url;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
   fecharMenu();notificar('Backup exportado. Guarde o arquivo em um local seguro.','success');
  }catch(e){notificar('Não foi possível exportar o backup. Verifique o espaço disponível.','error')}
 }
@@ -1371,9 +1434,9 @@ $('#backupFile').addEventListener('change',async e=>{
   if(!data||!['VEN Vendas','IAGER Vendas'].includes(data.app)||data.format!==1||!data.storage||typeof data.storage!=='object')throw new Error('invalid');
   confirmar('Restaurar cópia de segurança?', 'Os dados atuais deste navegador serão substituídos pelos dados do arquivo selecionado. Faça primeiro um backup atual se quiser preservar o que está aqui.',()=>{
    try{
-    localStorage.clear();
     const migrarChaveLegada = k => ({visualIager:'ven_visual',empresaIager:'ven_empresa',clientesIager:'ven_clientes',vendasIager:'ven_vendas',iagerMetasVendas:'ven_metasVendas',catalogoImportado:'ven_catalogoImportado',catalogoLimpo:'ven_catalogoLimpo',produtosManuais:'ven_produtosManuais',cart:'ven_cart',cfg:'ven_cfg',orcamentosSalvos:'ven_orcamentosSalvos',ultimoNumeroOrcamento:'ven_ultimoNumeroOrcamento',ultimoNumeroVenda:'ven_ultimoNumeroVenda'})[k] || k.replace(/^iagerMetaVendas_/,'ven_metaVendas_');
-    Object.entries(data.storage).forEach(([k,v])=>{if(typeof v==='string'){const nk=migrarChaveLegada(k);localStorage.setItem(nk,v)}});
+    const novo={};Object.entries(data.storage).forEach(([k,v])=>{if(typeof v==='string'&&!k.startsWith('__')){novo[migrarChaveLegada(k)]=v}});
+    if(!dbRaw.substituir(novo))throw new Error('restore');
     notificar('Backup restaurado. O aplicativo será recarregado.','success');
     setTimeout(()=>location.reload(),500);
    }catch(err){notificar('Não foi possível restaurar: o armazenamento pode estar cheio.','error')}
@@ -1485,10 +1548,13 @@ function atualizarTecladoVirtual(){
  const altura=keyboardViewport?keyboardViewport.height:window.innerHeight;
  const campoAtivo=!!document.activeElement?.matches('input,textarea');
  if(!campoAtivo)keyboardBaseHeight=altura;
- const ativo=campoAtivo && !!keyboardViewport && keyboardBaseHeight-altura>120;
+ const zoomado=!!keyboardViewport&&Math.abs((keyboardViewport.scale||1)-1)>.01;
+ const ativo=campoAtivo && !zoomado && !!keyboardViewport && keyboardBaseHeight-altura>120;
  if(campoAtivo&&!ativo)keyboardBaseHeight=altura;
  document.body.classList.toggle('keyboard-nav-hidden',ativo);
 }
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
+document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
 document.addEventListener('input',e=>{if(e.target.matches('#q'))document.body.classList.toggle('prod-search-active',!!e.target.value.trim())});
 document.addEventListener('focusin',e=>{if(e.target.matches('input,textarea'))setTimeout(atualizarTecladoVirtual,120)});
 document.addEventListener('focusout',()=>setTimeout(atualizarTecladoVirtual,180));

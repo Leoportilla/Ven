@@ -47,3 +47,8 @@ Os dados de negócio são armazenados localmente pelo aplicativo. A alfa ainda p
 - Política de privacidade publicada, ficha da loja, materiais promocionais e perfis oficiais de redes sociais.
 
 Nenhuma publicação na Google Play ou criação de redes sociais é feita por este pacote.
+
+
+## Versão atual
+
+**VEN 2.0.0-alpha.4** — nova identidade visual azul-claro/laranja/branco; `versionCode` 7. O projeto preserva a camada SQLite e a correção de tela fixa herdadas da alpha.3. A compilação real e o teste no aparelho ainda devem ser confirmados no GitHub Actions.
