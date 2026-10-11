@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1454ad"/><stop offset="1" stop-color="#062b65"/></linearGradient><linearGradient id="o" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9d27"/><stop offset="1" stop-color="#f36b12"/></linearGradient></defs>
+<rect width="512" height="512" rx="108" fill="url(#b)"/>
+<path d="M100 137 L178 137 L266 305 Q274 321 290 321 L329 321 L289 391 L258 391 Q218 391 197 353 Z" fill="url(#o)"/>
+<path d="M212 348 L328 137 L414 137 L303 338 Q286 369 252 369 Q230 369 212 348Z" fill="#fff"/>
+<text x="256" y="455" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="82" font-weight="900" fill="#fff" letter-spacing="4">VEN</text>
+</svg>
