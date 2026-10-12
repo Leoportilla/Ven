@@ -695,6 +695,59 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
 
 
 .field-hint{display:block;margin-top:6px;color:var(--muted,#7b8494);font-size:12px;line-height:1.4}
+
+/* ===== alpha.12 — cadastro moderno, teclado sem faixa azul, pedido enxuto, marca ===== */
+#product-box{display:flex!important;flex-direction:column;padding:0!important;overflow:hidden!important;max-height:min(calc(var(--vvh,100dvh) - 28px),780px)!important}
+.pm-head{padding:20px 20px 6px}
+.pm-head h2{margin:0 0 4px}.pm-head p{margin:0 0 6px!important}
+.pm-body{overflow-y:auto;flex:1 1 auto;min-height:0;padding:6px 20px 16px;overscroll-behavior:contain}
+.pm-foot{display:flex;gap:10px;padding:12px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--bd);background:var(--card)}
+.pm-foot .btn{flex:1;min-height:48px;font-weight:800}
+body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;padding-top:10px!important}
+.seg{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0;padding:4px;border-radius:16px;background:color-mix(in srgb,var(--mut) 14%,var(--card));border:1px solid var(--bd)}
+.seg-thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:12px;background:var(--pri);box-shadow:0 4px 12px color-mix(in srgb,var(--pri) 35%,transparent);transition:transform .22s cubic-bezier(.3,.8,.3,1);pointer-events:none}
+.seg[data-pos="1"] .seg-thumb{transform:translateX(100%)}
+.seg button{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 8px;border:0;border-radius:12px;background:transparent;color:var(--mut);font:inherit;font-size:14px;font-weight:800;cursor:pointer;transition:color .2s}
+.seg button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.seg button.is-active{color:var(--pri-tx,#fff)}
+.seg-label{display:block;font-size:13px;font-weight:700;color:var(--mut);margin:0 0 8px}
+.kind-choice-wrap{margin:4px 0 14px!important}
+/* pedido */
+.ord-more{margin:12px 0;border:1px solid var(--bd);border-radius:16px;background:var(--card);overflow:hidden}
+.ord-more summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;font-weight:750;font-size:14px;cursor:pointer;color:var(--tx)}
+.ord-more summary::-webkit-details-marker{display:none}
+.ord-more summary::after{content:'';width:8px;height:8px;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut);transform:rotate(45deg);transition:transform .2s;margin:-3px 2px 0 0;flex:none}
+.ord-more[open] summary::after{transform:rotate(-135deg);margin-top:3px}
+.ord-more summary small{margin-left:auto;color:var(--pri);font-weight:800}
+.ord-more .ord-more-body{padding:0 16px 16px;display:grid;gap:12px}
+.ord-client{margin:12px 0}
+.ord-client label,.ord-more label{display:block;font-size:13px;font-weight:700;color:var(--mut)}
+.ord-client input,.ord-more input,.ord-more textarea,.ord-more select{display:block;width:100%;margin-top:6px;box-sizing:border-box}
+.ord-totals{margin:12px 0;border-radius:18px;padding:16px 18px;background:linear-gradient(120deg,color-mix(in srgb,var(--pri) 12%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--pri) 25%,var(--bd))}
+.ord-totals .sub{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);margin-bottom:4px}
+.ord-totals .big{display:flex;align-items:baseline;justify-content:space-between;margin-top:8px;padding-top:10px;border-top:1px dashed var(--bd)}
+.ord-totals .big span{font-size:13px;font-weight:700;color:var(--mut)}
+.ord-totals .big strong{font-size:26px;font-weight:900;color:var(--pri)}
+.ord-acts{display:grid;gap:10px;margin-top:14px}
+.ord-acts .btn.big{min-height:54px;font-size:16px;font-weight:850;border-radius:16px}
+.ord-acts .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ord-acts .row2 .btn{min-height:46px;font-weight:750}
+.ord-clear{justify-self:center;margin-top:4px;padding:10px 14px;border:0;background:transparent;color:#e5484d;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.ord-hint{padding:12px 14px;margin:10px 0;border-radius:14px;border:1px dashed var(--bd);color:var(--mut);font-size:13px;text-align:center}
+.quote-product-picker .screen-tools-label{display:none}
+.quote-line-card{padding:12px 14px!important}
+/* desempenho: listas longas só desenham o que está na tela */
+.item,.quote-pick-row,.crm-card{content-visibility:auto;contain-intrinsic-size:auto 92px}
+
+.seg .kind-choice-btn,:root[data-theme="light"] .seg .kind-choice-btn,:root[data-theme="light"] .seg .kind-choice-btn.is-active,.seg .kind-choice-btn.is-active{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:12px!important;padding:12px 8px!important;transform:none!important;flex-direction:row!important}
+.seg .kind-choice-btn{color:var(--mut)}
+.seg .kind-choice-btn.is-active,:root[data-theme="light"] .seg .kind-choice-btn.is-active,.seg .st-btn.is-active{color:#fff!important}
+:root[data-theme="dark"] .seg .kind-choice-btn.is-active,:root[data-theme="dark"] .seg .st-btn.is-active{color:#171717!important}
+.ord-client input,.ord-more input,.ord-more textarea,.ord-more select,.quote-search-row input,.settings-field select,.settings-field textarea,.form select{padding:12px 13px;border:1px solid var(--bd);border-radius:12px;background:color-mix(in srgb,var(--bg) 88%,var(--card));color:var(--tx);font-size:16px;outline:none;box-sizing:border-box}
+:root[data-theme="light"] .ord-client input,:root[data-theme="light"] .ord-more input,:root[data-theme="light"] .ord-more textarea,:root[data-theme="light"] .ord-more select,:root[data-theme="light"] .quote-search-row input,:root[data-theme="light"] .settings-field select,:root[data-theme="light"] .settings-field textarea{background:#f4f7fa;color:#20252b;border-color:#d9e0e7}
+.ord-client input:focus,.ord-more input:focus,.ord-more textarea:focus,.quote-search-row input:focus,.settings-field input:focus,.settings-field textarea:focus{border-color:var(--pri)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--pri) 18%,transparent)!important;outline:none!important}
+.settings-field select,.ord-more select,.form select{-webkit-appearance:none;appearance:none;width:100%;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237b8794' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+.ord-more select{width:84px}
 </style>
 </head>
 <body>
@@ -747,18 +800,10 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
   <div><div class="mg-kicker">AJUSTES</div><h2>Configurações</h2><p>Aparência, catálogo e backup</p></div>
   <button id="menuClose" aria-label="Fechar menu">×</button>
  </div>
-  <div class="mg-title">APARÊNCIA E EMPRESA</div><div class="mg "><button class="menu-action" id="openVisual"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z"/></svg></span><span>Visual<small>Cores e modo claro ou escuro</small></span></button><button class="menu-action" id="openCompany"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span><span>Dados da empresa<small>Nome, CNPJ, endereço e logotipo</small></span></button></div><div class="mg-title">BACKUP E SEGURANÇA</div><div class="mg "><button class="menu-action" id="exportBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m-5 5 5-5 5 5"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg></span><span>Baixar backup<small>Salvar catálogo, clientes e pedidos em arquivo</small></span></button><button class="menu-action" id="importBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m-5-5 5 5 5-5"/><path d="M4 16v4h16v-4"/></svg></span><span>Restaurar backup<small>Recuperar dados de um arquivo salvo</small></span></button><button class="menu-action" id="backupInfo"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><span>Dados e segurança<small>Onde ficam os orçamentos</small></span></button></div><div class="mg-title">ATUALIZAÇÕES</div><div class="mg"><button class="menu-action" id="openUpdates" type="button"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 6l2 2M4 16l2 2a7 7 0 0 0 12.5-3"/></svg></span><span>Atualizações<small>Verificar novas versões do VEN</small></span></button></div><div class="mg-title">SOBRE O APLICATIVO</div><div class="mg"><button class="menu-action" id="openAbout" type="button"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></svg></span><span>Sobre o VEN<small>Autoria, contato e versão</small></span></button></div><div class="mg-title">ZONA DE RISCO</div><div class="mg mg-danger"><button class="menu-action" id="clearCatalog"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M6 5v14h12V5M9 9v6m6-6v6"/><path d="M9 2h6"/></svg></span><span>Limpar banco de dados<small>Apagar produtos importados e cadastrados</small></span></button><button class="menu-action reset-app-action" id="resetAppData"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 1 1 2 6"/><path d="M4 5v6h6"/></svg></span><span>Zerar dados do aplicativo<small>Apagar produtos, clientes, orçamentos e vendas</small></span></button></div><input type="file" id="backupFile" accept=".json,application/json" hidden>
+  <div class="mg-title">APARÊNCIA E EMPRESA</div><div class="mg "><button class="menu-action" id="openVisual"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z"/></svg></span><span>Visual<small>Cores e modo claro ou escuro</small></span></button><button class="menu-action" id="openCompany"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span><span>Dados da empresa<small>Nome, CNPJ, endereço e logotipo</small></span></button></div><div class="mg-title">BACKUP E SEGURANÇA</div><div class="mg "><button class="menu-action" id="exportBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m-5 5 5-5 5 5"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg></span><span>Baixar backup<small>Salvar catálogo, clientes e pedidos em arquivo</small></span></button><button class="menu-action" id="importBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m-5-5 5 5 5-5"/><path d="M4 16v4h16v-4"/></svg></span><span>Restaurar backup<small>Recuperar dados de um arquivo salvo</small></span></button><button class="menu-action" id="backupInfo"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><span>Dados e segurança<small>Onde ficam os orçamentos</small></span></button></div><div class="mg-title">SOBRE O APLICATIVO</div><div class="mg"><button class="menu-action" id="openAbout" type="button"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></svg></span><span>Sobre o VEN<small>Autoria, contato e versão</small></span></button></div><div class="mg-title">ZONA DE RISCO</div><div class="mg mg-danger"><button class="menu-action" id="clearCatalog"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M6 5v14h12V5M9 9v6m6-6v6"/><path d="M9 2h6"/></svg></span><span>Limpar banco de dados<small>Apagar produtos importados e cadastrados</small></span></button><button class="menu-action reset-app-action" id="resetAppData"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 1 1 2 6"/><path d="M4 5v6h6"/></svg></span><span>Zerar dados do aplicativo<small>Apagar produtos, clientes, orçamentos e vendas</small></span></button></div><input type="file" id="backupFile" accept=".json,application/json" hidden>
  </aside>
 </div>
 <div id="settings-overlay" role="dialog" aria-modal="true" aria-label="Configurações de personalização">
- <section id="updates-box" class="settings-box" style="display:none">
-  <h2>Atualizações do VEN</h2>
-  <p>O VEN pode consultar os lançamentos publicados no GitHub. Quando encontrar uma versão nova, você poderá abrir o download e confirmar a instalação pelo Android.</p>
-  <label class="settings-field" style="display:flex;align-items:center;gap:12px"><input id="autoUpdatesToggle" type="checkbox" style="width:22px;height:22px;flex:0 0 auto"> Verificar atualizações automaticamente</label>
-  <div class="settings-note">A verificação automática não instala silenciosamente. O Android solicitará confirmação para instalar. O repositório de atualizações precisa estar público e as versões devem usar a mesma assinatura digital.</div>
-  <p id="updateStatus" role="status" aria-live="polite">Pronto para verificar.</p>
-  <div class="settings-actions"><button class="btn" id="closeUpdates" type="button">Fechar</button><button class="btn" id="checkUpdatesNow" type="button">Verificar agora</button><button class="btn pri" id="downloadUpdate" type="button" style="display:none">Abrir atualização</button></div>
- </section>
  <section id="visual-box" class="settings-box" style="display:none">
   <h2>Visual do aplicativo</h2><p>Escolha a cor de destaque e a aparência. A preferência fica salva neste celular.</p>
   <div class="theme-options">
@@ -831,16 +876,15 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
 </div>
 <div id="product-overlay" role="dialog" aria-modal="true" aria-labelledby="productTitle">
  <section id="product-box">
-  <h2 id="productTitle">Cadastrar produto</h2><p>Cadastre produtos, materiais, serviços com preço fixo ou mão de obra por hora. Adicione campos personalizados para o seu tipo de negócio.</p>
+  <div class="pm-head"><h2 id="productTitle">Cadastrar produto</h2><p id="productSub">Preencha os dados abaixo. Campos com preço e nome são obrigatórios.</p></div>
+  <div class="pm-body">
   <div class="product-form-grid">
-   <div class="settings-field full kind-choice-wrap"><span class="kind-choice-label">O que você vai cadastrar?</span><div class="kind-choice" role="group" aria-label="Tipo de cadastro"><button type="button" class="kind-choice-btn is-active" data-kind="product" aria-pressed="true"><span class="kind-choice-icon" aria-hidden="true">▦</span><span><strong>Produto</strong><small>Itens e materiais</small></span></button><button type="button" class="kind-choice-btn" data-kind="service" aria-pressed="false"><span class="kind-choice-icon" aria-hidden="true">✳</span><span><strong>Serviço</strong><small>Mão de obra e horas</small></span></button></div><select id="prodKind" class="kind-choice-native" aria-hidden="true" tabindex="-1"><option value="product">Produto / material</option><option value="service">Serviço / mão de obra</option></select></div>
+   <div class="settings-field full kind-choice-wrap"><div class="seg" id="kindSeg" data-pos="0" role="group" aria-label="Tipo de cadastro"><i class="seg-thumb"></i><button type="button" class="kind-choice-btn is-active" data-kind="product" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg><span>Produto</span></button><button type="button" class="kind-choice-btn" data-kind="service" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg><span>Serviço</span></button></div><select id="prodKind" class="kind-choice-native" aria-hidden="true" tabindex="-1"><option value="product">Produto / material</option><option value="service">Serviço / mão de obra</option></select></div>
    <label class="settings-field full">Nome <input id="prodName" maxlength="180" placeholder="Ex.: Cabo elétrico, instalação, limpeza" required></label>
    <div id="serviceOptions" class="product-form-grid full" style="display:none">
-    <label class="settings-field">Tipo de serviço
-     <select id="prodServiceType"><option value="fixed">Mão de obra com valor fixo</option><option value="hourly">Mão de obra por hora trabalhada</option></select>
-    </label>
-    <label class="settings-field">Unidade de cobrança
-     <select id="prodUnit"><option value="un">Unidade / serviço</option><option value="h">Hora</option><option value="dia">Diária</option><option value="m2">m²</option><option value="m">Metro</option><option value="km">Quilômetro</option></select>
+    <div class="settings-field full"><span class="seg-label">Como você cobra?</span><div class="seg" id="stSeg" data-pos="0" role="group" aria-label="Forma de cobrança"><i class="seg-thumb"></i><button type="button" class="st-btn is-active" data-st="fixed"><span>Valor fixo</span></button><button type="button" class="st-btn" data-st="hourly"><span>Por hora</span></button></div><select id="prodServiceType" class="kind-choice-native" aria-hidden="true" tabindex="-1"><option value="fixed">Mão de obra com valor fixo</option><option value="hourly">Mão de obra por hora trabalhada</option></select></div>
+    <label class="settings-field full" id="unitField">Unidade de cobrança
+     <select id="prodUnit"><option value="un">Unidade / serviço</option><option value="dia">Diária</option><option value="m2">m²</option><option value="m">Metro</option><option value="km">Quilômetro</option><option value="h">Hora</option></select>
     </label>
    </div>
    <label class="settings-field">Código interno<input id="prodCode" maxlength="60" placeholder="Gerado automaticamente (pode alterar)" autocomplete="off"><small class="field-hint">Gerado automaticamente. Você pode editar antes de salvar.</small></label>
@@ -855,7 +899,8 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
   </div>
   <img id="productImagePreview" class="product-image-preview" alt="Prévia da imagem do produto">
   <div class="product-modal-actions"><button class="btn" id="removeProductImage" type="button">Remover imagem</button></div>
-  <div class="product-modal-actions"><button class="btn" id="cancelProduct" type="button">Cancelar</button><button class="btn pri" id="saveProduct" type="button">Salvar produto</button></div>
+  </div>
+  <div class="pm-foot"><button class="btn" id="cancelProduct" type="button">Cancelar</button><button class="btn pri" id="saveProduct" type="button">Salvar produto</button></div>
  </section>
 </div>
 
@@ -1207,26 +1252,32 @@ function renderProdutos(){
   const title=$('#main .screen-head'); if(title && persistentSearchRow) title.insertAdjacentElement('afterend',persistentSearchRow);
 }
 
-function renderOrc(){
+function resultadosOrcHtml(){
   const termo=norm($('#quoteProductSearch')?.value||'');
-  const produtosParaOrc=prods.filter(p=>!termo||p.s.includes(termo)).slice(0,30);
-  let h=`<section class="screen-head"><div class="screen-kicker">PEDIDOS</div><div class="screen-title-row"><div><h2 class="screen-title">${editingOrderNumber!==null?'Editar pedido #'+String(editingOrderNumber).padStart(4,'0'):'Novo pedido'}</h2><p class="screen-desc">Adicione produtos, revise quantidades e escolha como registrar o pedido.</p></div><span class="screen-count">${cart.length}</span></div></section>
-  <section class="quote-product-picker"><label class="screen-tools-label" for="quoteProductSearch">Adicionar produtos ao orçamento</label><div class="quote-search-row"><input id="quoteProductSearch" type="search" placeholder="Buscar produto por nome, código ou barras…" value="${esc($('#quoteProductSearch')?.value||'')}" autocomplete="off"><button type="button" id="quoteScan" class="quote-scan-btn" aria-label="Ler código de barras" title="Ler código de barras">▦</button></div>
-  <div class="quote-product-results">${produtosParaOrc.length?produtosParaOrc.map(p=>`<div class="quote-pick-row"><div class="info"><div class="nm">${esc(p.d)}</div><div class="meta">Cód. ${esc(p.id)}${p.b&&p.b.length?' · Barras: '+esc(p.b.join(', ')):''}</div></div><strong class="pr">${brl(p.p)}${p.kind==='service'&&p.serviceType==='hourly'?' / hora':(p.kind==='service'&&p.unit&&p.unit!=='un'?' / '+esc(p.unit):'')}</strong><button type="button" class="add" data-add="${esc(p.id)}" aria-label="Adicionar ${esc(p.d)}">+</button></div>`).join(''):(prods.length?'Nenhum produto corresponde à busca.':'Seu catálogo está vazio. Cadastre produtos, materiais ou serviços para começar.')}</div></section>`;
-  if(!cart.length){ h+='<div class="empty">Seu orçamento está vazio.<br>Pesquise um produto acima e toque em <b>+</b> para adicioná-lo.</div>'; $('#main').innerHTML=h; const t0=$('#main .screen-head'); if(t0 && persistentTabs) t0.insertAdjacentElement('afterend',persistentTabs); return; }
-  h+=`<div class="screen-tools"><span class="screen-tools-label">${cart.reduce((a,i)=>a+(Number(i.q)||0),0).toLocaleString('pt-BR')} unidade(s)/hora(s) no orçamento</span><span class="screen-tools-label">${cart.length} item(ns)</span></div>`;
+  if(!termo&&cart.length)return `<div class="ord-hint">Digite o nome, o código ou leia o código de barras para adicionar mais itens.</div>`;
+  const todos=prods.filter(p=>!termo||p.s.includes(termo));const lista=todos.slice(0,termo?20:8);
+  if(!lista.length)return prods.length?'<div class="ord-hint">Nenhum item corresponde à busca.</div>':'<div class="ord-hint">Seu catálogo está vazio. Cadastre produtos ou serviços para começar.</div>';
+  return lista.map(p=>`<div class="quote-pick-row"><div class="info"><div class="nm">${p.kind==='service'?'🛠 ':''}${esc(p.d)}</div><div class="meta">${p.kind==='service'?'Serviço':'Cód. '+esc(p.id)}${p.b&&p.b.length?' · '+esc(p.b[0]):''}</div></div><strong class="pr">${brl(p.p)}${p.kind==='service'&&p.serviceType==='hourly'?' / h':(p.kind==='service'&&p.unit&&p.unit!=='un'?' / '+esc(p.unit):'')}</strong><button type="button" class="add" data-add="${esc(p.id)}" aria-label="Adicionar ${esc(p.d)}">+</button></div>`).join('')+(todos.length>lista.length?`<div class="ord-hint">Mostrando ${lista.length} de ${todos.length}. Digite para refinar.</div>`:'');
+}
+function renderOrc(){
+  let h=`<section class="screen-head"><div class="screen-kicker">PEDIDOS</div><div class="screen-title-row"><div><h2 class="screen-title">${editingOrderNumber!==null?'Editar pedido #'+String(editingOrderNumber).padStart(4,'0'):'Novo pedido'}</h2><p class="screen-desc">Adicione itens, ajuste e grave.</p></div><span class="screen-count">${cart.length}</span></div></section>
+  <section class="quote-product-picker"><div class="quote-search-row"><input id="quoteProductSearch" type="search" placeholder="Buscar item por nome, código ou barras…" value="${esc($('#quoteProductSearch')?.value||'')}" autocomplete="off" aria-label="Buscar item"><button type="button" id="quoteScan" class="quote-scan-btn" aria-label="Ler código de barras" title="Ler código de barras">▦</button></div>
+  <div class="quote-product-results">${resultadosOrcHtml()}</div></section>`;
+  if(!cart.length){ h+='<div class="empty">Seu orçamento está vazio.<br>Pesquise um item acima e toque em <b>+</b> para adicioná-lo.</div>'; $('#main').innerHTML=h; const t0=$('#main .screen-head'); if(t0 && persistentTabs) t0.insertAdjacentElement('afterend',persistentTabs); return; }
   cart.forEach((i,ix)=>{
-    h += `<div class="quote-line-card"><div class="quote-line-top"><div class="nm">${esc(nomeItem(i))}${byId.get(String(i.id))?.kind==='service'?' · '+(byId.get(String(i.id))?.serviceType==='hourly'?'mão de obra por hora':'serviço'):''}</div><button class="quote-remove" data-del="${ix}" aria-label="Remover item">×</button></div>
-      <div class="qline"><button data-m="${ix}" aria-label="Diminuir quantidade">−</button><input type="number" inputmode="decimal" min="0" step="any" value="${i.q}" data-q="${ix}" aria-label="${byId.get(String(i.id))?.kind==='service'&&byId.get(String(i.id))?.serviceType==='hourly'?'Horas trabalhadas':'Quantidade'}">
+    const pr=byId.get(String(i.id)),svc=pr?.kind==='service',hr=svc&&pr?.serviceType==='hourly';
+    h += `<div class="quote-line-card"><div class="quote-line-top"><div class="nm">${svc?'🛠 ':''}${esc(nomeItem(i))}${svc?' · '+(hr?'por hora':'serviço'):''}</div><button class="quote-remove" data-del="${ix}" aria-label="Remover item">×</button></div>
+      <div class="qline"><button data-m="${ix}" aria-label="Diminuir quantidade">−</button><input type="number" inputmode="decimal" min="0" step="any" value="${i.q}" data-q="${ix}" aria-label="${hr?'Horas trabalhadas':'Quantidade'}">
         <button data-p="${ix}" aria-label="Aumentar quantidade">+</button><span class="meta">×</span><input class="pu" type="number" inputmode="decimal" min="0" step="0.01" value="${i.p}" data-pu="${ix}" aria-label="Preço unitário"><span class="tot">${brl(i.q*i.p)}</span></div></div>`;
   });
   const t=totais();
-  h += `<div class="form"><label>Cliente<input id="cli" value="${esc(cfg.cli)}" placeholder="Nome do cliente"><small style="color:var(--mut)">Digite um nome ou selecione um cliente cadastrado.</small></label>
-    <label>Desconto<div style="display:flex;gap:8px"><input id="desc" type="number" inputmode="decimal" min="0" step="any" value="${esc(cfg.desc)}" style="flex:1"><select id="tipo"><option value="%"${cfg.tipo==='%'?' selected':''}>%</option><option value="R$"${cfg.tipo==='R$'?' selected':''}>R$</option></select></div></label>
-    <label>Observações<textarea id="obs" rows="2" placeholder="Prazo, condições ou observações">${esc(cfg.obs)}</textarea></label></div>
-  <div class="form"><div class="row"><span>Subtotal</span><span id="rSub">${brl(t.sub)}</span></div><div class="row"><span>Desconto</span><span id="rDesc">− ${brl(t.d)}</span></div></div>
-  <div class="quote-total-strip"><div><span>Total do orçamento</span><strong id="rTot">${brl(t.total)}</strong></div><div class="quote-total-icon">R$</div></div>
-  <div class="acts"><button class="btn pri" id="saveQuote">${editingOrderNumber!==null?'Salvar alterações':'Gravar pedido'}</button><button class="btn" id="wa">Enviar no WhatsApp</button><button class="btn" id="pdf">Imprimir / PDF</button><button class="btn dng wide" id="limpa">Limpar orçamento</button></div>`;
+  const descTxt=Number(cfg.desc)>0?(cfg.tipo==='%'?cfg.desc+'%':brl(Number(cfg.desc))):'';
+  h += `<div class="ord-client"><label>Cliente<input id="cli" value="${esc(cfg.cli)}" placeholder="Nome do cliente (opcional)" autocomplete="off"></label></div>
+  <details class="ord-more"${(Number(cfg.desc)>0||(cfg.obs&&cfg.obs!=='Orçamento válido por 5 dias.'))?' open':''}><summary>Desconto e observações<small>${esc(descTxt)}</small></summary><div class="ord-more-body">
+    <label>Desconto<div style="display:flex;gap:8px;margin-top:6px"><input id="desc" type="number" inputmode="decimal" min="0" step="any" value="${esc(cfg.desc)}" style="flex:1;margin:0"><select id="tipo" style="width:84px;margin:0"><option value="%"${cfg.tipo==='%'?' selected':''}>%</option><option value="R$"${cfg.tipo==='R$'?' selected':''}>R$</option></select></div></label>
+    <label>Observações<textarea id="obs" rows="2" placeholder="Prazo, condições ou observações">${esc(cfg.obs)}</textarea></label></div></details>
+  <div class="ord-totals"><div class="sub"><span>Subtotal</span><span id="rSub">${brl(t.sub)}</span></div><div class="sub"><span>Desconto</span><span id="rDesc">− ${brl(t.d)}</span></div><div class="big"><span>Total</span><strong id="rTot">${brl(t.total)}</strong></div></div>
+  <div class="ord-acts"><button class="btn pri big" id="saveQuote">${editingOrderNumber!==null?'Salvar alterações':'Gravar pedido'}</button><div class="row2"><button class="btn" id="wa">WhatsApp</button><button class="btn" id="pdf">Imprimir / PDF</button></div><button class="ord-clear" id="limpa">Limpar orçamento</button></div>`;
   $('#main').innerHTML=h;
   const title=$('#main .screen-head'); if(title && persistentTabs) title.insertAdjacentElement('afterend',persistentTabs);
 }
@@ -1257,7 +1308,7 @@ function renderHome(){
   ['saved','clip','Pedidos','blue'],
   ['customers','users','Clientes','purple'],
   ['prod','box','Produtos','orange'],
-  ['newproduct','plus','Cadastrar produto','blue'],
+  ['newproduct','plus','Produto ou serviço','blue'],
   ['reports','chart','Relatório','green'],
  ];
  $('#main').innerHTML=`<section class="hm">
@@ -1381,7 +1432,8 @@ document.addEventListener('input',e=>{
   else if(t.id==='obs'){cfg.obs=t.value;salvar()}
   else if(t.id==='q'){
     limite=50;
-    const valor=t.value, inicio=t.selectionStart, fim=t.selectionEnd;
+    clearTimeout(window.__tProd);const valor=t.value, inicio=t.selectionStart, fim=t.selectionEnd;
+    window.__tProd=setTimeout(()=>{
     renderProdutos();
     const buscaAtual=$('#q');
     if(buscaAtual){
@@ -1390,8 +1442,9 @@ document.addEventListener('input',e=>{
       if(buscaAtual.value!==valor)buscaAtual.value=valor;
       try{buscaAtual.focus({preventScroll:true});buscAtualSelection(buscaAtual,inicio,fim)}catch(err){try{buscaAtual.focus();buscaAtual.setSelectionRange(inicio,fim)}catch(_) {}}
     }
+    },90);
   }
-  else if(t.id==='quoteProductSearch'){const pos=t.selectionStart;renderOrc();const next=$('#quoteProductSearch');if(next){next.focus();next.setSelectionRange(pos,pos)}}
+  else if(t.id==='quoteProductSearch'){clearTimeout(window.__tOrc);window.__tOrc=setTimeout(()=>{const r=$('.quote-product-results');if(r)r.innerHTML=resultadosOrcHtml()},80)}
 });
 function buscAtualSelection(el,inicio,fim){
   if(!el)return;
@@ -1426,22 +1479,12 @@ function barcodeLido(codigo){
 // Menu principal e importação assistida do catálogo TXT
 const drawerBackdrop=$('#drawerBackdrop'), importOverlay=$('#import-overlay');
 const settingsOverlay=document.getElementById('settings-overlay');
-function fecharSettings(){document.body.classList.remove('settings-overlay-open');settingsOverlay.style.display='none';document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none';document.getElementById('updates-box').style.display='none'}
-function abrirVisual(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='block';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none';document.getElementById('updates-box').style.display='none';settingsOverlay.style.display='flex';aplicarVisual()}
+function fecharSettings(){document.body.classList.remove('settings-overlay-open');settingsOverlay.style.display='none';document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none'}
+function abrirVisual(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='block';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none';settingsOverlay.style.display='flex';aplicarVisual()}
 function preencherEmpresaForm(){carregarEmpresa();document.getElementById('companyName').value=EMPRESA.nome||'';document.getElementById('companyTrade').value=EMPRESA.fantasia||'';document.getElementById('companyTax').value=EMPRESA.cnpj||'';document.getElementById('companyAddress').value=EMPRESA.end||'';document.getElementById('companyPhone').value=EMPRESA.telefone||'';document.getElementById('companyEmail').value=EMPRESA.email||'';const p=document.getElementById('companyLogoPreview');if(EMPRESA.logo){p.src=EMPRESA.logo;p.style.display='block'}else{p.removeAttribute('src');p.style.display='none'}document.getElementById('companyLogoFile').value=''}
-function abrirEmpresa(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='block';document.getElementById('about-box').style.display='none';document.getElementById('updates-box').style.display='none';preencherEmpresaForm();settingsOverlay.style.display='flex'}
-function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';document.getElementById('updates-box').style.display='none';settingsOverlay.style.display='flex'}
+function abrirEmpresa(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='block';document.getElementById('about-box').style.display='none';preencherEmpresaForm();settingsOverlay.style.display='flex'}
+function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex'}
 document.getElementById('openVisual').addEventListener('click',abrirVisual);document.getElementById('openCompany').addEventListener('click',abrirEmpresa);document.getElementById('openAbout').addEventListener('click',abrirSobre);document.getElementById('closeAbout').addEventListener('click',fecharSettings);
-const autoUpdatesToggle=document.getElementById('autoUpdatesToggle');
-let venUpdateDownloadUrl='';
-function updateStatus(text){document.getElementById('updateStatus').textContent=text}
-function abrirAtualizacoes(){fecharMenu();document.body.classList.add('settings-overlay-open');for(const id of ['visual-box','company-box','about-box'])document.getElementById(id).style.display='none';document.getElementById('updates-box').style.display='block';settingsOverlay.style.display='flex';autoUpdatesToggle.checked=localStorage.getItem('ven_auto_updates')!=='false';document.getElementById('downloadUpdate').style.display='none';updateStatus('Pronto para verificar.');}
-document.getElementById('openUpdates').addEventListener('click',abrirAtualizacoes);document.getElementById('closeUpdates').addEventListener('click',fecharSettings);
-autoUpdatesToggle.addEventListener('change',()=>{localStorage.setItem('ven_auto_updates',autoUpdatesToggle.checked?'true':'false');if(window.Android&&Android.setAutoUpdateEnabled)Android.setAutoUpdateEnabled(autoUpdatesToggle.checked);updateStatus(autoUpdatesToggle.checked?'Verificação automática ativada.':'Verificação automática desativada.');});
-document.getElementById('checkUpdatesNow').addEventListener('click',()=>{document.getElementById('downloadUpdate').style.display='none';updateStatus('Consultando lançamentos do GitHub...');if(window.Android&&Android.checkForUpdates){Android.checkForUpdates()}else{updateStatus('No navegador do PC, a consulta nativa não está disponível. Teste pelo APK Android.')}});
-document.getElementById('downloadUpdate').addEventListener('click',()=>{if(!venUpdateDownloadUrl)return;if(window.Android&&Android.openUpdateUrl)Android.openUpdateUrl(venUpdateDownloadUrl);else window.open(venUpdateDownloadUrl,'_blank','noopener')});
-window.venUpdateResult=function(result){try{if(typeof result==='string')result=JSON.parse(result);if(result.available){venUpdateDownloadUrl=result.url||result.releaseUrl||'';updateStatus('Nova versão disponível: '+(result.versionName||'versão mais recente')+'. Abra o download para instalar.');document.getElementById('downloadUpdate').style.display=venUpdateDownloadUrl?'inline-flex':'none';}else{venUpdateDownloadUrl='';document.getElementById('downloadUpdate').style.display='none';updateStatus(result.message||'Seu VEN já está atualizado.')}}catch(e){updateStatus('Não foi possível interpretar a resposta de atualização.')}};
-
 document.getElementById('closeVisual').addEventListener('click',fecharSettings);document.getElementById('cancelCompany').addEventListener('click',fecharSettings);
 settingsOverlay.addEventListener('click',e=>{if(e.target===settingsOverlay)fecharSettings()});
 document.querySelectorAll('[data-theme-choice]').forEach(b=>b.addEventListener('click',()=>{VISUAL.theme=b.dataset.themeChoice;aplicarVisual()}));
@@ -1542,7 +1585,17 @@ function abrirCadastroProduto(id=null){
  const preview=$('#productImagePreview');const img=p?.img||'';if(img){preview.src=img;preview.style.display='block';pendingProductImage=img}else{preview.removeAttribute('src');preview.style.display='none'}
  $('#prodImageFile').value='';productOverlay.style.display='flex';
 }
-function atualizarCamposCadastro(){const service=$('#prodKind').value==='service';const hourly=$('#prodServiceType').value==='hourly';$('#serviceOptions').style.display=service?'grid':'none';$('#barcodeField').style.display=service?'none':'';$('#stockField').style.display=service?'none':'';$('#costField').style.display=service?'none':'';$('#prodUnit').value=service?(hourly?'h':($('#prodUnit').value==='h'?'un':$('#prodUnit').value)):'un';$('#prodPriceLabel').textContent=service?'Valor cobrado (R$)':'Preço de venda (R$)'}
+function atualizarCamposCadastro(){const service=$('#prodKind').value==='service';const hourly=$('#prodServiceType').value==='hourly';$('#serviceOptions').style.display=service?'grid':'none';$('#barcodeField').style.display=service?'none':'';$('#stockField').style.display=service?'none':'';$('#costField').style.display=service?'none':'';$('#prodUnit').value=service?(hourly?'h':($('#prodUnit').value==='h'?'un':$('#prodUnit').value)):'un';$('#prodPriceLabel').textContent=service?(hourly?'Valor por hora (R$)':'Valor cobrado (R$)'):'Preço de venda (R$)';
+ $('#unitField').style.display=service&&!hourly?'':'none';
+ const ed=editingProductId!==null,nm=service?'serviço':'produto';
+ $('#productTitle').textContent=(ed?'Editar ':'Cadastrar ')+nm;
+ $('#saveProduct').textContent=ed?'Salvar alterações':'Salvar '+nm;
+ $('#productSub').textContent=service?'Mão de obra, instalação, visita técnica ou qualquer serviço que você cobra.':'Itens, materiais e mercadorias do seu estoque.';
+ $('#prodName').placeholder=service?'Ex.: Instalação de tomada, visita técnica':'Ex.: Cabo flexível 2,5 mm';
+ $('#kindSeg').dataset.pos=service?'1':'0';$('#stSeg').dataset.pos=hourly?'1':'0';
+ document.querySelectorAll('.st-btn').forEach(b=>b.classList.toggle('is-active',b.dataset.st===(hourly?'hourly':'fixed')));
+ document.querySelectorAll('.kind-choice-btn').forEach(b=>{const a=b.dataset.kind===(service?'service':'product');b.classList.toggle('is-active',a);b.setAttribute('aria-pressed',a?'true':'false')})}
+document.querySelectorAll('.st-btn').forEach(b=>b.addEventListener('click',()=>{$('#prodServiceType').value=b.dataset.st;$('#prodServiceType').dispatchEvent(new Event('change'))}));
 $('#prodKind').addEventListener('change',atualizarCamposCadastro); document.querySelectorAll('.kind-choice-btn').forEach(btn=>btn.addEventListener('click',()=>{const kind=btn.dataset.kind;$('#prodKind').value=kind;document.querySelectorAll('.kind-choice-btn').forEach(b=>{const active=b===btn;b.classList.toggle('is-active',active);b.setAttribute('aria-pressed',active?'true':'false')});atualizarCamposCadastro()})); function sincronizarSeletorTipo(){document.querySelectorAll('.kind-choice-btn').forEach(b=>{const active=b.dataset.kind===$('#prodKind').value;b.classList.toggle('is-active',active);b.setAttribute('aria-pressed',active?'true':'false')})}$('#prodServiceType').addEventListener('change',()=>{if($('#prodServiceType').value==='hourly')$('#prodUnit').value='h';else if($('#prodUnit').value==='h')$('#prodUnit').value='un';atualizarCamposCadastro()});
 function parseCamposPersonalizados(text){const out={};String(text||'').split(';').forEach(part=>{const i=part.indexOf('=');if(i>0){const k=part.slice(0,i).trim().slice(0,50),v=part.slice(i+1).trim().slice(0,150);if(k&&v)out[k]=v}});return out}
 function fecharCadastroProduto(){productOverlay.style.display='none';editingProductId=null;pendingProductImage=''}
@@ -1554,7 +1607,7 @@ $('#prodImageUrl').addEventListener('input',()=>{const url=$('#prodImageUrl').va
 $('#prodImageFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(!/^image\/(png|jpeg|webp)$/.test(f.type)){notificar('Escolha uma imagem PNG, JPG ou WebP.','error');e.target.value='';return}try{const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(f)});const im=new Image();im.onload=()=>{const scale=Math.min(1,600/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*scale));c.height=Math.max(1,Math.round(im.height*scale));c.getContext('2d').drawImage(im,0,0,c.width,c.height);pendingProductImage=c.toDataURL('image/jpeg',0.78);$('#productImagePreview').src=pendingProductImage;$('#productImagePreview').style.display='block';$('#prodImageUrl').value='';};im.onerror=()=>{pendingProductImage=data;$('#productImagePreview').src=data;$('#productImagePreview').style.display='block'};im.src=data}catch(err){notificar('Não foi possível ler a imagem.','error')}});
 $('#removeProductImage').addEventListener('click',()=>{pendingProductImage='';$('#prodImageUrl').value='';$('#prodImageFile').value='';$('#productImagePreview').removeAttribute('src');$('#productImagePreview').style.display='none'});
 $('#saveProduct').addEventListener('click',()=>{
- const name=$('#prodName').value.trim();if(!name){notificar('Informe o nome do produto.','error');$('#prodName').focus();return}
+ const name=$('#prodName').value.trim();if(!name){notificar($('#prodKind').value==='service'?'Informe o nome do serviço.':'Informe o nome do produto.','error');$('#prodName').focus();return}
  const bar=$('#prodBarcode').value.split(/[;,\s]+/).map(x=>x.trim()).filter(Boolean);
  let id;
  if(editingProductId!==null){id=String(editingProductId)}else{id=$('#prodCode').value.trim()||proximoCodigoManual();if(byId.has(id)){notificar('Já existe um produto com esse código. Informe outro código interno.','error');return}}
@@ -1597,19 +1650,23 @@ document.addEventListener('click',e=>{
 // Oculta apenas a navegação inferior quando o teclado virtual reduz a área visível.
 const keyboardViewport=window.visualViewport;
 let keyboardBaseHeight=keyboardViewport?keyboardViewport.height:window.innerHeight;
+// Só aparelhos de toque (celular/tablet) escondem a barra inferior ao digitar; no computador ela fica sempre visível.
+const TELA_TOQUE=(window.matchMedia&&matchMedia('(pointer:coarse)').matches)||/Android|iPhone|iPad/i.test(navigator.userAgent);
 function atualizarTecladoVirtual(){
  const altura=keyboardViewport?keyboardViewport.height:window.innerHeight;
  const campoAtivo=!!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
  if(!campoAtivo)keyboardBaseHeight=altura;
  const zoomado=!!keyboardViewport&&Math.abs((keyboardViewport.scale||1)-1)>.01;
  // Oculta a navegação no próprio foco para acompanhar a animação do teclado sem deixar uma faixa azul aparecendo.
- const ativo=campoAtivo && !zoomado;
+ const ativo=TELA_TOQUE && campoAtivo && !zoomado;
  if(campoAtivo&&!ativo)keyboardBaseHeight=altura;
  document.body.classList.toggle('keyboard-nav-hidden',ativo);
  document.documentElement.classList.toggle('keyboard-nav-hidden',ativo);
 }
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
 document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
+const _limpaNav=()=>{document.body.classList.remove('keyboard-nav-hidden');document.documentElement.classList.remove('keyboard-nav-hidden')};
+window.addEventListener('blur',_limpaNav);document.addEventListener('visibilitychange',()=>{if(document.hidden)_limpaNav()});
 document.addEventListener('input',e=>{if(e.target.matches('#q'))document.body.classList.toggle('prod-search-active',!!e.target.value.trim())});
 document.addEventListener('focusin',e=>{if(e.target.matches('input,textarea,select,[contenteditable="true"]')){atualizarTecladoVirtual();requestAnimationFrame(atualizarTecladoVirtual)}});
 document.addEventListener('focusout',()=>setTimeout(atualizarTecladoVirtual,80));
@@ -1760,6 +1817,19 @@ document.addEventListener('click',e=>{
 function destinoNativo(){try{if(window.Android&&Android.destinoInicial){const d=Android.destinoInicial();if(d==='agenda'){irParaView('agenda',false)}}}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){destinoNativo();sincronizarAvisos()}});
 setTimeout(()=>{sincronizarAvisos();destinoNativo();if(view==='home')avisarVencidasAoAbrir()},1200);
+
+/* alpha.12 — teclado: pinta a barra inferior do Android com a cor da tela enquanto digita (sem faixa azul) e mede a área visível */
+(function(){
+ let ligado=false,t=null;
+ const cor=()=>{const c=getComputedStyle(document.body).backgroundColor.match(/\d+/g)||[243,247,251];return '#'+c.slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('')};
+ function barra(on){if(on===ligado)return;ligado=on;try{if(window.Android&&Android.setBarraTeclado)Android.setBarraTeclado(on,cor())}catch(e){}}
+ const campo=el=>!!el&&el.matches&&el.matches('input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=date]),textarea');
+ document.addEventListener('focusin',e=>{clearTimeout(t);if(campo(e.target)){barra(true);setTimeout(()=>{try{if(e.target.closest('#product-box,.crm-box,#sale-overlay'))e.target.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}},320)}});
+ document.addEventListener('focusout',()=>{clearTimeout(t);t=setTimeout(()=>{if(!campo(document.activeElement))barra(false)},260)});
+ const vv=window.visualViewport;
+ const medir=()=>document.documentElement.style.setProperty('--vvh',Math.round((vv?vv.height:window.innerHeight))+'px');
+ medir();if(vv)vv.addEventListener('resize',medir);window.addEventListener('resize',medir);
+})();
 let backSairAte=0;
 function handleAndroidBack(){
   if(pkEl){fecharPicker();return true}
