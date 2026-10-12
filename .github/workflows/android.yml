@@ -1,4 +1,4 @@
-name: VEN - Compilar APK e publicar nova Release alfa
+name: VEN - Compilar APK automaticamente
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build-and-release:
-    name: Compilar APK e publicar versão numerada
+    name: Compilar e publicar APK VEN
     runs-on: ubuntu-latest
     steps:
       - name: Baixar código
@@ -22,6 +22,8 @@ jobs:
           java-version: '17'
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
       - name: Ler versão do app
         id: appver
         shell: bash
@@ -37,14 +39,14 @@ jobs:
         run: gradle --no-daemon assembleDebug
       - name: Renomear APK para VEN.apk
         run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/VEN.apk
-      - name: Guardar APK como artefato
+      - name: Disponibilizar APK como artefato
         uses: actions/upload-artifact@v4
         with:
           name: VEN-${{ steps.appver.outputs.version_name }}-APK
           path: app/build/outputs/apk/debug/VEN.apk
           if-no-files-found: error
           retention-days: 30
-      - name: Criar Release numerada da versão
+      - name: Publicar Release alfa da versão
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.appver.outputs.version_name }}
@@ -58,7 +60,7 @@ jobs:
             versionName: ${{ steps.appver.outputs.version_name }}
             versionCode: ${{ steps.appver.outputs.version_code }}
 
-            APK de teste assinado com a chave debug gerada pelo runner. A assinatura não é adequada para atualizações consistentes entre execuções; configurar uma chave persistente é necessário para atualizar por cima de uma instalação existente.
+            APK debug de teste. Para atualizações consistentes sobre uma instalação anterior, configure uma chave de assinatura persistente.
           files: app/build/outputs/apk/debug/VEN.apk
       - name: Atualizar canal latest-alpha usado pelo app
         uses: softprops/action-gh-release@v2
@@ -73,6 +75,4 @@ jobs:
             VERSÃO ALFA PARA TESTES — não é uma versão estável.
             versionName: ${{ steps.appver.outputs.version_name }}
             versionCode: ${{ steps.appver.outputs.version_code }}
-
-            APK de teste. A assinatura debug pode mudar entre execuções; para atualizar por cima de uma instalação existente, é necessária uma chave persistente compartilhada entre builds.
           files: app/build/outputs/apk/debug/VEN.apk

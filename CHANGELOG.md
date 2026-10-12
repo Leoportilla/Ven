@@ -1,18 +1,18 @@
 # Histórico de versões VEN
 
-## 2.0.0-alpha.30
-- Padronizados os ícones da tela Clientes: mesma cor por tema (laranja no escuro e azul no claro).
-- Padronizada a espessura dos traços dos ícones lineares e o tamanho visual dos ícones de marca.
-- Mantidos os seis botões na mesma linha e as ações existentes.
-- Workflows de compilação e publicação automática preservados sem alterações.
+## 2.0.0-alpha.40
+- Marco de referência aprovado pelo usuário, baseado no pacote funcional recebido como alpha.39.
+- Mantidos os ícones de contato aprovados: azul no modo claro, laranja no modo escuro, botões com fundo transparente e bordas discretas.
+- WhatsApp com balão em contorno e telefone preenchido.
+- Carro preenchido, com vidro e faróis brancos no modo claro e pretos no modo escuro.
+- Mantidos os botões de cadastro abaixo das listas de Produtos e Clientes e os indicadores numéricos reduzidos.
+- Versão Android: versionCode 41.
+- Compilação automática pelo GitHub Actions mantida.
 
-
-## 2.0.0-alpha.32
-- Padronização explícita de cor e espessura dos ícones de ações dos clientes, incluindo WhatsApp e Waze.
-- A abertura de e-mail usa o resolvedor do Android para permitir escolher um app padrão quando o sistema oferecer essa opção.
-- APK de saída dos workflows passa a se chamar `VEN.apk`.
-
-
-## VEN 2.0.0-alpha.32
-- Padronização visual dos seis botões de ação dos clientes: ícones em contorno fino, cores por tema e fundo/borda uniformes.
-- Mantidos os workflows de compilação e publicação existentes.
+## 2.0.0-alpha.39
+- Aplicado o acabamento visual aprovado aos ícones de contato no aplicativo e na prévia de navegador.
+- Fundo dos botões de ação transparente, com bordas discretas.
+- WhatsApp com balão em contorno e telefone preenchido.
+- Carro preenchido com vidro/faróis brancos no modo claro e pretos no modo escuro.
+- Ícones em azul no modo claro e laranja no modo escuro.
+- Mantidos os ajustes de listas da alpha.37 e a compilação automática.

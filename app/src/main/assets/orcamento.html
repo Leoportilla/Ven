@@ -204,7 +204,7 @@ body{padding-bottom:158px}
 .screen-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative;z-index:1}
 .screen-title{font-size:24px;line-height:1.12;font-weight:850;letter-spacing:-.5px;margin:0;color:var(--tx)}
 .screen-desc{font-size:12px;line-height:1.5;color:var(--mut);margin:7px 0 0;max-width:520px}
-.screen-count{display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:42px;padding:0 11px;border-radius:14px;background:color-mix(in srgb,var(--pri) 15%,var(--card));border:1px solid color-mix(in srgb,var(--pri) 28%,var(--bd));color:var(--pri);font-size:16px;font-weight:850;flex:none}
+.screen-count{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 8px;border-radius:11px;background:color-mix(in srgb,var(--pri) 15%,var(--card));border:1px solid color-mix(in srgb,var(--pri) 28%,var(--bd));color:var(--pri);font-size:14px;font-weight:850;flex:none}
 .screen-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 10px;flex-wrap:wrap}
 .screen-tools-label{font-size:11px;color:var(--mut)}
 #main .item{border-radius:16px;border-color:color-mix(in srgb,var(--bd) 78%,transparent);background:linear-gradient(135deg,var(--card),color-mix(in srgb,var(--card) 82%,#fff 0%));padding:13px;margin-bottom:9px;gap:12px;box-shadow:0 4px 14px #0000000a;transition:border-color .15s,transform .15s}
@@ -790,6 +790,53 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
 :root[data-theme="dark"] #main .saved-actions .crm-brand-action { --crm-action-color: #ff922b !important; color: #ff922b !important; }
 :root[data-theme="light"] #main .saved-actions .crm-icon-action,
 :root[data-theme="light"] #main .saved-actions .crm-brand-action { --crm-action-color: #2589c9 !important; color: #2589c9 !important; }
+
+
+/* Alpha.38: acabamento final dos ícones de contato, conforme referência aprovada. */
+#main .saved-actions .crm-icon-action,
+#main .saved-actions .crm-icon-action.dng,
+#main .saved-actions .crm-brand-action{
+  background:transparent!important;
+  box-shadow:none!important;
+  border:1px solid var(--bd)!important;
+}
+:root[data-theme="light"] #main .saved-actions .crm-icon-action,
+:root[data-theme="light"] #main .saved-actions .crm-icon-action.dng,
+:root[data-theme="light"] #main .saved-actions .crm-brand-action{
+  color:#168bd0!important;
+  border-color:#dce6ef!important;
+}
+:root:not([data-theme="light"]) #main .saved-actions .crm-icon-action,
+:root:not([data-theme="light"]) #main .saved-actions .crm-icon-action.dng,
+:root:not([data-theme="light"]) #main .saved-actions .crm-brand-action{
+  color:#ff922b!important;
+  border-color:#2b3038!important;
+}
+#main .saved-actions .crm-brand-action.waze svg.crm-car-icon .crm-car-body{
+  fill:currentColor!important;stroke:none!important;
+}
+#main .saved-actions .crm-brand-action.waze svg.crm-car-icon .crm-car-detail{
+  fill:#fff!important;stroke:none!important;
+}
+:root:not([data-theme="light"]) #main .saved-actions .crm-brand-action.waze svg.crm-car-icon .crm-car-detail{
+  fill:#000!important;
+}
+#main .saved-actions .crm-brand-action.whatsapp svg path:first-child{
+  fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;
+}
+#main .saved-actions .crm-brand-action.whatsapp svg .crm-wa-phone{
+  fill:currentColor!important;stroke:none!important;
+}
+
+
+/* Alpha.39: ícones de ação dos clientes conforme conjunto de referência (cantos arredondados, traço firme). */
+#main .saved-actions{display:flex!important;flex-wrap:nowrap;gap:8px}
+#main .saved-actions>.crm-icon-action,#main .saved-actions>.crm-brand-action{flex:1 1 0!important;min-width:0;height:54px!important;min-height:54px!important;border-radius:18px!important;padding:0!important;display:flex!important;align-items:center;justify-content:center;background:transparent!important}
+#main .saved-actions .crm-icon-action svg,#main .saved-actions .crm-brand-action svg{width:28px!important;height:28px!important}
+#main .saved-actions .crm-icon-action svg *{stroke-width:2.2!important;fill:none!important}
+#main .saved-actions .crm-brand-action.whatsapp svg path:first-child{stroke-width:3.4!important;fill:none!important}
+#main .saved-actions .crm-brand-action.waze svg.crm-car-icon{width:36px!important;height:36px!important}
+@media(max-width:380px){#main .saved-actions{gap:5px}#main .saved-actions>.crm-icon-action,#main .saved-actions>.crm-brand-action{height:48px!important;min-height:48px!important;border-radius:15px!important}}
 </style>
 </head>
 <body>
@@ -1217,9 +1264,10 @@ function atualizarPreviaWaze(){
 }
 function renderClientes(){
  const titulo='<section class="screen-head"><div class="screen-kicker">Relacionamento</div><div class="screen-title-row"><div><h2 class="screen-title">Clientes</h2><p class="screen-desc">Cadastre clientes e consulte seu histórico de compras.</p></div><span class="screen-count">'+clientes.length+'</span></div></section>';
- if(!clientes.length){$('#main').innerHTML=titulo+'<div class="crm-actions"><button class="btn pri" id="newCustomer">＋ Cadastrar cliente</button></div><div class="empty">Nenhum cliente cadastrado.<br>Cadastre clientes para vinculá-los aos orçamentos e vendas.</div>';return}
- let h=titulo+'<div class="crm-actions"><button class="btn pri" id="newCustomer">＋ Cadastrar cliente</button><span class="crm-meta">'+clientes.length+' cliente(s)</span></div>';
- clientes.slice().sort((a,b)=>a.nome.localeCompare(b.nome)).forEach(c=>{const wa=whatsappClienteUrl(c.telefone);const endereco=enderecoCliente(c);const wz=wazeClienteUrl(c);h+=`<div class="crm-card"><div class="crm-title">${esc(c.nome)}</div><div class="crm-meta">${c.doc?'CPF/CNPJ: '+esc(c.doc)+' · ':''}${c.telefone?esc(c.telefone):'Sem telefone'}${c.email?' · '+esc(c.email):''}</div>${endereco?`<div class="crm-meta crm-address-text">${esc(endereco)}</div>`:''}<div class="saved-actions"><button class="btn crm-icon-action" data-edit-customer="${esc(c.id)}" aria-label="Editar cliente" title="Editar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" /></svg></button>${c.email?`<button class="btn crm-icon-action" data-customer-email="${esc(c.id)}" aria-label="Enviar e-mail" title="E-mail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></button>`:''}${wz?`<a class="crm-brand-action waze" href="${esc(wz)}" target="_blank" rel="noopener" aria-label="Abrir endereço no Waze" title="Waze"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" d="M5 11 6.7 6.8A2 2 0 0 1 8.6 5.5h6.8a2 2 0 0 1 1.9 1.3L19 11l2 1.5V18h-3v-2H6v2H3v-5.5L5 11Z"/><path fill="none" d="M7 10h10l-1.1-3H8.1L7 10Z"/><path fill="none" d="M7 13h.01M17 13h.01"/></svg></a>`:''}${c.telefone?`<button class="crm-brand-action whatsapp" data-open-wa="${esc(c.id)}" aria-label="Abrir WhatsApp do cliente" title="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" d="M20.2 11.6a8.2 8.2 0 0 1-12.1 7.2L3.5 20l1.2-4.3a8.2 8.2 0 1 1 15.5-4.1Z"/><path fill="none" d="M8.5 7.8c-.3.1-.8.6-.9 1.2-.2.7.1 1.6.4 2.2.8 1.8 2.5 3.6 4.3 4.4.7.3 1.7.7 2.4.3.5-.3.9-.9 1-1.4l-2.2-1.1-1 1.1c-1.2-.5-2.4-1.7-2.9-2.8l1-1-1.1-2.3Z"/></svg></button>`:''}<button class="btn crm-icon-action" data-customer-history="${esc(c.id)}" aria-label="Ver vendas" title="Ver vendas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg></button><button class="btn dng crm-icon-action" data-delete-customer="${esc(c.id)}" aria-label="Excluir cliente" title="Excluir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2m-9 0 1 14h10l1-14M10 10v6m4-6v6"/></svg></button></div></div>`});
+ if(!clientes.length){$('#main').innerHTML=titulo+'<div class="empty">Nenhum cliente cadastrado.<br>Cadastre clientes para vinculá-los aos orçamentos e vendas.</div><div class="crm-actions catalog-bottom-actions"><button class="btn pri" id="newCustomer">＋ Cadastrar cliente</button></div>';return}
+ let h=titulo+'<div class="crm-list-count crm-meta">'+clientes.length+' cliente(s)</div>';
+ clientes.slice().sort((a,b)=>a.nome.localeCompare(b.nome)).forEach(c=>{const wa=whatsappClienteUrl(c.telefone);const endereco=enderecoCliente(c);const wz=wazeClienteUrl(c);h+=`<div class="crm-card"><div class="crm-title">${esc(c.nome)}</div><div class="crm-meta">${c.doc?'CPF/CNPJ: '+esc(c.doc)+' · ':''}${c.telefone?esc(c.telefone):'Sem telefone'}${c.email?' · '+esc(c.email):''}</div>${endereco?`<div class="crm-meta crm-address-text">${esc(endereco)}</div>`:''}<div class="saved-actions"><button class="btn crm-icon-action" data-edit-customer="${esc(c.id)}" aria-label="Editar cliente" title="Editar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.2 3.9a2.1 2.1 0 0 1 3 0l1.9 1.9a2.1 2.1 0 0 1 0 3L9 19.9l-4.6.9.9-4.6Z"/><path d="M13.2 21h7.6"/></svg></button>${c.email?`<button class="btn crm-icon-action" data-customer-email="${esc(c.id)}" aria-label="Enviar e-mail" title="E-mail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.6"/><path d="m3.6 7.6 8.4 5.6 8.4-5.6"/></svg></button>`:''}${wz?`<a class="crm-brand-action waze" href="${esc(wz)}" target="_blank" rel="noopener" aria-label="Abrir endereço no Waze" title="Waze"><svg viewBox="0 0 48 48" aria-hidden="true" class="crm-car-icon"><path class="crm-car-body" d="M8 25.5 11.5 15c.7-2.1 2.4-3.4 4.6-3.4h15.8c2.2 0 3.9 1.3 4.6 3.4L40 25.5l3.2 2.1v9.2h-5v-3.5H9.8v3.5h-5v-9.2L8 25.5Z"/><path class="crm-car-detail" d="m16 16.4-2.3 7.1h20.6L32 16.4H16Z"/><circle class="crm-car-detail" cx="15.9" cy="30.1" r="2.3"/><circle class="crm-car-detail" cx="32.1" cy="30.1" r="2.3"/></svg></a>`:''}${c.telefone?`<button class="crm-brand-action whatsapp" data-open-wa="${esc(c.id)}" aria-label="Abrir WhatsApp do cliente" title="WhatsApp"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M4.6 43.4l2.9-9A18.4 18.4 0 1 1 15 40.6z" stroke-linejoin="round"/><path class="crm-wa-phone" fill="currentColor" d="M32.2 28.4c-.4-.2-2.8-1.4-3.3-1.5-.4-.2-.8-.2-1.1.3-.3.4-1.3 1.5-1.6 1.8-.3.3-.6.3-1.1.1-.5-.2-2-.7-3.8-2.3-1.4-1.2-2.3-2.7-2.6-3.2-.3-.5 0-.7.2-1l.8-.9c.2-.3.3-.5.5-.8.1-.3.1-.6 0-.8-.1-.2-1.1-2.6-1.5-3.6-.4-.9-.8-.8-1.1-.8h-.9c-.3 0-.8.1-1.2.6-.4.5-1.6 1.6-1.6 4s1.7 4.6 1.9 4.9c.2.3 3.3 5 8 7 .9.4 1.7.6 2.3.8 1 .3 1.8.3 2.5.2.8-.1 2.8-1.1 3.2-2.2.4-1.1.4-2 .3-2.2-.1-.2-.4-.3-.9-.5Z"/></svg></button>`:''}<button class="btn crm-icon-action" data-customer-history="${esc(c.id)}" aria-label="Ver vendas" title="Ver vendas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7.5L19 7.5V19a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14.5 3v4.5H19M9 12.5h6M9 16.5h6"/></svg></button><button class="btn dng crm-icon-action" data-delete-customer="${esc(c.id)}" aria-label="Excluir cliente" title="Excluir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.5h17M9 6.5V4h6v2.5M6 6.5l.9 12.6a1.8 1.8 0 0 0 1.8 1.7h6.6a1.8 1.8 0 0 0 1.8-1.7L18 6.5M10 10.5v6M14 10.5v6"/></svg></button></div></div>`});
+ h+='<div class="crm-actions catalog-bottom-actions"><button class="btn pri" id="newCustomer">＋ Cadastrar cliente</button></div>';
  $('#main').innerHTML=h;
 }
 function abrirCadastroCliente(id=null){
@@ -1316,7 +1364,7 @@ function buscar(){
 
 function renderProdutos(){
   const r = buscar();
-  let h = `<section class="screen-head"><div class="screen-kicker">Catálogo da loja</div><div class="screen-title-row"><div><h2 class="screen-title">Produtos e serviços</h2><p class="screen-desc">Gerencie materiais, produtos, mão de obra e serviços.</p><button type="button" class="btn pri" id="addProductFromCatalog" style="margin-top:10px">＋ Adicionar produto/serviço</button></div><span class="screen-count">${prods.length.toLocaleString('pt-BR')}</span></div></section><div class="screen-tools"><span class="screen-tools-label">${r.length.toLocaleString('pt-BR')} resultado(s)${$('#q').value.trim()?' para “'+esc($('#q').value.trim())+'”':''}</span><span class="screen-tools-label">Catálogo de produtos</span></div>`;
+  let h = `<section class="screen-head"><div class="screen-kicker">Catálogo da loja</div><div class="screen-title-row"><div><h2 class="screen-title">Produtos e serviços</h2><p class="screen-desc">Gerencie materiais, produtos, mão de obra e serviços.</p></div><span class="screen-count">${prods.length.toLocaleString('pt-BR')}</span></div></section><div class="screen-tools"><span class="screen-tools-label">${r.length.toLocaleString('pt-BR')} resultado(s)${$('#q').value.trim()?' para “'+esc($('#q').value.trim())+'”':''}</span><span class="screen-tools-label">Catálogo de produtos</span></div>`;
   r.slice(0,limite).forEach(p=>{
     const est = p.kind==='service' ? (p.serviceType==='hourly'?'Mão de obra · por hora':'Serviço · valor fixo') : (p.q>0 ? `Estoque: ${p.q}` : '<span class="sem">Sem estoque</span>');
     const img=p.img?`<img class="product-thumb" src="${esc(p.img)}" alt="" loading="lazy" onerror="this.style.display='none'">`:'';
@@ -1332,6 +1380,7 @@ function renderProdutos(){
     }
   }
   if(r.length>limite) h += `<button class="more" id="mais">Mostrar mais (${r.length-limite} restantes)</button>`;
+  if(r.length>0 || prods.length>0) h += '<div class="catalog-bottom-actions"><button type="button" class="btn pri" id="addProductFromCatalog">＋ Adicionar produto/serviço</button></div>';
   $('#main').innerHTML = h;
   const title=$('#main .screen-head'); if(title && persistentSearchRow) title.insertAdjacentElement('afterend',persistentSearchRow);
 }

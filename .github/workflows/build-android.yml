@@ -1,4 +1,4 @@
-name: Build VEN Android APK (somente artefato manual)
+name: VEN - Compilação manual do APK
 
 on:
   workflow_dispatch:
@@ -20,6 +20,8 @@ jobs:
           java-version: '17'
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
       - name: Compilar APK
         run: gradle --no-daemon assembleDebug
       - name: Renomear APK para VEN.apk
@@ -27,7 +29,7 @@ jobs:
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
-          name: VEN-APK-manual
+          name: VEN-alpha40-APK-manual
           path: app/build/outputs/apk/debug/VEN.apk
           if-no-files-found: error
           retention-days: 14
