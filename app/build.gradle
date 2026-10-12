@@ -6,10 +6,26 @@ android {
         applicationId 'br.com.ven.app'
         minSdk 23
         targetSdk 34
-        versionCode 23
-        versionName '2.0.0-alpha.20'
+        versionCode 24
+        versionName '2.0.0-alpha.21'
     }
     buildFeatures { buildConfig true }
+    signingConfigs {
+        release {
+            // O keystore é criado pelo GitHub Actions a partir dos Secrets.
+            // Não coloque o arquivo .jks nem senhas no repositório.
+            storeFile file('keystore.jks')
+            storePassword System.getenv('KEYSTORE_PASSWORD') ?: ''
+            keyAlias System.getenv('KEY_ALIAS') ?: ''
+            keyPassword System.getenv('KEY_PASSWORD') ?: ''
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17

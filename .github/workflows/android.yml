@@ -35,13 +35,34 @@ jobs:
           print("version_name=" + re.search(r"versionName '([^']+)'", text).group(1))
           print("version_code=" + re.search(r"versionCode (\d+)", text).group(1))
           PYVER
-      - name: Compilar APK debug
-        run: gradle --no-daemon assembleDebug
+      - name: Validar Secrets de assinatura
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_BASE64" || (echo "Falta o Secret KEYSTORE_BASE64"; exit 1)
+          test -n "$KEYSTORE_PASSWORD" || (echo "Falta o Secret KEYSTORE_PASSWORD"; exit 1)
+          test -n "$KEY_ALIAS" || (echo "Falta o Secret KEY_ALIAS"; exit 1)
+          test -n "$KEY_PASSWORD" || (echo "Falta o Secret KEY_PASSWORD"; exit 1)
+      - name: Decodificar Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          printf '%s' "$KEYSTORE_BASE64" | tr -d '\r\n' | base64 --decode > app/keystore.jks
+          test -s app/keystore.jks
+      - name: Compilar APK release assinado
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: gradle --no-daemon assembleRelease
       - name: Guardar APK como artefato
         uses: actions/upload-artifact@v4
         with:
-          name: VEN-${{ steps.appver.outputs.version_name }}-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: VEN-${{ steps.appver.outputs.version_name }}-APK-assinado
+          path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
       - name: Criar Release numerada da versão
@@ -58,8 +79,8 @@ jobs:
             versionName: ${{ steps.appver.outputs.version_name }}
             versionCode: ${{ steps.appver.outputs.version_code }}
 
-            APK debug para testes. Para instalar por cima de uma versão anterior, os APKs devem usar a mesma chave de assinatura.
-          files: app/build/outputs/apk/debug/app-debug.apk
+            APK release assinado com o keystore configurado nos GitHub Actions Secrets. Para atualizar por cima, a chave precisa ser a mesma da versão já instalada.
+          files: app/build/outputs/apk/release/app-release.apk
       - name: Atualizar canal latest-alpha usado pelo app
         uses: softprops/action-gh-release@v2
         with:
@@ -74,5 +95,5 @@ jobs:
             versionName: ${{ steps.appver.outputs.version_name }}
             versionCode: ${{ steps.appver.outputs.version_code }}
 
-            APK de depuração. Instalação sobre versão anterior requer assinatura compatível.
-          files: app/build/outputs/apk/debug/app-debug.apk
+            APK release assinado. Instalação sobre versão anterior requer a mesma chave de assinatura da versão instalada.
+          files: app/build/outputs/apk/release/app-release.apk
