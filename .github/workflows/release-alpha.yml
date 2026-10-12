@@ -1,0 +1,39 @@
+name: Package VEN Alpha Pre-release
+
+on:
+  push:
+    tags:
+      - 'v*-alpha.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build debug APK
+        run: gradle --no-daemon assembleDebug
+      - name: Publish GitHub Pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: VEN ${{ github.ref_name }} (ALFA)
+          tag_name: ${{ github.ref_name }}
+          prerelease: true
+          generate_release_notes: true
+          body: |
+            **VERSÃO ALFA — somente para testes.**
+
+            Este APK é uma compilação debug. Não é uma versão estável nem um pacote assinado para a Google Play. Faça backup dos dados antes de testar.
+          files: app/build/outputs/apk/debug/app-debug.apk

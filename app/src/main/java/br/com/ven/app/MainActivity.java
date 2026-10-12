@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
     private static final int FILE_CHOOSER_REQUEST = 1001;
     private static String destinoPendente = "";
     // Atualizações públicas do GitHub. O repositório precisa ser público; nunca embutir token de acesso no APK.
-    private static final String UPDATE_OWNER = "Leportilla";
+    private static final String UPDATE_OWNER = "Leoportilla";
     private static final String UPDATE_REPO = "Ven";
     private static final String UPDATE_TAG = "latest-alpha";
     private static final String UPDATE_API = "https://api.github.com/repos/" + UPDATE_OWNER + "/" + UPDATE_REPO + "/releases/tags/" + UPDATE_TAG;
@@ -115,6 +115,11 @@ public class MainActivity extends Activity {
         });
         setContentView(webView);
         webView.loadUrl("file:///android_asset/orcamento.html");
+    }
+
+    // Encaminha a verificacao automatica para a rotina do bridge nativo.
+    private void verificarAtualizacao(boolean mostrarStatus) {
+        new AndroidBridge().verificarAtualizacao(mostrarStatus);
     }
 
     // Links que nao sao da propria tela (whatsapp:, intent:, tel:, mailto:, https:) abrem no app certo em vez de trocar a pagina do aplicativo.
