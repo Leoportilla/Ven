@@ -60,10 +60,15 @@ public class MainActivity extends Activity {
         pedirPermissaoAvisos();
         // Cor da faixa do app (guardada da ultima vez): evita piscar outra cor ao abrir.
         aplicarCromo(getSharedPreferences("ven", MODE_PRIVATE).getString("cromo", "#10151B"));
-        // Mantém o conteúdo abaixo da barra de status e acima da navegação do Android.
+        // Desenha também atrás da área de navegação por gestos. Em Android recentes,
+        // setNavigationBarColor() não pinta a área da alça de gestos; sem edge-to-edge
+        // o fundo da janela aparece como uma faixa branca/cinza abaixo do menu.
         getWindow().setStatusBarColor(0xFF0A2A66);
-        getWindow().setNavigationBarColor(0xFF08476B);
-        getWindow().getDecorView().setSystemUiVisibility(0);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 29) getWindow().setNavigationBarContrastEnforced(false);
+        getWindow().getDecorView().setSystemUiVisibility(
+                android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
@@ -255,7 +260,9 @@ public class MainActivity extends Activity {
                     // Isso evita que a área exposta pelo redimensionamento do teclado apareça azul.
                     getWindow().getDecorView().setBackgroundColor(corBarra);
                     if (webView != null) webView.setBackgroundColor(corBarra);
-                    getWindow().setNavigationBarColor(corBarra);
+                    // A área de gestos permanece transparente; o WebView desenha o fundo
+                    // por trás dela, evitando a faixa clara exposta no tema branco.
+                    getWindow().setNavigationBarColor(Color.TRANSPARENT);
                     if (Build.VERSION.SDK_INT >= 29) getWindow().setNavigationBarContrastEnforced(false);
                 } catch (Exception ignorado) { }
             });
