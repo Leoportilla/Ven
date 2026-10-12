@@ -1,4 +1,4 @@
-name: VEN - Compilar APK e publicar atualização alfa
+name: VEN - Compilar APK e publicar nova Release alfa
 
 on:
   push:
@@ -9,8 +9,8 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    name: Compilar APK e atualizar release
+  build-and-release:
+    name: Compilar APK e publicar versão numerada
     runs-on: ubuntu-latest
     steps:
       - name: Baixar código
@@ -44,7 +44,23 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
-      - name: Publicar release alfa mais recente
+      - name: Criar Release numerada da versão
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.appver.outputs.version_name }}
+          name: VEN ${{ steps.appver.outputs.version_name }} (ALFA)
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          make_latest: false
+          generate_release_notes: true
+          body: |
+            **VERSÃO ALFA — somente para testes.**
+            versionName: ${{ steps.appver.outputs.version_name }}
+            versionCode: ${{ steps.appver.outputs.version_code }}
+
+            APK debug para testes. Para instalar por cima de uma versão anterior, os APKs devem usar a mesma chave de assinatura.
+          files: app/build/outputs/apk/debug/app-debug.apk
+      - name: Atualizar canal latest-alpha usado pelo app
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest-alpha
@@ -58,5 +74,5 @@ jobs:
             versionName: ${{ steps.appver.outputs.version_name }}
             versionCode: ${{ steps.appver.outputs.version_code }}
 
-            O APK desta release é de depuração. Antes de distribuir atualizações instaláveis por cima de uma versão anterior, configure uma chave de assinatura estável para todos os builds.
+            APK de depuração. Instalação sobre versão anterior requer assinatura compatível.
           files: app/build/outputs/apk/debug/app-debug.apk

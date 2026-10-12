@@ -239,6 +239,23 @@ public class MainActivity extends Activity {
             });
         }
 
+        // Mantém a barra de navegação do Android na mesma cor do fundo quando o teclado virtual abre.
+        @JavascriptInterface
+        public void setBarraTeclado(final boolean ativa, final String cor) {
+            runOnUiThread(() -> {
+                try {
+                    int corBarra;
+                    if (ativa) {
+                        corBarra = Color.parseColor(cor == null ? "#F4F7FB" : cor);
+                    } else {
+                        corBarra = Color.parseColor(getSharedPreferences("ven", MODE_PRIVATE).getString("cromo", "#10151B"));
+                    }
+                    getWindow().setNavigationBarColor(corBarra);
+                    if (Build.VERSION.SDK_INT >= 29) getWindow().setNavigationBarContrastEnforced(false);
+                } catch (Exception ignorado) { }
+            });
+        }
+
         @JavascriptInterface
         public void setTema(final String cor) {
             runOnUiThread(() -> {

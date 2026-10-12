@@ -1647,21 +1647,27 @@ document.addEventListener('click',e=>{
 });
 
 
-// Oculta apenas a navegação inferior quando o teclado virtual reduz a área visível.
+// Teclado responsivo: esconder a navegação somente enquanto o teclado realmente reduz a área visível.
+// Não usar apenas o foco do campo: ao recolher o teclado pela seta, o campo continua focado.
 const keyboardViewport=window.visualViewport;
 let keyboardBaseHeight=keyboardViewport?keyboardViewport.height:window.innerHeight;
-// Só aparelhos de toque (celular/tablet) escondem a barra inferior ao digitar; no computador ela fica sempre visível.
+let keyboardResizeTimer=0;
 const TELA_TOQUE=(window.matchMedia&&matchMedia('(pointer:coarse)').matches)||/Android|iPhone|iPad/i.test(navigator.userAgent);
 function atualizarTecladoVirtual(){
  const altura=keyboardViewport?keyboardViewport.height:window.innerHeight;
  const campoAtivo=!!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
- if(!campoAtivo)keyboardBaseHeight=altura;
  const zoomado=!!keyboardViewport&&Math.abs((keyboardViewport.scale||1)-1)>.01;
- // Oculta a navegação no próprio foco para acompanhar a animação do teclado sem deixar uma faixa azul aparecendo.
- const ativo=TELA_TOQUE && campoAtivo && !zoomado;
- if(campoAtivo&&!ativo)keyboardBaseHeight=altura;
- document.body.classList.toggle('keyboard-nav-hidden',ativo);
- document.documentElement.classList.toggle('keyboard-nav-hidden',ativo);
+ if(!TELA_TOQUE || !campoAtivo || zoomado){
+  if(!campoAtivo || !zoomado) keyboardBaseHeight=altura;
+  document.body.classList.remove('keyboard-nav-hidden');
+  document.documentElement.classList.remove('keyboard-nav-hidden');
+  return;
+ }
+ // Atualiza a referência quando a janela cresce (rotação ou teclado fechado).
+ if(altura>keyboardBaseHeight) keyboardBaseHeight=altura;
+ const tecladoVisivel=(keyboardBaseHeight-altura)>100;
+ document.body.classList.toggle('keyboard-nav-hidden',tecladoVisivel);
+ document.documentElement.classList.toggle('keyboard-nav-hidden',tecladoVisivel);
 }
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
 document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
@@ -1818,10 +1824,10 @@ function destinoNativo(){try{if(window.Android&&Android.destinoInicial){const d=
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){destinoNativo();sincronizarAvisos()}});
 setTimeout(()=>{sincronizarAvisos();destinoNativo();if(view==='home')avisarVencidasAoAbrir()},1200);
 
-/* alpha.12 — teclado: pinta a barra inferior do Android com a cor da tela enquanto digita (sem faixa azul) e mede a área visível */
+/* Alpha 15 — cor da barra do sistema sincronizada com o fundo real do campo. */
 (function(){
  let ligado=false,t=null;
- const cor=()=>{const c=getComputedStyle(document.body).backgroundColor.match(/\d+/g)||[243,247,251];return '#'+c.slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('')};
+ const cor=()=>{const c=getComputedStyle(document.body).backgroundColor.match(/\d+/g)||[244,247,251];return '#'+c.slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('')};
  function barra(on){if(on===ligado)return;ligado=on;try{if(window.Android&&Android.setBarraTeclado)Android.setBarraTeclado(on,cor())}catch(e){}}
  const campo=el=>!!el&&el.matches&&el.matches('input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=date]),textarea');
  document.addEventListener('focusin',e=>{clearTimeout(t);if(campo(e.target)){barra(true);setTimeout(()=>{try{if(e.target.closest('#product-box,.crm-box,#sale-overlay'))e.target.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}},320)}});
