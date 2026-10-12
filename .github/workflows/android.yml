@@ -14,16 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Baixar código
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
       - name: Configurar Java 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - name: Configurar Gradle 8.9
+      - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
       - name: Ler versão do app
         id: appver
         shell: bash
@@ -32,37 +30,16 @@ jobs:
           import re
           from pathlib import Path
           text = Path("app/build.gradle").read_text()
-          print("version_name=" + re.search(r"versionName '([^']+)'", text).group(1))
+          print("version_name=" + re.search(r"versionName ['\"]([^'\"]+)", text).group(1))
           print("version_code=" + re.search(r"versionCode (\d+)", text).group(1))
           PYVER
-      - name: Validar Secrets de assinatura
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          test -n "$KEYSTORE_BASE64" || (echo "Falta o Secret KEYSTORE_BASE64"; exit 1)
-          test -n "$KEYSTORE_PASSWORD" || (echo "Falta o Secret KEYSTORE_PASSWORD"; exit 1)
-          test -n "$KEY_ALIAS" || (echo "Falta o Secret KEY_ALIAS"; exit 1)
-          test -n "$KEY_PASSWORD" || (echo "Falta o Secret KEY_PASSWORD"; exit 1)
-      - name: Decodificar Keystore
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: |
-          printf '%s' "$KEYSTORE_BASE64" | tr -d '\r\n' | base64 --decode > app/keystore.jks
-          test -s app/keystore.jks
-      - name: Compilar APK release assinado
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: gradle --no-daemon assembleRelease
+      - name: Compilar APK de teste
+        run: gradle --no-daemon assembleDebug
       - name: Guardar APK como artefato
         uses: actions/upload-artifact@v4
         with:
-          name: VEN-${{ steps.appver.outputs.version_name }}-APK-assinado
-          path: app/build/outputs/apk/release/app-release.apk
+          name: VEN-${{ steps.appver.outputs.version_name }}-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
       - name: Criar Release numerada da versão
@@ -79,8 +56,8 @@ jobs:
             versionName: ${{ steps.appver.outputs.version_name }}
             versionCode: ${{ steps.appver.outputs.version_code }}
 
-            APK release assinado com o keystore configurado nos GitHub Actions Secrets. Para atualizar por cima, a chave precisa ser a mesma da versão já instalada.
-          files: app/build/outputs/apk/release/app-release.apk
+            APK de teste assinado com a chave debug gerada pelo runner. A assinatura não é adequada para atualizações consistentes entre execuções; configurar uma chave persistente é necessário para atualizar por cima de uma instalação existente.
+          files: app/build/outputs/apk/debug/app-debug.apk
       - name: Atualizar canal latest-alpha usado pelo app
         uses: softprops/action-gh-release@v2
         with:
@@ -95,5 +72,5 @@ jobs:
             versionName: ${{ steps.appver.outputs.version_name }}
             versionCode: ${{ steps.appver.outputs.version_code }}
 
-            APK release assinado. Instalação sobre versão anterior requer a mesma chave de assinatura da versão instalada.
-          files: app/build/outputs/apk/release/app-release.apk
+            APK de teste. A assinatura debug pode mudar entre execuções; para atualizar por cima de uma instalação existente, é necessária uma chave persistente compartilhada entre builds.
+          files: app/build/outputs/apk/debug/app-debug.apk

@@ -582,7 +582,7 @@ body.settings-menu-open #home-nav,body.settings-overlay-open #home-nav{z-index:9
 html[data-theme] #drawerBackdrop{background:var(--bg)!important}
 html[data-theme] .drawer{left:50%!important;right:auto!important;transform:translateX(-50%);width:min(900px,100%)!important;max-width:900px!important;padding:0 0 calc(112px + env(safe-area-inset-bottom))!important}
 .hm-top{position:relative}
-.hm-menu-btn{position:absolute;z-index:4;right:16px;top:12px;width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,.24);border-radius:50%;background:var(--chrome-act);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;-webkit-appearance:none;appearance:none;transition:transform .12s,background .12s}
+.hm-menu-btn{position:absolute;z-index:4;right:16px;top:calc(var(--ven-statusbar-inset, 0px) + 12px);width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,.24);border-radius:50%;background:var(--chrome-act);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;-webkit-appearance:none;appearance:none;transition:transform .12s,background .12s}
 .hm-menu-btn span{display:block;width:18px;height:2px;border-radius:2px;background:#fff}
 .hm-menu-btn:active{transform:scale(.93);background:rgba(255,255,255,.3)}
 .hm-hello{padding-right:58px}

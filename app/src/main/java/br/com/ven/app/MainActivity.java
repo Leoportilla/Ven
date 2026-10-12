@@ -95,6 +95,21 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                // Informa ao HTML a altura real da barra de status do Android.
+                // O botão de menu é absoluto e não respeita sozinho o padding superior do cabeçalho.
+                try {
+                    int topInsetPx = 0;
+                    if (Build.VERSION.SDK_INT >= 30) {
+                        android.view.WindowInsets wi = getWindow().getDecorView().getRootWindowInsets();
+                        if (wi != null) topInsetPx = wi.getInsets(android.view.WindowInsets.Type.statusBars()).top;
+                    } else if (Build.VERSION.SDK_INT >= 23) {
+                        android.view.WindowInsets wi = getWindow().getDecorView().getRootWindowInsets();
+                        if (wi != null) topInsetPx = wi.getSystemWindowInsetTop();
+                    }
+                    float density = getResources().getDisplayMetrics().density;
+                    int topInsetDp = Math.round(topInsetPx / density);
+                    view.evaluateJavascript("document.documentElement.style.setProperty('--ven-statusbar-inset','" + topInsetDp + "px')", null);
+                } catch (Exception ignorado) { }
                 SharedPreferences prefs = getSharedPreferences("ven_updates", MODE_PRIVATE);
                 long last = prefs.getLong("last_check", 0L);
                 if (prefs.getBoolean("auto", true) && System.currentTimeMillis() - last > 24L * 60L * 60L * 1000L) {

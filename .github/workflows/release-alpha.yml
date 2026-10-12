@@ -13,39 +13,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - name: Set up Gradle 8.9
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
-      - name: Validate signing Secrets
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          test -n "$KEYSTORE_BASE64" || (echo "Missing secret KEYSTORE_BASE64"; exit 1)
-          test -n "$KEYSTORE_PASSWORD" || (echo "Missing secret KEYSTORE_PASSWORD"; exit 1)
-          test -n "$KEY_ALIAS" || (echo "Missing secret KEY_ALIAS"; exit 1)
-          test -n "$KEY_PASSWORD" || (echo "Missing secret KEY_PASSWORD"; exit 1)
-      - name: Decode signing keystore
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: |
-          printf '%s' "$KEYSTORE_BASE64" | tr -d '\r\n' | base64 --decode > app/keystore.jks
-          test -s app/keystore.jks
-      - name: Build signed release APK
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: gradle --no-daemon assembleRelease
+      - name: Build debug APK for alpha testing
+        run: gradle --no-daemon assembleDebug
       - name: Publish GitHub Pre-release
         uses: softprops/action-gh-release@v2
         with:
@@ -56,5 +33,5 @@ jobs:
           body: |
             **VERSÃO ALFA — somente para testes.**
 
-            APK release assinado com os Secrets do GitHub Actions. Para atualizar uma instalação existente, o keystore deve ser o mesmo usado para assinar o APK já instalado.
-          files: app/build/outputs/apk/release/app-release.apk
+            APK debug para teste. A assinatura debug pode mudar entre execuções; atualizar por cima exige uma chave persistente igual à da instalação anterior.
+          files: app/build/outputs/apk/debug/app-debug.apk
