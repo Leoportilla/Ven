@@ -1827,7 +1827,16 @@ setTimeout(()=>{sincronizarAvisos();destinoNativo();if(view==='home')avisarVenci
  document.addEventListener('focusin',e=>{clearTimeout(t);if(campo(e.target)){barra(true);setTimeout(()=>{try{if(e.target.closest('#product-box,.crm-box,#sale-overlay'))e.target.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}},320)}});
  document.addEventListener('focusout',()=>{clearTimeout(t);t=setTimeout(()=>{if(!campo(document.activeElement))barra(false)},260)});
  const vv=window.visualViewport;
- const medir=()=>document.documentElement.style.setProperty('--vvh',Math.round((vv?vv.height:window.innerHeight))+'px');
+ let alturaBaseTeclado=vv?vv.height:window.innerHeight;
+ let tecladoNativoAtivo=false;
+ const medir=()=>{
+  const h=vv?vv.height:window.innerHeight;
+  document.documentElement.style.setProperty('--vvh',Math.round(h)+'px');
+  if(h>alturaBaseTeclado)alturaBaseTeclado=h;
+  const tecladoVisivel=(alturaBaseTeclado-h)>110;
+  if(tecladoVisivel!==tecladoNativoAtivo){tecladoNativoAtivo=tecladoVisivel;try{if(window.Android&&Android.setBarraTeclado)Android.setBarraTeclado(tecladoVisivel,cor())}catch(e){}}
+  if(!tecladoVisivel)alturaBaseTeclado=h;
+ };
  medir();if(vv)vv.addEventListener('resize',medir);window.addEventListener('resize',medir);
 })();
 let backSairAte=0;

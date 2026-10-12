@@ -838,9 +838,10 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
    O VEN está sendo preparado para atender diferentes pequenos negócios, com gestão de produtos, pedidos, clientes, vendas e relatórios.<br><br>
    <b>Modelo comercial planejado:</b> compra única, sem mensalidade. A demonstração de 7 dias e o desbloqueio permanente dependem da futura integração e validação com o Google Play Billing; ainda não estão ativos nesta versão.<br><br>
    <b>Publicação e redes sociais:</b> em preparação. Os links oficiais serão adicionados quando os perfis e a página da loja estiverem definidos.<br><br>
-   Versão 2.0.0 — edição VEN.
+   Versão instalada: <b>2.0.0-alpha.17</b>.<br>
+   <span id="ven-update-status">Você pode verificar se há uma versão mais recente.</span>
   </div>
-  <div class="settings-actions"><button class="btn" id="closeAbout" type="button">Fechar</button></div>
+  <div class="settings-actions"><button class="btn pri" id="checkVenUpdate" type="button">Buscar atualização</button><button class="btn" id="closeAbout" type="button">Fechar</button></div>
  </section>
 </div>
 <div id="customer-overlay" class="crm-modal" role="dialog" aria-modal="true" aria-labelledby="customerTitle">
@@ -1487,6 +1488,8 @@ function preencherEmpresaForm(){carregarEmpresa();document.getElementById('compa
 function abrirEmpresa(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='block';document.getElementById('about-box').style.display='none';preencherEmpresaForm();settingsOverlay.style.display='flex'}
 function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex'}
 document.getElementById('openVisual').addEventListener('click',abrirVisual);document.getElementById('openCompany').addEventListener('click',abrirEmpresa);document.getElementById('openAbout').addEventListener('click',abrirSobre);document.getElementById('closeAbout').addEventListener('click',fecharSettings);
+document.getElementById('checkVenUpdate').addEventListener('click',()=>{const el=document.getElementById('ven-update-status');el.textContent='Consultando atualizações…';try{if(window.Android&&Android.checkForUpdates)Android.checkForUpdates();else el.textContent='A busca de atualização só está disponível no aplicativo Android.'}catch(e){el.textContent='Não foi possível iniciar a consulta.'}});
+window.venUpdateResult=function(raw){let r;try{r=typeof raw==='string'?JSON.parse(raw):raw}catch(e){r={message:'Resposta de atualização inválida.'}}const el=document.getElementById('ven-update-status');if(!el)return;if(r&&r.available){el.textContent='Nova versão disponível: '+(r.versionName||'atualização')+'. Abrindo a página para baixar.';if(window.Android&&Android.openUpdateUrl&&r.url)Android.openUpdateUrl(r.url)}else{el.textContent=(r&&r.message)||'Seu VEN já está atualizado.'}};
 document.getElementById('closeVisual').addEventListener('click',fecharSettings);document.getElementById('cancelCompany').addEventListener('click',fecharSettings);
 settingsOverlay.addEventListener('click',e=>{if(e.target===settingsOverlay)fecharSettings()});
 document.querySelectorAll('[data-theme-choice]').forEach(b=>b.addEventListener('click',()=>{VISUAL.theme=b.dataset.themeChoice;aplicarVisual()}));
@@ -1835,7 +1838,16 @@ setTimeout(()=>{sincronizarAvisos();destinoNativo();if(view==='home')avisarVenci
  document.addEventListener('focusin',e=>{clearTimeout(t);if(campo(e.target)){barra(true);setTimeout(()=>{try{if(e.target.closest('#product-box,.crm-box,#sale-overlay'))e.target.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}},320)}});
  document.addEventListener('focusout',()=>{clearTimeout(t);t=setTimeout(()=>{if(!campo(document.activeElement))barra(false)},260)});
  const vv=window.visualViewport;
- const medir=()=>document.documentElement.style.setProperty('--vvh',Math.round((vv?vv.height:window.innerHeight))+'px');
+ let alturaBaseTeclado=vv?vv.height:window.innerHeight;
+ let tecladoNativoAtivo=false;
+ const medir=()=>{
+  const h=vv?vv.height:window.innerHeight;
+  document.documentElement.style.setProperty('--vvh',Math.round(h)+'px');
+  if(h>alturaBaseTeclado)alturaBaseTeclado=h;
+  const tecladoVisivel=(alturaBaseTeclado-h)>110;
+  if(tecladoVisivel!==tecladoNativoAtivo){tecladoNativoAtivo=tecladoVisivel;try{if(window.Android&&Android.setBarraTeclado)Android.setBarraTeclado(tecladoVisivel,cor())}catch(e){}}
+  if(!tecladoVisivel)alturaBaseTeclado=h;
+ };
  medir();if(vv)vv.addEventListener('resize',medir);window.addEventListener('resize',medir);
 })();
 let backSairAte=0;
