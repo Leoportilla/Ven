@@ -1,9 +1,12 @@
 # VEN 2.0.0-alpha.12
-- Cadastro: título e botão mudam para "Cadastrar/Salvar serviço" ou "produto"; edição mostra "Editar …/Salvar alterações".
-- Seletor Produto/Serviço e "Valor fixo / Por hora" agora são controles deslizantes (estilo moderno). Unidade só aparece para serviço de valor fixo.
-- Janela de cadastro com rodapé fixo (Cancelar/Salvar sempre visíveis, inclusive com o teclado aberto) e rolagem só no meio.
-- Teclado: a barra inferior do Android e o fundo da janela assumem a cor da tela enquanto se digita (sem faixa azul). Manifesto com adjustResize.
-- Pedido: busca atualiza só a lista (sem redesenhar a tela), cliente em destaque, desconto/observações recolhíveis, totais agrupados, ação principal grande e "Limpar" discreto.
-- Desempenho: busca com debounce, listas com content-visibility.
-- Logo oficial novo (V com seta) apenas como ícone do app (adaptativo + legado) e ícone de notificação; fora da Home e do menu.
-- Rodapé: no HTML de teste (computador) a barra inferior não some mais ao digitar; só aparelhos de toque a escondem enquanto o teclado está aberto, e ela sempre volta ao sair do campo.
+
+- Adicionada seção Configurações > Atualizações.
+- Preferência para ativar/desativar verificação automática (até uma vez a cada 24 horas ao abrir o app).
+- Verificação manual de release pública `latest-alpha` no GitHub.
+- Quando houver versão maior, o app mostra a versão e abre a página da release para o usuário baixar e confirmar a instalação.
+- GitHub Actions compila em cada push para `main`/`master`, guarda o APK como artefato e atualiza a release alfa.
+
+## Limitações importantes
+- A release precisa estar em repositório público para consulta sem autenticação.
+- O fluxo atual usa APK debug; não distribua para usuários finais. Para instalar atualizações por cima sem erro de assinatura, configurar keystore estável em GitHub Secrets e build assinado.
+- O Android exige confirmação do usuário para instalação de APK externo; não há instalação silenciosa normal.

@@ -1,6 +1,6 @@
 # VEN — Vendas sem complicação
 
-**Versão de teste: 2.0.0-alpha.1**  
+**Versão de teste: 2.0.0-alpha.13**  
 **Status: ALFA — uso experimental; ainda não é uma versão para produção.**
 
 O VEN é um aplicativo Android para pequenos negócios, com orçamento, catálogo e cadastro manual, leitura de código de barras, clientes, vendas, recebimentos/vencimentos, relatórios/metas, avisos, impressão/PDF, WhatsApp, personalização visual, dados da empresa e backup/restauração.
