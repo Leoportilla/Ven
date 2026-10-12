@@ -838,7 +838,7 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
    O VEN está sendo preparado para atender diferentes pequenos negócios, com gestão de produtos, pedidos, clientes, vendas e relatórios.<br><br>
    <b>Modelo comercial planejado:</b> compra única, sem mensalidade. A demonstração de 7 dias e o desbloqueio permanente dependem da futura integração e validação com o Google Play Billing; ainda não estão ativos nesta versão.<br><br>
    <b>Publicação e redes sociais:</b> em preparação. Os links oficiais serão adicionados quando os perfis e a página da loja estiverem definidos.<br><br>
-   Versão instalada: <b>2.0.0-alpha.18</b>.<br>
+   Versão instalada: <b>2.0.0-alpha.19</b>.<br>
    <span id="ven-update-status">Você pode verificar se há uma versão mais recente.</span>
   </div>
   <div class="settings-actions"><button class="btn pri" id="checkVenUpdate" type="button">Buscar atualização</button><button class="btn" id="closeAbout" type="button">Fechar</button></div>
@@ -1652,27 +1652,40 @@ document.addEventListener('click',e=>{
 });
 
 
-// Teclado responsivo: esconder a navegação somente enquanto o teclado realmente reduz a área visível.
-// Não usar apenas o foco do campo: ao recolher o teclado pela seta, o campo continua focado.
+// Alpha 19: um único controlador para menu inferior, viewport e cor da barra Android.
 const keyboardViewport=window.visualViewport;
 let keyboardBaseHeight=keyboardViewport?keyboardViewport.height:window.innerHeight;
-let keyboardResizeTimer=0;
+let tecladoNativoAtivo=false;
+let ultimaCorBarra='';
 const TELA_TOQUE=(window.matchMedia&&matchMedia('(pointer:coarse)').matches)||/Android|iPhone|iPad/i.test(navigator.userAgent);
+function corFundoAtual(){
+ const el=document.body;
+ const bg=getComputedStyle(el).backgroundColor;
+ const m=bg.match(/\d+/g);
+ if(m&&m.length>=3)return '#'+m.slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('');
+ return document.documentElement.dataset.theme==='dark'?'#101216':'#F4F7FB';
+}
+function sincronizarBarraAndroid(ativa){
+ const cor=corFundoAtual();
+ if(ativa===tecladoNativoAtivo&&cor===ultimaCorBarra)return;
+ tecladoNativoAtivo=ativa;ultimaCorBarra=cor;
+ try{if(window.Android&&Android.setBarraTeclado)Android.setBarraTeclado(ativa,cor)}catch(e){}
+}
 function atualizarTecladoVirtual(){
  const altura=keyboardViewport?keyboardViewport.height:window.innerHeight;
  const campoAtivo=!!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
  const zoomado=!!keyboardViewport&&Math.abs((keyboardViewport.scale||1)-1)>.01;
- if(!TELA_TOQUE || !campoAtivo || zoomado){
-  if(!campoAtivo || !zoomado) keyboardBaseHeight=altura;
-  document.body.classList.remove('keyboard-nav-hidden');
-  document.documentElement.classList.remove('keyboard-nav-hidden');
+ if(!TELA_TOQUE||zoomado){
+  document.body.classList.remove('keyboard-nav-hidden');document.documentElement.classList.remove('keyboard-nav-hidden');
+  if(!campoAtivo){keyboardBaseHeight=altura;sincronizarBarraAndroid(false)}
   return;
  }
- // Atualiza a referência quando a janela cresce (rotação ou teclado fechado).
- if(altura>keyboardBaseHeight) keyboardBaseHeight=altura;
- const tecladoVisivel=(keyboardBaseHeight-altura)>100;
- document.body.classList.toggle('keyboard-nav-hidden',tecladoVisivel);
- document.documentElement.classList.toggle('keyboard-nav-hidden',tecladoVisivel);
+ if(altura>keyboardBaseHeight)keyboardBaseHeight=altura;
+ const aberto=campoAtivo&&(keyboardBaseHeight-altura)>110;
+ document.body.classList.toggle('keyboard-nav-hidden',aberto);
+ document.documentElement.classList.toggle('keyboard-nav-hidden',aberto);
+ sincronizarBarraAndroid(aberto);
+ if(!aberto)keyboardBaseHeight=altura;
 }
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
 document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
@@ -1680,10 +1693,11 @@ const _limpaNav=()=>{document.body.classList.remove('keyboard-nav-hidden');docum
 window.addEventListener('blur',_limpaNav);document.addEventListener('visibilitychange',()=>{if(document.hidden)_limpaNav()});
 document.addEventListener('input',e=>{if(e.target.matches('#q'))document.body.classList.toggle('prod-search-active',!!e.target.value.trim())});
 document.addEventListener('focusin',e=>{if(e.target.matches('input,textarea,select,[contenteditable="true"]')){atualizarTecladoVirtual();requestAnimationFrame(atualizarTecladoVirtual)}});
-document.addEventListener('focusout',()=>setTimeout(atualizarTecladoVirtual,80));
+document.addEventListener('focusout',()=>setTimeout(atualizarTecladoVirtual,180));
 if(keyboardViewport)keyboardViewport.addEventListener('resize',atualizarTecladoVirtual);
 window.addEventListener('resize',atualizarTecladoVirtual);
 document.addEventListener('visibilitychange',atualizarTecladoVirtual);
+window.addEventListener('pageshow',atualizarTecladoVirtual);
 
 render();
 
@@ -1829,27 +1843,8 @@ function destinoNativo(){try{if(window.Android&&Android.destinoInicial){const d=
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){destinoNativo();sincronizarAvisos()}});
 setTimeout(()=>{sincronizarAvisos();destinoNativo();if(view==='home')avisarVencidasAoAbrir()},1200);
 
-/* Alpha 15 — cor da barra do sistema sincronizada com o fundo real do campo. */
-(function(){
- let ligado=false,t=null;
- const cor=()=>{const c=getComputedStyle(document.body).backgroundColor.match(/\d+/g)||[244,247,251];return '#'+c.slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('')};
- function barra(on){if(on===ligado)return;ligado=on;try{if(window.Android&&Android.setBarraTeclado)Android.setBarraTeclado(on,cor())}catch(e){}}
- const campo=el=>!!el&&el.matches&&el.matches('input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=date]),textarea');
- document.addEventListener('focusin',e=>{clearTimeout(t);if(campo(e.target)){barra(true);setTimeout(()=>{try{if(e.target.closest('#product-box,.crm-box,#sale-overlay'))e.target.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}},320)}});
- document.addEventListener('focusout',()=>{clearTimeout(t);t=setTimeout(()=>{if(!campo(document.activeElement))barra(false)},260)});
- const vv=window.visualViewport;
- let alturaBaseTeclado=vv?vv.height:window.innerHeight;
- let tecladoNativoAtivo=false;
- const medir=()=>{
-  const h=vv?vv.height:window.innerHeight;
-  document.documentElement.style.setProperty('--vvh',Math.round(h)+'px');
-  if(h>alturaBaseTeclado)alturaBaseTeclado=h;
-  const tecladoVisivel=(alturaBaseTeclado-h)>110;
-  if(tecladoVisivel!==tecladoNativoAtivo){tecladoNativoAtivo=tecladoVisivel;try{if(window.Android&&Android.setBarraTeclado)Android.setBarraTeclado(tecladoVisivel,cor())}catch(e){}}
-  if(!tecladoVisivel)alturaBaseTeclado=h;
- };
- medir();if(vv)vv.addEventListener('resize',medir);window.addEventListener('resize',medir);
-})();
+/* Alpha 19: o controlador único acima também atualiza a altura útil para modais. */
+(function(){const medir=()=>document.documentElement.style.setProperty('--vvh',Math.round((keyboardViewport?keyboardViewport.height:window.innerHeight))+'px');medir();if(keyboardViewport)keyboardViewport.addEventListener('resize',medir);window.addEventListener('resize',medir)})();
 let backSairAte=0;
 function handleAndroidBack(){
   if(pkEl){fecharPicker();return true}

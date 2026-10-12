@@ -245,11 +245,12 @@ public class MainActivity extends Activity {
             runOnUiThread(() -> {
                 try {
                     int corBarra;
-                    if (ativa) {
-                        corBarra = Color.parseColor(cor == null ? "#F4F7FB" : cor);
-                    } else {
-                        corBarra = Color.parseColor(getSharedPreferences("ven", MODE_PRIVATE).getString("cromo", "#10151B"));
-                    }
+                    // Usa a cor atual enviada pelo HTML tanto ao abrir quanto ao fechar o teclado.
+                    // Restaurar sempre o cromo salvo causava um flash escuro no tema claro.
+                    String corAtual = (cor == null || cor.trim().isEmpty())
+                            ? getSharedPreferences("ven", MODE_PRIVATE).getString("cromo", "#F4F7FB")
+                            : cor.trim();
+                    corBarra = Color.parseColor(corAtual);
                     // Mantém o fundo nativo e o WebView sincronizados com o campo focado.
                     // Isso evita que a área exposta pelo redimensionamento do teclado apareça azul.
                     getWindow().getDecorView().setBackgroundColor(corBarra);
