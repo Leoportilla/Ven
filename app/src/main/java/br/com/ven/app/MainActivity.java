@@ -237,6 +237,23 @@ public class MainActivity extends Activity {
             destinoPendente = "";
             return d == null ? "" : d;
         }
+        // Abre o aplicativo de e-mail com destinatário, assunto e mensagem preenchidos.
+        @JavascriptInterface
+        public void abrirEmail(final String destinatario, final String assunto, final String mensagem) {
+            runOnUiThread(() -> {
+                try {
+                    String para = destinatario == null ? "" : destinatario.trim();
+                    if (para.isEmpty()) { Toast.makeText(MainActivity.this, "E-mail do cliente não cadastrado.", Toast.LENGTH_LONG).show(); return; }
+                    Intent i = new Intent(Intent.ACTION_SENDTO);
+                    i.setData(Uri.parse("mailto:" + Uri.encode(para)));
+                    i.putExtra(Intent.EXTRA_EMAIL, new String[]{para});
+                    i.putExtra(Intent.EXTRA_SUBJECT, assunto == null ? "" : assunto);
+                    i.putExtra(Intent.EXTRA_TEXT, mensagem == null ? "" : mensagem);
+                    startActivity(Intent.createChooser(i, "Enviar e-mail"));
+                } catch (Exception e) { Toast.makeText(MainActivity.this, "Não foi possível abrir um aplicativo de e-mail.", Toast.LENGTH_LONG).show(); }
+            });
+        }
+
         // Abre a conversa do WhatsApp com o numero informado (com DDI 55 + DDD), no WhatsApp ou WhatsApp Business.
         @JavascriptInterface
         public void abrirWhatsAppContato(final String numero) {
