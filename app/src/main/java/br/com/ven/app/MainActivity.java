@@ -250,6 +250,10 @@ public class MainActivity extends Activity {
                     } else {
                         corBarra = Color.parseColor(getSharedPreferences("ven", MODE_PRIVATE).getString("cromo", "#10151B"));
                     }
+                    // Mantém o fundo nativo e o WebView sincronizados com o campo focado.
+                    // Isso evita que a área exposta pelo redimensionamento do teclado apareça azul.
+                    getWindow().getDecorView().setBackgroundColor(corBarra);
+                    if (webView != null) webView.setBackgroundColor(corBarra);
                     getWindow().setNavigationBarColor(corBarra);
                     if (Build.VERSION.SDK_INT >= 29) getWindow().setNavigationBarContrastEnforced(false);
                 } catch (Exception ignorado) { }

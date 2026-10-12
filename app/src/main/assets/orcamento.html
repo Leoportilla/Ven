@@ -572,7 +572,9 @@ header{display:block}
 @media(min-width:700px){
 #home-nav{padding-left:max(12px,calc((100vw - 1100px)/2));padding-right:max(12px,calc((100vw - 1100px)/2))}
 }
-body.keyboard-nav-hidden #home-nav,body.keyboard-nav-hidden #bar{display:none!important}
+/* O menu principal permanece visível mesmo quando o teclado é recolhido. */
+body.keyboard-nav-hidden #home-nav{display:grid!important;visibility:visible!important}
+body.keyboard-nav-hidden #bar{display:none!important}
 body.keyboard-nav-hidden{padding-bottom:0!important; background:var(--bg)!important;}
 html.keyboard-nav-hidden,html.keyboard-nav-hidden body{background:var(--bg)!important;}
 body.keyboard-nav-hidden.home-mode{padding-bottom:0!important}
