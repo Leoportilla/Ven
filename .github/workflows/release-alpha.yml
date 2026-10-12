@@ -23,6 +23,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Build debug APK for alpha testing
         run: gradle --no-daemon assembleDebug
+      - name: Renomear APK para VEN.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/VEN.apk
       - name: Publish GitHub Pre-release
         uses: softprops/action-gh-release@v2
         with:
@@ -34,4 +36,4 @@ jobs:
             **VERSÃO ALFA — somente para testes.**
 
             APK debug para teste. A assinatura debug pode mudar entre execuções; atualizar por cima exige uma chave persistente igual à da instalação anterior.
-          files: app/build/outputs/apk/debug/app-debug.apk
+          files: app/build/outputs/apk/debug/VEN.apk

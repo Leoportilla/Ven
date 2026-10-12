@@ -249,7 +249,9 @@ public class MainActivity extends Activity {
                     i.putExtra(Intent.EXTRA_EMAIL, new String[]{para});
                     i.putExtra(Intent.EXTRA_SUBJECT, assunto == null ? "" : assunto);
                     i.putExtra(Intent.EXTRA_TEXT, mensagem == null ? "" : mensagem);
-                    startActivity(Intent.createChooser(i, "Enviar e-mail"));
+                    // Deixa o Android resolver o app de e-mail diretamente; quando houver mais de um,
+                    // o sistema pode oferecer “Sempre”/“Só uma vez” para definir o padrão.
+                    startActivity(i);
                 } catch (Exception e) { Toast.makeText(MainActivity.this, "Não foi possível abrir um aplicativo de e-mail.", Toast.LENGTH_LONG).show(); }
             });
         }

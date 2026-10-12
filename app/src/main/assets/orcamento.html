@@ -770,6 +770,23 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
 
 /* Alpha 26: keep close control clear of Android status bar. */
 @media(max-width:600px){.mg-head #menuClose{margin-top:42px!important;position:relative;top:0!important;transform:none!important;align-self:flex-start;z-index:8}}
+
+/* Alpha.31: uniform customer action icon color and stroke, including brand icons Waze/WhatsApp. */
+#main .saved-actions .crm-icon-action,
+#main .saved-actions .crm-brand-action { color: var(--crm-action-color, #ff922b) !important; }
+#main .saved-actions .crm-icon-action svg,
+#main .saved-actions .crm-brand-action svg { color: inherit !important; }
+#main .saved-actions .crm-icon-action svg *,
+#main .saved-actions .crm-brand-action svg * {
+  stroke: currentColor !important;
+  stroke-width: 2.15 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+:root[data-theme="dark"] #main .saved-actions .crm-icon-action,
+:root[data-theme="dark"] #main .saved-actions .crm-brand-action { --crm-action-color: #ff922b !important; color: #ff922b !important; }
+:root[data-theme="light"] #main .saved-actions .crm-icon-action,
+:root[data-theme="light"] #main .saved-actions .crm-brand-action { --crm-action-color: #2589c9 !important; color: #2589c9 !important; }
 </style>
 </head>
 <body>
