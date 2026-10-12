@@ -1,6 +1,8 @@
 package br.com.ven.app;
 
 import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.SharedPreferences;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -31,6 +33,11 @@ import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions;
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning;
 
 import org.json.JSONObject;
+import org.json.JSONArray;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MainActivity extends Activity {
     private WebView webView;
@@ -38,6 +45,12 @@ public class MainActivity extends Activity {
     private ValueCallback<Uri[]> filePathCallback;
     private static final int FILE_CHOOSER_REQUEST = 1001;
     private static String destinoPendente = "";
+    // Atualizações públicas do GitHub. O repositório precisa ser público; nunca embutir token de acesso no APK.
+    private static final String UPDATE_OWNER = "Leportilla";
+    private static final String UPDATE_REPO = "Ven";
+    private static final String UPDATE_TAG = "latest-alpha";
+    private static final String UPDATE_API = "https://api.github.com/repos/" + UPDATE_OWNER + "/" + UPDATE_REPO + "/releases/tags/" + UPDATE_TAG;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +84,15 @@ public class MainActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return abrirExterno(request.getUrl().toString());
+            }
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                SharedPreferences prefs = getSharedPreferences("ven_updates", MODE_PRIVATE);
+                long last = prefs.getLong("last_check", 0L);
+                if (prefs.getBoolean("auto", true) && System.currentTimeMillis() - last > 24L * 60L * 60L * 1000L) {
+                    new android.os.Handler(getMainLooper()).postDelayed(() -> verificarAtualizacao(false), 2500L);
+                }
             }
         });
         webView.setWebChromeClient(new WebChromeClient() {
@@ -248,6 +270,72 @@ public class MainActivity extends Activity {
                     Toast.makeText(MainActivity.this, "Não foi possível abrir o compartilhamento.", Toast.LENGTH_LONG).show();
                 }
             });
+        }
+
+        @JavascriptInterface
+        public void setAutoUpdateEnabled(final boolean enabled) {
+            getSharedPreferences("ven_updates", MODE_PRIVATE).edit().putBoolean("auto", enabled).apply();
+            if (enabled) verificarAtualizacao(false);
+        }
+
+        @JavascriptInterface
+        public void checkForUpdates() { verificarAtualizacao(true); }
+
+        @JavascriptInterface
+        public void openUpdateUrl(final String url) {
+            runOnUiThread(() -> {
+                try {
+                    Uri uri = Uri.parse(url == null ? "" : url);
+                    if (!"https".equalsIgnoreCase(uri.getScheme()) || !"github.com".equalsIgnoreCase(uri.getHost())) {
+                        Toast.makeText(MainActivity.this, "Link de atualização inválido.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Não foi possível abrir a atualização.", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        // Consulta a release pública latest-alpha; o usuário confirma a instalação pelo Android.
+        private void verificarAtualizacao(boolean mostrarStatus) {
+            new Thread(() -> {
+                HttpURLConnection conn = null;
+                JSONObject resposta;
+                try {
+                    URL url = new URL(UPDATE_API);
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setConnectTimeout(8000);
+                    conn.setReadTimeout(8000);
+                    conn.setRequestProperty("Accept", "application/vnd.github+json");
+                    conn.setRequestProperty("User-Agent", "VEN-Android-Updater");
+                    int status = conn.getResponseCode();
+                    if (status != 200) throw new Exception(status == 404 ? "Lançamento não encontrado ou repositório privado." : "GitHub respondeu HTTP " + status + ".");
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+                    StringBuilder body = new StringBuilder(); String line;
+                    while ((line = reader.readLine()) != null) body.append(line);
+                    reader.close();
+                    JSONObject release = new JSONObject(body.toString());
+                    String releaseBody = release.optString("body", "");
+                    int remoteCode = -1;
+                    java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("(?i)versionCode\\s*[:=]\\s*(\\d+)").matcher(releaseBody);
+                    if (matcher.find()) remoteCode = Integer.parseInt(matcher.group(1));
+                    String versionName = "nova versão";
+                    java.util.regex.Matcher nameMatcher = java.util.regex.Pattern.compile("(?i)versionName\\s*[:=]\\s*([^\\r\\n]+)").matcher(releaseBody);
+                    if (nameMatcher.find()) versionName = nameMatcher.group(1).trim();
+                    String releaseUrl = release.optString("html_url", "https://github.com/" + UPDATE_OWNER + "/" + UPDATE_REPO + "/releases");
+                    boolean available = remoteCode > BuildConfig.VERSION_CODE;
+                    resposta = new JSONObject(); resposta.put("available", available); resposta.put("versionName", versionName); resposta.put("versionCode", remoteCode); resposta.put("url", releaseUrl);
+                    if (!available) resposta.put("message", "Seu VEN já está atualizado.");
+                    getSharedPreferences("ven_updates", MODE_PRIVATE).edit().putLong("last_check", System.currentTimeMillis()).apply();
+                } catch (Exception e) {
+                    resposta = new JSONObject();
+                    try { resposta.put("available", false); resposta.put("message", "Não foi possível consultar atualizações. " + e.getMessage()); } catch (Exception ignored) { }
+                } finally { if (conn != null) conn.disconnect(); }
+                final String json = resposta.toString();
+                runOnUiThread(() -> { if (webView != null) webView.evaluateJavascript("if(window.venUpdateResult)window.venUpdateResult(" + JSONObject.quote(json) + ")", null); });
+            }).start();
         }
 
         // Imprime/gera PDF a partir de um HTML proprio do orcamento (nao depende do CSS de impressao da tela).

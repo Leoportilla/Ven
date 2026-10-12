@@ -573,6 +573,8 @@ header{display:block}
 #home-nav{padding-left:max(12px,calc((100vw - 1100px)/2));padding-right:max(12px,calc((100vw - 1100px)/2))}
 }
 body.keyboard-nav-hidden #home-nav,body.keyboard-nav-hidden #bar{display:none!important}
+body.keyboard-nav-hidden{padding-bottom:0!important; background:var(--bg)!important;}
+html.keyboard-nav-hidden,html.keyboard-nav-hidden body{background:var(--bg)!important;}
 body.keyboard-nav-hidden.home-mode{padding-bottom:0!important}
 body.settings-menu-open #home-nav,body.settings-overlay-open #home-nav{z-index:98!important}
 html[data-theme] #drawerBackdrop{background:var(--bg)!important}
@@ -675,6 +677,24 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjus
 input,select,textarea{font-size:16px}
 html,body,*{scrollbar-width:none;-ms-overflow-style:none}
 html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none;width:0;height:0}
+
+/* alpha.9 — seletor de produto/serviço moderno e compacto */
+.kind-choice-wrap{margin:8px 0 16px!important}
+.kind-choice-label{display:block;font-size:13px;font-weight:750;letter-spacing:.01em;color:var(--mut);margin:0 0 9px}
+.kind-choice{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kind-choice-btn{appearance:none;display:flex;align-items:center;gap:11px;text-align:left;min-width:0;padding:13px 12px;border:1px solid var(--bd);border-radius:17px;background:var(--card);color:var(--tx);cursor:pointer;transition:border-color .16s,background-color .16s,transform .16s;}
+.kind-choice-btn:active{transform:scale(.985)}
+.kind-choice-btn.is-active{border:1.5px solid #0B7FB8;background:rgba(11,127,184,.10);box-shadow:inset 0 0 0 1px rgba(11,127,184,.08)}
+.kind-choice-icon{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border-radius:13px;background:rgba(245,130,32,.13);color:#F58220;font-size:23px;font-weight:800}
+.kind-choice-btn strong{display:block;font-size:14px;line-height:1.25;font-weight:800}
+.kind-choice-btn small{display:block;color:var(--mut);font-size:11px;line-height:1.35;margin-top:3px;font-weight:500}
+.kind-choice-native{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+:root[data-theme="light"] .kind-choice-btn{background:#fff;color:#20252b;border-color:#dfe5eb}
+:root[data-theme="light"] .kind-choice-btn.is-active{background:#eaf6fb;border-color:#0B7FB8}
+@media(max-width:360px){.kind-choice{gap:7px}.kind-choice-btn{padding:11px 8px;gap:7px}.kind-choice-icon{flex-basis:34px;width:34px;height:34px;border-radius:11px}.kind-choice-btn small{font-size:10px}}
+
+
+.field-hint{display:block;margin-top:6px;color:var(--muted,#7b8494);font-size:12px;line-height:1.4}
 </style>
 </head>
 <body>
@@ -727,10 +747,18 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
   <div><div class="mg-kicker">AJUSTES</div><h2>Configurações</h2><p>Aparência, catálogo e backup</p></div>
   <button id="menuClose" aria-label="Fechar menu">×</button>
  </div>
-  <div class="mg-title">APARÊNCIA E EMPRESA</div><div class="mg "><button class="menu-action" id="openVisual"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z"/></svg></span><span>Visual<small>Cores e modo claro ou escuro</small></span></button><button class="menu-action" id="openCompany"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span><span>Dados da empresa<small>Nome, CNPJ, endereço e logotipo</small></span></button></div><div class="mg-title">BACKUP E SEGURANÇA</div><div class="mg "><button class="menu-action" id="exportBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m-5 5 5-5 5 5"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg></span><span>Baixar backup<small>Salvar catálogo, clientes e pedidos em arquivo</small></span></button><button class="menu-action" id="importBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m-5-5 5 5 5-5"/><path d="M4 16v4h16v-4"/></svg></span><span>Restaurar backup<small>Recuperar dados de um arquivo salvo</small></span></button><button class="menu-action" id="backupInfo"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><span>Dados e segurança<small>Onde ficam os orçamentos</small></span></button></div><div class="mg-title">SOBRE O APLICATIVO</div><div class="mg"><button class="menu-action" id="openAbout" type="button"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></svg></span><span>Sobre o VEN<small>Autoria, contato e versão</small></span></button></div><div class="mg-title">ZONA DE RISCO</div><div class="mg mg-danger"><button class="menu-action" id="clearCatalog"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M6 5v14h12V5M9 9v6m6-6v6"/><path d="M9 2h6"/></svg></span><span>Limpar banco de dados<small>Apagar produtos importados e cadastrados</small></span></button><button class="menu-action reset-app-action" id="resetAppData"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 1 1 2 6"/><path d="M4 5v6h6"/></svg></span><span>Zerar dados do aplicativo<small>Apagar produtos, clientes, orçamentos e vendas</small></span></button></div><input type="file" id="backupFile" accept=".json,application/json" hidden>
+  <div class="mg-title">APARÊNCIA E EMPRESA</div><div class="mg "><button class="menu-action" id="openVisual"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z"/></svg></span><span>Visual<small>Cores e modo claro ou escuro</small></span></button><button class="menu-action" id="openCompany"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span><span>Dados da empresa<small>Nome, CNPJ, endereço e logotipo</small></span></button></div><div class="mg-title">BACKUP E SEGURANÇA</div><div class="mg "><button class="menu-action" id="exportBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m-5 5 5-5 5 5"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg></span><span>Baixar backup<small>Salvar catálogo, clientes e pedidos em arquivo</small></span></button><button class="menu-action" id="importBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m-5-5 5 5 5-5"/><path d="M4 16v4h16v-4"/></svg></span><span>Restaurar backup<small>Recuperar dados de um arquivo salvo</small></span></button><button class="menu-action" id="backupInfo"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><span>Dados e segurança<small>Onde ficam os orçamentos</small></span></button></div><div class="mg-title">ATUALIZAÇÕES</div><div class="mg"><button class="menu-action" id="openUpdates" type="button"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 6l2 2M4 16l2 2a7 7 0 0 0 12.5-3"/></svg></span><span>Atualizações<small>Verificar novas versões do VEN</small></span></button></div><div class="mg-title">SOBRE O APLICATIVO</div><div class="mg"><button class="menu-action" id="openAbout" type="button"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></svg></span><span>Sobre o VEN<small>Autoria, contato e versão</small></span></button></div><div class="mg-title">ZONA DE RISCO</div><div class="mg mg-danger"><button class="menu-action" id="clearCatalog"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M6 5v14h12V5M9 9v6m6-6v6"/><path d="M9 2h6"/></svg></span><span>Limpar banco de dados<small>Apagar produtos importados e cadastrados</small></span></button><button class="menu-action reset-app-action" id="resetAppData"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 1 1 2 6"/><path d="M4 5v6h6"/></svg></span><span>Zerar dados do aplicativo<small>Apagar produtos, clientes, orçamentos e vendas</small></span></button></div><input type="file" id="backupFile" accept=".json,application/json" hidden>
  </aside>
 </div>
 <div id="settings-overlay" role="dialog" aria-modal="true" aria-label="Configurações de personalização">
+ <section id="updates-box" class="settings-box" style="display:none">
+  <h2>Atualizações do VEN</h2>
+  <p>O VEN pode consultar os lançamentos publicados no GitHub. Quando encontrar uma versão nova, você poderá abrir o download e confirmar a instalação pelo Android.</p>
+  <label class="settings-field" style="display:flex;align-items:center;gap:12px"><input id="autoUpdatesToggle" type="checkbox" style="width:22px;height:22px;flex:0 0 auto"> Verificar atualizações automaticamente</label>
+  <div class="settings-note">A verificação automática não instala silenciosamente. O Android solicitará confirmação para instalar. O repositório de atualizações precisa estar público e as versões devem usar a mesma assinatura digital.</div>
+  <p id="updateStatus" role="status" aria-live="polite">Pronto para verificar.</p>
+  <div class="settings-actions"><button class="btn" id="closeUpdates" type="button">Fechar</button><button class="btn" id="checkUpdatesNow" type="button">Verificar agora</button><button class="btn pri" id="downloadUpdate" type="button" style="display:none">Abrir atualização</button></div>
+ </section>
  <section id="visual-box" class="settings-box" style="display:none">
   <h2>Visual do aplicativo</h2><p>Escolha a cor de destaque e a aparência. A preferência fica salva neste celular.</p>
   <div class="theme-options">
@@ -805,9 +833,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
  <section id="product-box">
   <h2 id="productTitle">Cadastrar produto</h2><p>Cadastre produtos, materiais, serviços com preço fixo ou mão de obra por hora. Adicione campos personalizados para o seu tipo de negócio.</p>
   <div class="product-form-grid">
-   <label class="settings-field full">O que deseja cadastrar?
-    <select id="prodKind"><option value="product">Produto / material</option><option value="service">Serviço / mão de obra</option></select>
-   </label>
+   <div class="settings-field full kind-choice-wrap"><span class="kind-choice-label">O que você vai cadastrar?</span><div class="kind-choice" role="group" aria-label="Tipo de cadastro"><button type="button" class="kind-choice-btn is-active" data-kind="product" aria-pressed="true"><span class="kind-choice-icon" aria-hidden="true">▦</span><span><strong>Produto</strong><small>Itens e materiais</small></span></button><button type="button" class="kind-choice-btn" data-kind="service" aria-pressed="false"><span class="kind-choice-icon" aria-hidden="true">✳</span><span><strong>Serviço</strong><small>Mão de obra e horas</small></span></button></div><select id="prodKind" class="kind-choice-native" aria-hidden="true" tabindex="-1"><option value="product">Produto / material</option><option value="service">Serviço / mão de obra</option></select></div>
    <label class="settings-field full">Nome <input id="prodName" maxlength="180" placeholder="Ex.: Cabo elétrico, instalação, limpeza" required></label>
    <div id="serviceOptions" class="product-form-grid full" style="display:none">
     <label class="settings-field">Tipo de serviço
@@ -817,7 +843,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:non
      <select id="prodUnit"><option value="un">Unidade / serviço</option><option value="h">Hora</option><option value="dia">Diária</option><option value="m2">m²</option><option value="m">Metro</option><option value="km">Quilômetro</option></select>
     </label>
    </div>
-   <label class="settings-field">Código interno<input id="prodCode" maxlength="60" placeholder="Ex.: ITEM-001"></label>
+   <label class="settings-field">Código interno<input id="prodCode" maxlength="60" placeholder="Gerado automaticamente (pode alterar)" autocomplete="off"><small class="field-hint">Gerado automaticamente. Você pode editar antes de salvar.</small></label>
    <label class="settings-field" id="barcodeField">Código de barras<input id="prodBarcode" maxlength="80" inputmode="numeric" placeholder="EAN / GTIN"></label>
    <label class="settings-field" id="costField">Preço de custo (R$)<input id="prodCost" type="number" min="0" step="0.01" value="0"></label>
    <label class="settings-field"><span id="prodPriceLabel">Preço de venda (R$)</span><input id="prodPrice" type="number" min="0" step="0.01" value="0" required></label>
@@ -980,7 +1006,7 @@ let ven_produtosManuais=Array.isArray(ven_produtosManuaisIniciais)?ven_produtosM
 let prods=[...produtosImportados,...ven_produtosManuais];
 let byId = new Map(prods.map(p=>[String(p.id),p]));
 function reconstruirProdutos(){prods=[...produtosImportados,...ven_produtosManuais].map(normalizarProduto);byId=new Map(prods.map(p=>[String(p.id),p]));store.set('ven_produtosManuais',ven_produtosManuais);}
-function proximoCodigoManual(){let max=0;prods.forEach(p=>{const n=Number(p.id);if(Number.isFinite(n))max=Math.max(max,n)});return 'MAN-'+String(max+1).padStart(4,'0')}
+function proximoCodigoManual(){const usados=new Set(prods.map(p=>String(p.id||'').trim().toUpperCase()));let n=1,codigo='';do{codigo='MAN-'+String(n).padStart(4,'0');n++}while(usados.has(codigo));return codigo}
 
 let cart = store.get('ven_cart',[]).map(i=>({...i,id:String(i.id)})).filter(i=>byId.has(i.id)).map(i=>({...i,d:i.d||byId.get(i.id).d}));
 let cfg = store.get('ven_cfg',{cli:'',desc:'',tipo:'%',obs:'Orçamento válido por 5 dias.'});
@@ -1400,12 +1426,22 @@ function barcodeLido(codigo){
 // Menu principal e importação assistida do catálogo TXT
 const drawerBackdrop=$('#drawerBackdrop'), importOverlay=$('#import-overlay');
 const settingsOverlay=document.getElementById('settings-overlay');
-function fecharSettings(){document.body.classList.remove('settings-overlay-open');settingsOverlay.style.display='none';document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none'}
-function abrirVisual(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='block';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none';settingsOverlay.style.display='flex';aplicarVisual()}
+function fecharSettings(){document.body.classList.remove('settings-overlay-open');settingsOverlay.style.display='none';document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none';document.getElementById('updates-box').style.display='none'}
+function abrirVisual(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='block';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none';document.getElementById('updates-box').style.display='none';settingsOverlay.style.display='flex';aplicarVisual()}
 function preencherEmpresaForm(){carregarEmpresa();document.getElementById('companyName').value=EMPRESA.nome||'';document.getElementById('companyTrade').value=EMPRESA.fantasia||'';document.getElementById('companyTax').value=EMPRESA.cnpj||'';document.getElementById('companyAddress').value=EMPRESA.end||'';document.getElementById('companyPhone').value=EMPRESA.telefone||'';document.getElementById('companyEmail').value=EMPRESA.email||'';const p=document.getElementById('companyLogoPreview');if(EMPRESA.logo){p.src=EMPRESA.logo;p.style.display='block'}else{p.removeAttribute('src');p.style.display='none'}document.getElementById('companyLogoFile').value=''}
-function abrirEmpresa(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='block';document.getElementById('about-box').style.display='none';preencherEmpresaForm();settingsOverlay.style.display='flex'}
-function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex'}
+function abrirEmpresa(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='block';document.getElementById('about-box').style.display='none';document.getElementById('updates-box').style.display='none';preencherEmpresaForm();settingsOverlay.style.display='flex'}
+function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';document.getElementById('updates-box').style.display='none';settingsOverlay.style.display='flex'}
 document.getElementById('openVisual').addEventListener('click',abrirVisual);document.getElementById('openCompany').addEventListener('click',abrirEmpresa);document.getElementById('openAbout').addEventListener('click',abrirSobre);document.getElementById('closeAbout').addEventListener('click',fecharSettings);
+const autoUpdatesToggle=document.getElementById('autoUpdatesToggle');
+let venUpdateDownloadUrl='';
+function updateStatus(text){document.getElementById('updateStatus').textContent=text}
+function abrirAtualizacoes(){fecharMenu();document.body.classList.add('settings-overlay-open');for(const id of ['visual-box','company-box','about-box'])document.getElementById(id).style.display='none';document.getElementById('updates-box').style.display='block';settingsOverlay.style.display='flex';autoUpdatesToggle.checked=localStorage.getItem('ven_auto_updates')!=='false';document.getElementById('downloadUpdate').style.display='none';updateStatus('Pronto para verificar.');}
+document.getElementById('openUpdates').addEventListener('click',abrirAtualizacoes);document.getElementById('closeUpdates').addEventListener('click',fecharSettings);
+autoUpdatesToggle.addEventListener('change',()=>{localStorage.setItem('ven_auto_updates',autoUpdatesToggle.checked?'true':'false');if(window.Android&&Android.setAutoUpdateEnabled)Android.setAutoUpdateEnabled(autoUpdatesToggle.checked);updateStatus(autoUpdatesToggle.checked?'Verificação automática ativada.':'Verificação automática desativada.');});
+document.getElementById('checkUpdatesNow').addEventListener('click',()=>{document.getElementById('downloadUpdate').style.display='none';updateStatus('Consultando lançamentos do GitHub...');if(window.Android&&Android.checkForUpdates){Android.checkForUpdates()}else{updateStatus('No navegador do PC, a consulta nativa não está disponível. Teste pelo APK Android.')}});
+document.getElementById('downloadUpdate').addEventListener('click',()=>{if(!venUpdateDownloadUrl)return;if(window.Android&&Android.openUpdateUrl)Android.openUpdateUrl(venUpdateDownloadUrl);else window.open(venUpdateDownloadUrl,'_blank','noopener')});
+window.venUpdateResult=function(result){try{if(typeof result==='string')result=JSON.parse(result);if(result.available){venUpdateDownloadUrl=result.url||result.releaseUrl||'';updateStatus('Nova versão disponível: '+(result.versionName||'versão mais recente')+'. Abra o download para instalar.');document.getElementById('downloadUpdate').style.display=venUpdateDownloadUrl?'inline-flex':'none';}else{venUpdateDownloadUrl='';document.getElementById('downloadUpdate').style.display='none';updateStatus(result.message||'Seu VEN já está atualizado.')}}catch(e){updateStatus('Não foi possível interpretar a resposta de atualização.')}};
+
 document.getElementById('closeVisual').addEventListener('click',fecharSettings);document.getElementById('cancelCompany').addEventListener('click',fecharSettings);
 settingsOverlay.addEventListener('click',e=>{if(e.target===settingsOverlay)fecharSettings()});
 document.querySelectorAll('[data-theme-choice]').forEach(b=>b.addEventListener('click',()=>{VISUAL.theme=b.dataset.themeChoice;aplicarVisual()}));
@@ -1499,15 +1535,15 @@ function abrirCadastroProduto(id=null){
  fecharMenu();editingProductId=id;pendingProductImage='';
  const p=id?prods.find(x=>String(x.id)===String(id)):null;
  $('#productTitle').textContent=p?'Editar item':'Cadastrar produto ou serviço';
- $('#prodKind').value=p?.kind||'product';$('#prodServiceType').value=p?.serviceType||'fixed';$('#prodUnit').value=p?.unit||'un';
- $('#prodName').value=p?.d||'';$('#prodCode').value=p?.manual?p.id:(p?.id||'');$('#prodBarcode').value=(p?.b||[]).join(', ');
+ $('#prodKind').value=p?.kind||'product';sincronizarSeletorTipo();$('#prodServiceType').value=p?.serviceType||'fixed';$('#prodUnit').value=p?.unit||'un';
+ $('#prodName').value=p?.d||'';$('#prodCode').value=p?(p?.manual?p.id:(p?.id||'')):proximoCodigoManual();$('#prodBarcode').value=(p?.b||[]).join(', ');
  $('#prodCost').value=Number(p?.c)||0;$('#prodPrice').value=Number(p?.p)||0;$('#prodStock').value=Number(p?.q)||0;$('#prodLocation').value=p?.l||'';$('#prodCustomFields').value=Object.entries(p?.attrs||{}).map(([k,v])=>k+'='+v).join('; ');$('#prodImageUrl').value=p?.img&&!p.img.startsWith('data:')?p.img:'';
  atualizarCamposCadastro();
  const preview=$('#productImagePreview');const img=p?.img||'';if(img){preview.src=img;preview.style.display='block';pendingProductImage=img}else{preview.removeAttribute('src');preview.style.display='none'}
  $('#prodImageFile').value='';productOverlay.style.display='flex';
 }
 function atualizarCamposCadastro(){const service=$('#prodKind').value==='service';const hourly=$('#prodServiceType').value==='hourly';$('#serviceOptions').style.display=service?'grid':'none';$('#barcodeField').style.display=service?'none':'';$('#stockField').style.display=service?'none':'';$('#costField').style.display=service?'none':'';$('#prodUnit').value=service?(hourly?'h':($('#prodUnit').value==='h'?'un':$('#prodUnit').value)):'un';$('#prodPriceLabel').textContent=service?'Valor cobrado (R$)':'Preço de venda (R$)'}
-$('#prodKind').addEventListener('change',atualizarCamposCadastro);$('#prodServiceType').addEventListener('change',()=>{if($('#prodServiceType').value==='hourly')$('#prodUnit').value='h';else if($('#prodUnit').value==='h')$('#prodUnit').value='un';atualizarCamposCadastro()});
+$('#prodKind').addEventListener('change',atualizarCamposCadastro); document.querySelectorAll('.kind-choice-btn').forEach(btn=>btn.addEventListener('click',()=>{const kind=btn.dataset.kind;$('#prodKind').value=kind;document.querySelectorAll('.kind-choice-btn').forEach(b=>{const active=b===btn;b.classList.toggle('is-active',active);b.setAttribute('aria-pressed',active?'true':'false')});atualizarCamposCadastro()})); function sincronizarSeletorTipo(){document.querySelectorAll('.kind-choice-btn').forEach(b=>{const active=b.dataset.kind===$('#prodKind').value;b.classList.toggle('is-active',active);b.setAttribute('aria-pressed',active?'true':'false')})}$('#prodServiceType').addEventListener('change',()=>{if($('#prodServiceType').value==='hourly')$('#prodUnit').value='h';else if($('#prodUnit').value==='h')$('#prodUnit').value='un';atualizarCamposCadastro()});
 function parseCamposPersonalizados(text){const out={};String(text||'').split(';').forEach(part=>{const i=part.indexOf('=');if(i>0){const k=part.slice(0,i).trim().slice(0,50),v=part.slice(i+1).trim().slice(0,150);if(k&&v)out[k]=v}});return out}
 function fecharCadastroProduto(){productOverlay.style.display='none';editingProductId=null;pendingProductImage=''}
 document.addEventListener('click',e=>{if(e.target.closest('#startFirstProduct'))abrirCadastroProduto()});
@@ -1563,18 +1599,20 @@ const keyboardViewport=window.visualViewport;
 let keyboardBaseHeight=keyboardViewport?keyboardViewport.height:window.innerHeight;
 function atualizarTecladoVirtual(){
  const altura=keyboardViewport?keyboardViewport.height:window.innerHeight;
- const campoAtivo=!!document.activeElement?.matches('input,textarea');
+ const campoAtivo=!!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
  if(!campoAtivo)keyboardBaseHeight=altura;
  const zoomado=!!keyboardViewport&&Math.abs((keyboardViewport.scale||1)-1)>.01;
- const ativo=campoAtivo && !zoomado && !!keyboardViewport && keyboardBaseHeight-altura>120;
+ // Oculta a navegação no próprio foco para acompanhar a animação do teclado sem deixar uma faixa azul aparecendo.
+ const ativo=campoAtivo && !zoomado;
  if(campoAtivo&&!ativo)keyboardBaseHeight=altura;
  document.body.classList.toggle('keyboard-nav-hidden',ativo);
+ document.documentElement.classList.toggle('keyboard-nav-hidden',ativo);
 }
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
 document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
 document.addEventListener('input',e=>{if(e.target.matches('#q'))document.body.classList.toggle('prod-search-active',!!e.target.value.trim())});
-document.addEventListener('focusin',e=>{if(e.target.matches('input,textarea'))setTimeout(atualizarTecladoVirtual,120)});
-document.addEventListener('focusout',()=>setTimeout(atualizarTecladoVirtual,180));
+document.addEventListener('focusin',e=>{if(e.target.matches('input,textarea,select,[contenteditable="true"]')){atualizarTecladoVirtual();requestAnimationFrame(atualizarTecladoVirtual)}});
+document.addEventListener('focusout',()=>setTimeout(atualizarTecladoVirtual,80));
 if(keyboardViewport)keyboardViewport.addEventListener('resize',atualizarTecladoVirtual);
 window.addEventListener('resize',atualizarTecladoVirtual);
 document.addEventListener('visibilitychange',atualizarTecladoVirtual);

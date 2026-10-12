@@ -52,3 +52,8 @@ Nenhuma publicação na Google Play ou criação de redes sociais é feita por e
 ## Versão atual
 
 **VEN 2.0.0-alpha.4** — nova identidade visual azul-claro/laranja/branco; `versionCode` 7. O projeto preserva a camada SQLite e a correção de tela fixa herdadas da alpha.3. A compilação real e o teste no aparelho ainda devem ser confirmados no GitHub Actions.
+
+
+## Atualizações alfa via GitHub
+
+A configuração `Configurações > Atualizações` consulta a release pública `latest-alpha`. O workflow `.github/workflows/android.yml` compila em cada push e atualiza a release. Configure `UPDATE_OWNER` e `UPDATE_REPO` em `MainActivity.java` para o dono/nome reais do repositório. O repositório precisa ser público para o app consultar a API sem token. O APK atual é debug e não deve ser distribuído ao público; configure assinatura estável antes de testar atualizações por cima de instalações existentes.

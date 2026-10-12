@@ -1,43 +1,62 @@
-name: VEN - Gerar APK automaticamente
+name: VEN - Compilar APK e publicar atualização alfa
 
 on:
   push:
     branches: [ main, master ]
-    paths:
-      - 'app/**'
-      - '*.gradle'
-      - 'settings.gradle'
-      - 'gradle.properties'
-      - '.github/workflows/**'
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
-    name: Compile Android debug APK
+    name: Compilar APK e atualizar release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source
+      - name: Baixar código
         uses: actions/checkout@v5
-      - name: Set up JDK 17
+      - name: Configurar Java 17
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-      - name: Set up Gradle 8.9
+      - name: Configurar Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Build debug APK
+      - name: Ler versão do app
+        id: appver
+        shell: bash
+        run: |
+          python3 - <<'PYVER' >> "$GITHUB_OUTPUT"
+          import re
+          from pathlib import Path
+          text = Path("app/build.gradle").read_text()
+          print("version_name=" + re.search(r"versionName '([^']+)'", text).group(1))
+          print("version_code=" + re.search(r"versionCode (\d+)", text).group(1))
+          PYVER
+      - name: Compilar APK debug
         run: gradle --no-daemon assembleDebug
-      - name: Upload APK artifact
+      - name: Guardar APK como artefato
         uses: actions/upload-artifact@v4
         with:
-          name: VEN-2.0.0-alpha.4-debug
+          name: VEN-${{ steps.appver.outputs.version_name }}-APK
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
+      - name: Publicar release alfa mais recente
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-alpha
+          name: VEN ${{ steps.appver.outputs.version_name }} (alfa mais recente)
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          make_latest: false
+          overwrite_files: true
+          body: |
+            VERSÃO ALFA PARA TESTES — não é uma versão estável.
+            versionName: ${{ steps.appver.outputs.version_name }}
+            versionCode: ${{ steps.appver.outputs.version_code }}
+
+            O APK desta release é de depuração. Antes de distribuir atualizações instaláveis por cima de uma versão anterior, configure uma chave de assinatura estável para todos os builds.
+          files: app/build/outputs/apk/debug/app-debug.apk
