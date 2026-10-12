@@ -163,6 +163,7 @@ body.settings-overlay-open{overflow:hidden}
 .crm-title{font-weight:800;font-size:16px}
 .crm-meta{font-size:13px;color:var(--mut);margin-top:4px;overflow-wrap:anywhere}
 .crm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.crm-address-block{grid-column:1/-1;border:1px solid var(--bd);border-radius:13px;padding:12px;margin-top:8px}.crm-address-heading{font-weight:800;color:var(--tx);font-size:14px;margin-bottom:6px}.crm-waze-preview{margin-top:8px;padding:10px;border-radius:10px;background:color-mix(in srgb,#33a852 12%,var(--card));font-size:13px}.crm-waze-preview a,.crm-waze-link{display:inline-flex;align-items:center;gap:6px;color:#16833d;font-weight:800;text-decoration:none;margin-top:4px}.crm-waze-link{border:1px solid color-mix(in srgb,#16833d 35%,var(--bd));border-radius:9px;padding:8px 10px}.crm-address-text{white-space:normal;overflow-wrap:anywhere}
 .crm-grid .wide{grid-column:1/-1}
 .crm-modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:16px;background:#000a;overflow:auto}
 .crm-box{width:100%;max-width:520px;max-height:92vh;overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:20px;padding:20px;box-shadow:0 20px 70px #0008}
@@ -224,7 +225,16 @@ body{padding-bottom:158px}
 #main .crm-actions{margin:0 0 12px;padding:0 2px}
 #main .crm-card{border-radius:17px;border-color:var(--bd);background:var(--card);padding:15px;margin:10px 0;box-shadow:0 4px 16px #0000000a}
 #main .crm-card .crm-title{font-size:15px;font-weight:850}
-#main .saved-actions .btn{border-radius:11px;min-height:38px;font-weight:700}
+#main .saved-actions{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-items:stretch}
+#main .saved-actions>.btn,#main .saved-actions>.crm-brand-action{box-sizing:border-box;width:100%;min-width:0;max-width:none;flex:none!important;height:52px;min-height:52px;padding:5px 2px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1.1;font-weight:750;white-space:normal;text-align:center}
+#main .saved-actions .crm-brand-action{background:var(--card);border:1px solid var(--bd);color:var(--crm-action-color);text-decoration:none;box-shadow:none}
+#main .saved-actions .crm-brand-action svg{width:29px;height:29px;display:block;flex:none}
+#main .saved-actions .crm-brand-action.waze,#main .saved-actions .crm-brand-action.whatsapp{border-color:color-mix(in srgb,var(--crm-action-color) 38%,var(--bd))}
+#main .saved-actions .crm-brand-action:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+:root[data-theme="light"] #main .saved-actions .crm-brand-action{--crm-action-color:#2589c9;background:#fff}
+:root[data-theme="dark"] #main .saved-actions .crm-brand-action{--crm-action-color:#ff922b;background:#111419}
+@media(max-width:440px){#main .saved-actions{gap:5px}#main .saved-actions>.btn,#main .saved-actions>.crm-brand-action{font-size:11px;height:50px;min-height:50px}}
+
 #main .status-pill{padding:5px 9px;margin-top:5px}
 #main .empty{padding:30px 18px;border:1px dashed var(--bd);border-radius:17px;background:color-mix(in srgb,var(--card) 65%,transparent);line-height:1.6}
 :root[data-theme="light"] #main .item,:root[data-theme="light"] #main .crm-card,:root[data-theme="light"] .quote-line-card{box-shadow:0 5px 18px #20252b0a}
@@ -510,6 +520,7 @@ html[data-theme] .drawer{border:0!important;box-shadow:none!important;background
 .mg-head h2{margin:0;font-size:24px;font-weight:850;letter-spacing:-.4px;color:#fff}
 .mg-head p{margin:5px 0 0;font-size:13px;font-weight:400;color:var(--chrome-mut)}
 .mg-head #menuClose{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:var(--chrome-act);color:#fff;font-size:24px;line-height:1}
+@media(max-width:600px){.mg-head #menuClose{margin-top:42px!important;transform:none;align-self:flex-start;position:relative;z-index:8}}
 .mg-title{margin:22px 20px 8px;font-size:11px;font-weight:800;letter-spacing:1.4px;color:var(--mut)}
 .mg{margin:0 16px;border-radius:18px;background:var(--card);border:1px solid var(--bd);overflow:hidden}
 .mg .menu-action{width:100%;margin:0;border:0;border-radius:0;background:transparent!important;padding:14px 14px;gap:13px;border-top:1px solid var(--bd);color:var(--tx)!important;position:relative}
@@ -572,7 +583,9 @@ header{display:block}
 @media(min-width:700px){
 #home-nav{padding-left:max(12px,calc((100vw - 1100px)/2));padding-right:max(12px,calc((100vw - 1100px)/2))}
 }
-body.keyboard-nav-hidden #home-nav,body.keyboard-nav-hidden #bar{display:none!important}
+/* Alpha 18: quando o teclado virtual está aberto, esconder temporariamente a navegação inferior para liberar espaço. Ao fechar o teclado, a classe é removida pelo detector e o menu reaparece. */
+body.keyboard-nav-hidden #home-nav{display:none!important;visibility:hidden!important;pointer-events:none!important}
+body.keyboard-nav-hidden #bar{display:none!important}
 body.keyboard-nav-hidden{padding-bottom:0!important; background:var(--bg)!important;}
 html.keyboard-nav-hidden,html.keyboard-nav-hidden body{background:var(--bg)!important;}
 body.keyboard-nav-hidden.home-mode{padding-bottom:0!important}
@@ -580,7 +593,7 @@ body.settings-menu-open #home-nav,body.settings-overlay-open #home-nav{z-index:9
 html[data-theme] #drawerBackdrop{background:var(--bg)!important}
 html[data-theme] .drawer{left:50%!important;right:auto!important;transform:translateX(-50%);width:min(900px,100%)!important;max-width:900px!important;padding:0 0 calc(112px + env(safe-area-inset-bottom))!important}
 .hm-top{position:relative}
-.hm-menu-btn{position:absolute;z-index:4;right:16px;top:12px;width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,.24);border-radius:50%;background:var(--chrome-act);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;-webkit-appearance:none;appearance:none;transition:transform .12s,background .12s}
+.hm-menu-btn{position:absolute;z-index:4;right:16px;top:calc(var(--ven-statusbar-inset, 0px) + 12px);width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,.24);border-radius:50%;background:var(--chrome-act);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;-webkit-appearance:none;appearance:none;transition:transform .12s,background .12s}
 .hm-menu-btn span{display:block;width:18px;height:2px;border-radius:2px;background:#fff}
 .hm-menu-btn:active{transform:scale(.93);background:rgba(255,255,255,.3)}
 .hm-hello{padding-right:58px}
@@ -748,6 +761,9 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
 .ord-client input:focus,.ord-more input:focus,.ord-more textarea:focus,.quote-search-row input:focus,.settings-field input:focus,.settings-field textarea:focus{border-color:var(--pri)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--pri) 18%,transparent)!important;outline:none!important}
 .settings-field select,.ord-more select,.form select{-webkit-appearance:none;appearance:none;width:100%;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237b8794' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
 .ord-more select{width:84px}
+
+/* Alpha 26: keep close control clear of Android status bar. */
+@media(max-width:600px){.mg-head #menuClose{margin-top:42px!important;position:relative;top:0!important;transform:none!important;align-self:flex-start;z-index:8}}
 </style>
 </head>
 <body>
@@ -836,9 +852,10 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
    O VEN está sendo preparado para atender diferentes pequenos negócios, com gestão de produtos, pedidos, clientes, vendas e relatórios.<br><br>
    <b>Modelo comercial planejado:</b> compra única, sem mensalidade. A demonstração de 7 dias e o desbloqueio permanente dependem da futura integração e validação com o Google Play Billing; ainda não estão ativos nesta versão.<br><br>
    <b>Publicação e redes sociais:</b> em preparação. Os links oficiais serão adicionados quando os perfis e a página da loja estiverem definidos.<br><br>
-   Versão 2.0.0 — edição VEN.
+   Versão instalada: <b>2.0.0-alpha.24</b>.<br>
+   <span id="ven-update-status">Você pode verificar se há uma versão mais recente.</span>
   </div>
-  <div class="settings-actions"><button class="btn" id="closeAbout" type="button">Fechar</button></div>
+  <div class="settings-actions"><button class="btn pri" id="checkVenUpdate" type="button">Buscar atualização</button><button class="btn" id="closeAbout" type="button">Fechar</button></div>
  </section>
 </div>
 <div id="customer-overlay" class="crm-modal" role="dialog" aria-modal="true" aria-labelledby="customerTitle">
@@ -846,7 +863,16 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
   <label class="crm-field">Nome / razão social<input id="custName" maxlength="140" required placeholder="Nome do cliente"></label>
   <div class="crm-grid"><label class="crm-field">CPF / CNPJ<input id="custDoc" maxlength="30" placeholder="Documento"></label><label class="crm-field">Telefone / WhatsApp<input id="custPhone" maxlength="50" placeholder="Telefone"></label>
   <label class="crm-field wide">E-mail<input id="custEmail" type="email" maxlength="120" placeholder="cliente@email.com"></label>
-  <label class="crm-field wide">Endereço<input id="custAddress" maxlength="200" placeholder="Rua, número, cidade"></label>
+  <div class="crm-address-block wide">
+   <div class="crm-address-heading">Endereço do cliente</div>
+   <label class="crm-field wide">Rua / avenida<input id="custStreet" maxlength="160" autocomplete="street-address" placeholder="Nome da rua ou avenida"></label>
+   <div class="crm-grid"><label class="crm-field">Número<input id="custAddressNumber" maxlength="20" inputmode="text" placeholder="Nº"></label><label class="crm-field">Complemento<input id="custAddressExtra" maxlength="80" placeholder="Apto, casa, sala"></label>
+    <label class="crm-field wide">Bairro<input id="custNeighborhood" maxlength="100" autocomplete="address-level3" placeholder="Bairro"></label>
+    <label class="crm-field">Cidade<input id="custCity" maxlength="100" autocomplete="address-level2" placeholder="Cidade"></label><label class="crm-field">Estado (UF)<input id="custState" maxlength="2" autocapitalize="characters" autocomplete="address-level1" placeholder="RS"></label>
+    <label class="crm-field wide">CEP<input id="custCep" maxlength="9" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000"></label>
+   </div>
+   <div id="custWazePreview" class="crm-waze-preview" hidden></div>
+  </div>
   <label class="crm-field wide">Observações<textarea id="custNotes" rows="2" maxlength="500" placeholder="Opcional"></textarea></label></div>
   <div class="crm-modal-actions"><button class="btn" id="cancelCustomer" type="button">Cancelar</button><button class="btn pri" id="saveCustomer" type="button">Salvar cliente</button></div>
  </section>
@@ -1141,14 +1167,41 @@ function salvarClientes(){store.set('ven_clientes',clientes)}
 function salvarVendas(){store.set('ven_vendas',vendas);if(typeof sincronizarAvisos==='function')sincronizarAvisos()}
 function proximoIdVenda(){return Number(store.get('ven_ultimoNumeroVenda',0))+1}
 function whatsappClienteUrl(telefone){let n=String(telefone||'').replace(/\D/g,'');if(!n)return '';n=n.replace(/^0+/, '');if(n.startsWith('55'))n=n.slice(2);if(n.length<10||n.length>11)return '';return 'https://wa.me/55'+n;}
+function enderecoCliente(c){
+ const rua=String(c?.street||'').trim();
+ if(rua){return [rua,c.addressNumber?('Nº '+c.addressNumber):'',c.addressExtra,c.neighborhood,c.city,c.state,c.cep?('CEP '+c.cep):''].filter(Boolean).join(', ')}
+ // Compatibilidade com cadastros antigos que guardavam o endereço em um único campo.
+ return String(c?.address||'').trim();
+}
+function wazeClienteUrl(c){
+ const rua=String(c?.street||'').trim();
+ const cidade=String(c?.city||'').trim();
+ const uf=String(c?.state||'').trim();
+ if(!rua||!cidade||!uf)return '';
+ const endereco=enderecoCliente(c);
+ return 'https://waze.com/ul?q='+encodeURIComponent(endereco)+'&navigate=yes';
+}
+function enderecoEstruturadoDoFormulario(){return {street:$('#custStreet').value.trim(),addressNumber:$('#custAddressNumber').value.trim(),addressExtra:$('#custAddressExtra').value.trim(),neighborhood:$('#custNeighborhood').value.trim(),city:$('#custCity').value.trim(),state:$('#custState').value.trim().toUpperCase(),cep:$('#custCep').value.trim()}}
+function atualizarPreviaWaze(){
+ const preview=$('#custWazePreview');if(!preview)return;
+ const c=enderecoEstruturadoDoFormulario();const url=wazeClienteUrl(c);
+ if(!url){preview.hidden=true;preview.innerHTML='';return}
+ preview.hidden=false;preview.innerHTML='<div>Endereço preenchido. Confira se os dados estão corretos:</div><div class="crm-address-text">'+esc(enderecoCliente(c))+'</div><a href="'+esc(url)+'" target="_blank" rel="noopener">Abrir rota no Waze ↗</a>';
+}
 function renderClientes(){
  const titulo='<section class="screen-head"><div class="screen-kicker">Relacionamento</div><div class="screen-title-row"><div><h2 class="screen-title">Clientes</h2><p class="screen-desc">Cadastre clientes e consulte seu histórico de compras.</p></div><span class="screen-count">'+clientes.length+'</span></div></section>';
  if(!clientes.length){$('#main').innerHTML=titulo+'<div class="crm-actions"><button class="btn pri" id="newCustomer">＋ Cadastrar cliente</button></div><div class="empty">Nenhum cliente cadastrado.<br>Cadastre clientes para vinculá-los aos orçamentos e vendas.</div>';return}
  let h=titulo+'<div class="crm-actions"><button class="btn pri" id="newCustomer">＋ Cadastrar cliente</button><span class="crm-meta">'+clientes.length+' cliente(s)</span></div>';
- clientes.slice().sort((a,b)=>a.nome.localeCompare(b.nome)).forEach(c=>{const wa=whatsappClienteUrl(c.telefone);h+=`<div class="crm-card"><div class="crm-title">${esc(c.nome)}</div><div class="crm-meta">${c.doc?'CPF/CNPJ: '+esc(c.doc)+' · ':''}${c.telefone?esc(c.telefone):'Sem telefone'}${c.email?' · '+esc(c.email):''}</div>${c.address?`<div class="crm-meta">${esc(c.address)}</div>`:''}<div class="saved-actions"><button class="btn" data-edit-customer="${esc(c.id)}">Editar</button>${c.telefone?`<button class="btn pri" data-open-wa="${esc(c.id)}">WhatsApp ↗</button>`:''}<button class="btn" data-customer-history="${esc(c.id)}">Ver vendas</button><button class="btn dng" data-delete-customer="${esc(c.id)}">Excluir</button></div></div>`});
+ clientes.slice().sort((a,b)=>a.nome.localeCompare(b.nome)).forEach(c=>{const wa=whatsappClienteUrl(c.telefone);const endereco=enderecoCliente(c);const wz=wazeClienteUrl(c);h+=`<div class="crm-card"><div class="crm-title">${esc(c.nome)}</div><div class="crm-meta">${c.doc?'CPF/CNPJ: '+esc(c.doc)+' · ':''}${c.telefone?esc(c.telefone):'Sem telefone'}${c.email?' · '+esc(c.email):''}</div>${endereco?`<div class="crm-meta crm-address-text">${esc(endereco)}</div>`:''}<div class="saved-actions"><button class="btn" data-edit-customer="${esc(c.id)}">Editar</button>${wz?`<a class="crm-brand-action waze" href="${esc(wz)}" target="_blank" rel="noopener" aria-label="Abrir endereço no Waze" title="Waze"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M8 25.5 11.5 15c.7-2.1 2.4-3.4 4.6-3.4h15.8c2.2 0 3.9 1.3 4.6 3.4L40 25.5l3.2 2.1v9.2h-5v-3.5H9.8v3.5h-5v-9.2L8 25.5Zm8-9.1-2.3 7.1h20.6L32 16.4H16Zm-1.1 11.8a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm18.2 0a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/></svg></a>`:''}${c.telefone?`<button class="crm-brand-action whatsapp" data-open-wa="${esc(c.id)}" aria-label="Abrir WhatsApp do cliente" title="WhatsApp"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M24 3.5C12.7 3.5 3.5 12.3 3.5 23.2c0 3.5 1 6.8 2.8 9.7L3.5 44l11.3-2.9c2.8 1.5 5.9 2.2 9.2 2.2 11.3 0 20.5-8.8 20.5-19.7S35.3 3.5 24 3.5Zm0 35.8c-3 0-5.9-.8-8.4-2.3l-.6-.4-6.7 1.7 1.8-6.4-.4-.6a16.1 16.1 0 0 1-2.5-8.1C7.2 14 14.7 6.8 24 6.8S40.8 14 40.8 23.2 33.3 39.3 24 39.3Z"/><path fill="currentColor" d="M32.2 28.4c-.4-.2-2.8-1.4-3.3-1.5-.4-.2-.8-.2-1.1.3-.3.4-1.3 1.5-1.6 1.8-.3.3-.6.3-1.1.1-.5-.2-2-.7-3.8-2.3-1.4-1.2-2.3-2.7-2.6-3.2-.3-.5 0-.7.2-1l.8-.9c.2-.3.3-.5.5-.8.1-.3.1-.6 0-.8-.1-.2-1.1-2.6-1.5-3.6-.4-.9-.8-.8-1.1-.8h-.9c-.3 0-.8.1-1.2.6-.4.5-1.6 1.6-1.6 4s1.7 4.6 1.9 4.9c.2.3 3.3 5 8 7 .9.4 1.7.6 2.3.8 1 .3 1.8.3 2.5.2.8-.1 2.8-1.1 3.2-2.2.4-1.1.4-2 .3-2.2-.1-.2-.4-.3-.9-.5Z"/></svg></button>`:''}<button class="btn" data-customer-history="${esc(c.id)}">Ver vendas</button><button class="btn dng" data-delete-customer="${esc(c.id)}">Excluir</button></div></div>`});
  $('#main').innerHTML=h;
 }
-function abrirCadastroCliente(id=null){editingCustomerId=id;const c=id?clientes.find(x=>String(x.id)===String(id)):null;$('#customerTitle').textContent=c?'Editar cliente':'Cadastrar cliente';$('#custName').value=c?.nome||'';$('#custDoc').value=c?.doc||'';$('#custPhone').value=c?.telefone||'';$('#custEmail').value=c?.email||'';$('#custAddress').value=c?.address||'';$('#custNotes').value=c?.notes||'';$('#customer-overlay').style.display='flex';}
+function abrirCadastroCliente(id=null){
+ editingCustomerId=id;const c=id?clientes.find(x=>String(x.id)===String(id)):null;
+ $('#customerTitle').textContent=c?'Editar cliente':'Cadastrar cliente';$('#custName').value=c?.nome||'';$('#custDoc').value=c?.doc||'';$('#custPhone').value=c?.telefone||'';$('#custEmail').value=c?.email||'';
+ // Cadastros antigos permanecem intactos; o endereço antigo é colocado no campo Rua para permitir a atualização manual.
+ $('#custStreet').value=c?.street||(c?.address||'');$('#custAddressNumber').value=c?.addressNumber||'';$('#custAddressExtra').value=c?.addressExtra||'';$('#custNeighborhood').value=c?.neighborhood||'';$('#custCity').value=c?.city||'';$('#custState').value=c?.state||'';$('#custCep').value=c?.cep||'';$('#custNotes').value=c?.notes||'';
+ $('#customer-overlay').style.display='flex';atualizarPreviaWaze();
+}
 function fecharCadastroCliente(){$('#customer-overlay').style.display='none';editingCustomerId=null}
 function renderVendas(){
  const hoje=new Date(), isoHoje=isoLocal(hoje);
@@ -1202,8 +1255,10 @@ function fecharVendaModal(){$('#sale-overlay').style.display='none';quoteForSale
 function confirmarFechamentoVenda(){if(!quoteForSale)return;const total=totalSnapshot(quoteForSale).total;let recebido=Math.max(0,Number($('#saleReceived').value)||0);if(recebido>total){notificar('O valor recebido não pode ser maior que o total da venda.','error');return}let status=$('#saleStatus').value;if(status==='paid')recebido=total;if(status==='partial'&&(recebido<=0||recebido>=total)){notificar('Para pagamento parcial, informe um valor recebido maior que zero e menor que o total.','error');return}if(status==='pending'&&recebido>0)status=recebido>=total?'paid':'partial';if(status==='paid')recebido=total;const cliente=clientes.find(c=>String(c.id)===$('#saleCustomer').value);const n=proximoIdVenda();store.set('ven_ultimoNumeroVenda',n);const v={numero:n,orcamentoNumero:quoteForSale.numero,data:($('#saleDate').value?new Date($('#saleDate').value+'T12:00:00').toISOString():new Date().toISOString()),vencimento:$('#saleDue').value||'',clienteId:cliente?cliente.id:'',clienteNome:cliente?cliente.nome:(quoteForSale.cli||''),clienteSnapshot:cliente?{...cliente}:null,pagamento:$('#salePayment').value,status,recebido,total,termos:$('#saleTerms').value.trim(),observacoes:$('#saleNotes').value.trim(),itens:quoteForSale.itens.map(i=>({...i})),empresaSnapshot:{...EMPRESA}};vendas.unshift(v);salvarVendas();orcamentos=orcamentos.map(o=>Number(o.numero)===Number(quoteForSale.numero)?{...o,tipoRegistro:'venda_fechada',vendaNumero:n,atualizado:new Date().toISOString()}:o);salvarHistorico();fecharVendaModal();view='sales';render();notificar('Venda #'+String(n).padStart(4,'0')+' registrada.');}
 function imprimirReciboVenda(numero){const v=vendas.find(x=>Number(x.numero)===Number(numero));if(!v)return;const e=v.empresaSnapshot||EMPRESA;const linhas=(v.itens||[]).map(i=>`<tr><td>${esc(i.d)}</td><td class="r">${Number(i.q)||0}</td><td class="r">${brl(i.p)}</td><td class="r">${brl((Number(i.q)||0)*(Number(i.p)||0))}</td></tr>`).join('');const saldo=Math.max(0,(Number(v.total)||0)-(Number(v.recebido)||0));$('#imp').innerHTML=`${e.logo?'<img src="'+esc(e.logo)+'" style="max-width:110px;max-height:60px;object-fit:contain"><br>':''}<h2>${esc(e.fantasia||e.nome||'Empresa')}</h2><div>${e.cnpj?'CPF/CNPJ '+esc(e.cnpj)+' · ':''}${esc(e.end||'')}${e.telefone?' · '+esc(e.telefone):''}</div><h2 style="margin-top:20px">RECIBO / COMPROVANTE COMERCIAL Nº ${String(v.numero).padStart(4,'0')}</h2><p>Data: ${esc(formatData(v.data))}</p><p>Recebemos de: <b>${esc(v.clienteNome||'Cliente não informado')}</b></p><p>Referente à venda dos produtos abaixo, originada do orçamento nº ${String(v.orcamentoNumero).padStart(4,'0')}.</p><table><thead><tr><th>Produto</th><th class="r">Qtd.</th><th class="r">Unitário</th><th class="r">Total</th></tr></thead><tbody>${linhas}</tbody></table><div class="sum"><b>Total da venda: ${brl(v.total)}</b><br>Forma de pagamento: ${esc(v.pagamento)}<br>Recebido: ${brl(v.recebido)}<br>Saldo pendente: ${brl(saldo)}${v.vencimento?'<br>Vencimento: '+new Date(v.vencimento+'T12:00:00').toLocaleDateString('pt-BR'):''}</div>${v.observacoes?'<p>Observações: '+esc(v.observacoes)+'</p>':''}<p style="margin-top:28px">Documento comercial de controle. Não substitui nota fiscal.</p>`;if(window.Android&&Android.printHtml){const css='body{font:14px/1.4 sans-serif;color:#000;background:#fff;margin:16px}h2{color:#e56a00}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border-bottom:1px solid #bbb;padding:6px 4px;text-align:left}.r{text-align:right}.sum{margin-top:14px;text-align:right}';Android.printHtml('<!doctype html><html><head><meta name="viewport" content="width=device-width"><style>'+css+'</style></head><body>'+$('#imp').innerHTML+'</body></html>')}else window.print();}
 document.getElementById('customer-overlay').addEventListener('click',e=>{if(e.target.id==='customer-overlay')fecharCadastroCliente()});
+
 $('#cancelCustomer').addEventListener('click',fecharCadastroCliente);
-$('#saveCustomer').addEventListener('click',()=>{const nome=$('#custName').value.trim();if(!nome){notificar('Informe o nome do cliente.','error');$('#custName').focus();return}const obj={id:editingCustomerId||('CLI-'+Date.now()),nome,doc:$('#custDoc').value.trim(),telefone:$('#custPhone').value.trim(),email:$('#custEmail').value.trim(),address:$('#custAddress').value.trim(),notes:$('#custNotes').value.trim(),atualizado:new Date().toISOString()};if(editingCustomerId)clientes=clientes.map(c=>String(c.id)===String(editingCustomerId)?obj:c);else clientes.push(obj);salvarClientes();fecharCadastroCliente();renderClientes();notificar('Cliente salvo.');});
+['custStreet','custAddressNumber','custAddressExtra','custNeighborhood','custCity','custState','custCep'].forEach(id=>$('#'+id).addEventListener('input',()=>{if(id==='custState')$('#custState').value=$('#custState').value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,2);if(id==='custCep'){const n=$('#custCep').value.replace(/\D/g,'').slice(0,8);$('#custCep').value=n.length>5?n.slice(0,5)+'-'+n.slice(5):n;}atualizarPreviaWaze()}));
+$('#saveCustomer').addEventListener('click',()=>{const nome=$('#custName').value.trim();if(!nome){notificar('Informe o nome do cliente.','error');$('#custName').focus();return}const endereco=enderecoEstruturadoDoFormulario();const obj={id:editingCustomerId||('CLI-'+Date.now()),nome,doc:$('#custDoc').value.trim(),telefone:$('#custPhone').value.trim(),email:$('#custEmail').value.trim(),...endereco,address:enderecoCliente(endereco),notes:$('#custNotes').value.trim(),atualizado:new Date().toISOString()};if(editingCustomerId)clientes=clientes.map(c=>String(c.id)===String(editingCustomerId)?obj:c);else clientes.push(obj);salvarClientes();fecharCadastroCliente();renderClientes();notificar('Cliente salvo.');});
 document.addEventListener('click',e=>{if(e.target.closest('#saveSalesGoal')){const val=Math.max(0,Number(document.getElementById('salesGoalInput')?.value)||0);const d=new Date();const k='ven_metaVendas_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const ms=store.get('ven_metasVendas',{});ms[k]=val;store.set('ven_metasVendas',ms);renderVendas();notificar('Meta mensal salva.');return}const wab=e.target.closest('[data-open-wa]');if(wab){const c=clientes.find(x=>String(x.id)===String(wab.dataset.openWa));if(c&&c.telefone){const url=whatsappClienteUrl(c.telefone);if(url){const numero=url.replace(/^https:\/\/wa\.me\//,'');if(window.Android&&Android.abrirWhatsAppContato)Android.abrirWhatsAppContato(numero);else window.open(url,'_blank');}else notificar('Informe um celular com DDD no cadastro do cliente.','error')}return}if(e.target.closest('#newCustomer')){abrirCadastroCliente();return}const edit=e.target.closest('[data-edit-customer]');if(edit){abrirCadastroCliente(edit.dataset.editCustomer);return}const del=e.target.closest('[data-delete-customer]');if(del){const id=del.dataset.deleteCustomer;confirmar('Excluir cliente?','O cadastro será removido. Vendas e orçamentos já registrados manterão os dados históricos.',()=>{clientes=clientes.filter(c=>String(c.id)!==String(id));salvarClientes();renderClientes();notificar('Cliente removido.');});return}const hist=e.target.closest('[data-customer-history]');if(hist){salesCustomerId=String(hist.dataset.customerHistory);salesFilterMode='all';salesFilterFrom='';salesFilterTo='';salesKeepCustomer=true;irParaView('sales');return}const conv=e.target.closest('[data-convert-sale]');if(conv){abrirFechamentoVenda(Number(conv.dataset.convertSale));return}const rec=e.target.closest('[data-sale-receipt]');if(rec){imprimirReciboVenda(Number(rec.dataset.saleReceipt));return}const paid=e.target.closest('[data-sale-paid]');if(paid){const v=vendas.find(x=>Number(x.numero)===Number(paid.dataset.salePaid));if(v){v.status='paid';v.recebido=v.total;v.pagoEm=new Date().toISOString();salvarVendas();renderVendas();notificar('Venda marcada como paga.')}return}const det=e.target.closest('[data-sale-detail]');if(det){const v=vendas.find(x=>Number(x.numero)===Number(det.dataset.saleDetail));if(v)notificar('Venda #'+String(v.numero).padStart(4,'0')+' · '+v.clienteNome+' · '+brl(v.total)+' · '+v.pagamento+' · '+(v.status==='paid'?'Paga':v.status==='partial'?'Parcial':'Pendente'));return}});
 $('#cancelSale').addEventListener('click',fecharVendaModal);$('#confirmSale').addEventListener('click',confirmarFechamentoVenda);document.getElementById('sale-overlay').addEventListener('click',e=>{if(e.target.id==='sale-overlay')fecharVendaModal()});
 
@@ -1485,6 +1540,8 @@ function preencherEmpresaForm(){carregarEmpresa();document.getElementById('compa
 function abrirEmpresa(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='block';document.getElementById('about-box').style.display='none';preencherEmpresaForm();settingsOverlay.style.display='flex'}
 function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex'}
 document.getElementById('openVisual').addEventListener('click',abrirVisual);document.getElementById('openCompany').addEventListener('click',abrirEmpresa);document.getElementById('openAbout').addEventListener('click',abrirSobre);document.getElementById('closeAbout').addEventListener('click',fecharSettings);
+document.getElementById('checkVenUpdate').addEventListener('click',()=>{const el=document.getElementById('ven-update-status');el.textContent='Consultando atualizações…';try{if(window.Android&&Android.checkForUpdates)Android.checkForUpdates();else el.textContent='A busca de atualização só está disponível no aplicativo Android.'}catch(e){el.textContent='Não foi possível iniciar a consulta.'}});
+window.venUpdateResult=function(raw){let r;try{r=typeof raw==='string'?JSON.parse(raw):raw}catch(e){r={message:'Resposta de atualização inválida.'}}const el=document.getElementById('ven-update-status');if(!el)return;if(r&&r.available){el.textContent='Nova versão disponível: '+(r.versionName||'atualização')+'. Abrindo a página para baixar.';if(window.Android&&Android.openUpdateUrl&&r.url)Android.openUpdateUrl(r.url)}else{el.textContent=(r&&r.message)||'Seu VEN já está atualizado.'}};
 document.getElementById('closeVisual').addEventListener('click',fecharSettings);document.getElementById('cancelCompany').addEventListener('click',fecharSettings);
 settingsOverlay.addEventListener('click',e=>{if(e.target===settingsOverlay)fecharSettings()});
 document.querySelectorAll('[data-theme-choice]').forEach(b=>b.addEventListener('click',()=>{VISUAL.theme=b.dataset.themeChoice;aplicarVisual()}));
@@ -1647,21 +1704,40 @@ document.addEventListener('click',e=>{
 });
 
 
-// Oculta apenas a navegação inferior quando o teclado virtual reduz a área visível.
+// Alpha 19: um único controlador para menu inferior, viewport e cor da barra Android.
 const keyboardViewport=window.visualViewport;
 let keyboardBaseHeight=keyboardViewport?keyboardViewport.height:window.innerHeight;
-// Só aparelhos de toque (celular/tablet) escondem a barra inferior ao digitar; no computador ela fica sempre visível.
+let tecladoNativoAtivo=false;
+let ultimaCorBarra='';
 const TELA_TOQUE=(window.matchMedia&&matchMedia('(pointer:coarse)').matches)||/Android|iPhone|iPad/i.test(navigator.userAgent);
+function corFundoAtual(){
+ const el=document.body;
+ const bg=getComputedStyle(el).backgroundColor;
+ const m=bg.match(/\d+/g);
+ if(m&&m.length>=3)return '#'+m.slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('');
+ return document.documentElement.dataset.theme==='dark'?'#101216':'#F4F7FB';
+}
+function sincronizarBarraAndroid(ativa){
+ const cor=corFundoAtual();
+ if(ativa===tecladoNativoAtivo&&cor===ultimaCorBarra)return;
+ tecladoNativoAtivo=ativa;ultimaCorBarra=cor;
+ try{if(window.Android&&Android.setBarraTeclado)Android.setBarraTeclado(ativa,cor)}catch(e){}
+}
 function atualizarTecladoVirtual(){
  const altura=keyboardViewport?keyboardViewport.height:window.innerHeight;
  const campoAtivo=!!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
- if(!campoAtivo)keyboardBaseHeight=altura;
  const zoomado=!!keyboardViewport&&Math.abs((keyboardViewport.scale||1)-1)>.01;
- // Oculta a navegação no próprio foco para acompanhar a animação do teclado sem deixar uma faixa azul aparecendo.
- const ativo=TELA_TOQUE && campoAtivo && !zoomado;
- if(campoAtivo&&!ativo)keyboardBaseHeight=altura;
- document.body.classList.toggle('keyboard-nav-hidden',ativo);
- document.documentElement.classList.toggle('keyboard-nav-hidden',ativo);
+ if(!TELA_TOQUE||zoomado){
+  document.body.classList.remove('keyboard-nav-hidden');document.documentElement.classList.remove('keyboard-nav-hidden');
+  if(!campoAtivo){keyboardBaseHeight=altura;sincronizarBarraAndroid(false)}
+  return;
+ }
+ if(altura>keyboardBaseHeight)keyboardBaseHeight=altura;
+ const aberto=campoAtivo&&(keyboardBaseHeight-altura)>110;
+ document.body.classList.toggle('keyboard-nav-hidden',aberto);
+ document.documentElement.classList.toggle('keyboard-nav-hidden',aberto);
+ sincronizarBarraAndroid(aberto);
+ if(!aberto)keyboardBaseHeight=altura;
 }
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
 document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
@@ -1669,10 +1745,11 @@ const _limpaNav=()=>{document.body.classList.remove('keyboard-nav-hidden');docum
 window.addEventListener('blur',_limpaNav);document.addEventListener('visibilitychange',()=>{if(document.hidden)_limpaNav()});
 document.addEventListener('input',e=>{if(e.target.matches('#q'))document.body.classList.toggle('prod-search-active',!!e.target.value.trim())});
 document.addEventListener('focusin',e=>{if(e.target.matches('input,textarea,select,[contenteditable="true"]')){atualizarTecladoVirtual();requestAnimationFrame(atualizarTecladoVirtual)}});
-document.addEventListener('focusout',()=>setTimeout(atualizarTecladoVirtual,80));
+document.addEventListener('focusout',()=>setTimeout(atualizarTecladoVirtual,180));
 if(keyboardViewport)keyboardViewport.addEventListener('resize',atualizarTecladoVirtual);
 window.addEventListener('resize',atualizarTecladoVirtual);
 document.addEventListener('visibilitychange',atualizarTecladoVirtual);
+window.addEventListener('pageshow',atualizarTecladoVirtual);
 
 render();
 
@@ -1818,27 +1895,8 @@ function destinoNativo(){try{if(window.Android&&Android.destinoInicial){const d=
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){destinoNativo();sincronizarAvisos()}});
 setTimeout(()=>{sincronizarAvisos();destinoNativo();if(view==='home')avisarVencidasAoAbrir()},1200);
 
-/* alpha.12 — teclado: pinta a barra inferior do Android com a cor da tela enquanto digita (sem faixa azul) e mede a área visível */
-(function(){
- let ligado=false,t=null;
- const cor=()=>{const c=getComputedStyle(document.body).backgroundColor.match(/\d+/g)||[243,247,251];return '#'+c.slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('')};
- function barra(on){if(on===ligado)return;ligado=on;try{if(window.Android&&Android.setBarraTeclado)Android.setBarraTeclado(on,cor())}catch(e){}}
- const campo=el=>!!el&&el.matches&&el.matches('input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=date]),textarea');
- document.addEventListener('focusin',e=>{clearTimeout(t);if(campo(e.target)){barra(true);setTimeout(()=>{try{if(e.target.closest('#product-box,.crm-box,#sale-overlay'))e.target.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}},320)}});
- document.addEventListener('focusout',()=>{clearTimeout(t);t=setTimeout(()=>{if(!campo(document.activeElement))barra(false)},260)});
- const vv=window.visualViewport;
- let alturaBaseTeclado=vv?vv.height:window.innerHeight;
- let tecladoNativoAtivo=false;
- const medir=()=>{
-  const h=vv?vv.height:window.innerHeight;
-  document.documentElement.style.setProperty('--vvh',Math.round(h)+'px');
-  if(h>alturaBaseTeclado)alturaBaseTeclado=h;
-  const tecladoVisivel=(alturaBaseTeclado-h)>110;
-  if(tecladoVisivel!==tecladoNativoAtivo){tecladoNativoAtivo=tecladoVisivel;try{if(window.Android&&Android.setBarraTeclado)Android.setBarraTeclado(tecladoVisivel,cor())}catch(e){}}
-  if(!tecladoVisivel)alturaBaseTeclado=h;
- };
- medir();if(vv)vv.addEventListener('resize',medir);window.addEventListener('resize',medir);
-})();
+/* Alpha 19: o controlador único acima também atualiza a altura útil para modais. */
+(function(){const medir=()=>document.documentElement.style.setProperty('--vvh',Math.round((keyboardViewport?keyboardViewport.height:window.innerHeight))+'px');medir();if(keyboardViewport)keyboardViewport.addEventListener('resize',medir);window.addEventListener('resize',medir)})();
 let backSairAte=0;
 function handleAndroidBack(){
   if(pkEl){fecharPicker();return true}
