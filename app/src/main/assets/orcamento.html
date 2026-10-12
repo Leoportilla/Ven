@@ -53,8 +53,11 @@ main{padding:12px 16px}
 .saved-actions .btn{flex:1;padding:9px 8px;font-size:13px}
 #main .saved-actions{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:7px}
 #main .saved-actions>.crm-icon-action,#main .saved-actions>.crm-brand-action{height:48px;min-height:48px;padding:5px;display:flex;align-items:center;justify-content:center;flex:1 1 0;min-width:0}
-#main .saved-actions .crm-icon-action svg{width:23px;height:23px;display:block;fill:none;stroke:currentColor;stroke-width:2.15;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-#main .saved-actions .crm-icon-action{color:#ff922b!important} #main .saved-actions .crm-icon-action.dng{color:#ff922b!important} #main .saved-actions .crm-brand-action{color:#ff922b!important} #main .saved-actions .crm-brand-action svg{width:24px;height:24px;display:block} #main .saved-actions .crm-brand-action svg [stroke]{stroke:currentColor} :root[data-theme="light"] #main .saved-actions .crm-icon-action,:root[data-theme="light"] #main .saved-actions .crm-icon-action.dng,:root[data-theme="light"] #main .saved-actions .crm-brand-action{color:#2589c9!important}
+#main .saved-actions .crm-icon-action svg,#main .saved-actions .crm-brand-action svg{width:23px;height:23px;display:block;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important;vector-effect:non-scaling-stroke}
+#main .saved-actions .crm-icon-action,#main .saved-actions .crm-icon-action.dng,#main .saved-actions .crm-brand-action{color:#ff922b!important;background:var(--card)!important;border:1px solid var(--bd)!important;box-shadow:none!important}
+:root[data-theme="light"] #main .saved-actions .crm-icon-action,:root[data-theme="light"] #main .saved-actions .crm-icon-action.dng,:root[data-theme="light"] #main .saved-actions .crm-brand-action{color:#2589c9!important;background:var(--card)!important;border-color:var(--bd)!important}
+:root[data-theme="dark"] #main .saved-actions .crm-icon-action,:root[data-theme="dark"] #main .saved-actions .crm-icon-action.dng,:root[data-theme="dark"] #main .saved-actions .crm-brand-action{background:var(--card)!important;border-color:var(--bd)!important}
+#main .saved-actions .crm-brand-action.whatsapp svg path,#main .saved-actions .crm-brand-action.waze svg path{fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
 @media(max-width:380px){#main .saved-actions{gap:4px}#main .saved-actions>.crm-icon-action,#main .saved-actions>.crm-brand-action{height:44px;min-height:44px}}
 #imp{display:none}
 @media print{
@@ -235,7 +238,7 @@ body{padding-bottom:158px}
 #main .saved-actions>.btn,#main .saved-actions>.crm-brand-action{box-sizing:border-box;width:100%;min-width:0;max-width:none;flex:none!important;height:52px;min-height:52px;padding:5px 2px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1.1;font-weight:750;white-space:normal;text-align:center}
 #main .saved-actions .crm-brand-action{background:var(--card);border:1px solid var(--bd);color:var(--crm-action-color);text-decoration:none;box-shadow:none}
 #main .saved-actions .crm-brand-action svg{width:29px;height:29px;display:block;flex:none}
-#main .saved-actions .crm-brand-action.waze,#main .saved-actions .crm-brand-action.whatsapp{border-color:color-mix(in srgb,var(--crm-action-color) 38%,var(--bd))}
+#main .saved-actions .crm-brand-action.waze,#main .saved-actions .crm-brand-action.whatsapp{border-color:var(--bd)!important}
 #main .saved-actions .crm-brand-action:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
 :root[data-theme="light"] #main .saved-actions .crm-brand-action{--crm-action-color:#2589c9;background:#fff}
 :root[data-theme="dark"] #main .saved-actions .crm-brand-action{--crm-action-color:#ff922b;background:#111419}

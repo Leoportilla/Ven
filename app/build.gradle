@@ -7,7 +7,7 @@ android {
         minSdk 23
         targetSdk 34
         versionCode 33
-        versionName '2.0.0-alpha.31'
+        versionName '2.0.0-alpha.32'
     }
     buildFeatures { buildConfig true }
     signingConfigs {
