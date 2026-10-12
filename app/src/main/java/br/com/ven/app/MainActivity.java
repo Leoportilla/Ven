@@ -66,9 +66,11 @@ public class MainActivity extends Activity {
         getWindow().setStatusBarColor(0xFF0A2A66);
         getWindow().setNavigationBarColor(Color.TRANSPARENT);
         if (Build.VERSION.SDK_INT >= 29) getWindow().setNavigationBarContrastEnforced(false);
+        // Mantém o conteúdo atrás da área inferior de gestos, mas não ativa
+        // LAYOUT_STABLE, que estava associado ao deslocamento inesperado dos
+        // controles de navegação do sistema em alguns aparelhos.
         getWindow().getDecorView().setSystemUiVisibility(
-                android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
