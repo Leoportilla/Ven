@@ -572,8 +572,8 @@ header{display:block}
 @media(min-width:700px){
 #home-nav{padding-left:max(12px,calc((100vw - 1100px)/2));padding-right:max(12px,calc((100vw - 1100px)/2))}
 }
-/* O menu principal permanece visível mesmo quando o teclado é recolhido. */
-body.keyboard-nav-hidden #home-nav{display:grid!important;visibility:visible!important}
+/* Alpha 18: quando o teclado virtual está aberto, esconder temporariamente a navegação inferior para liberar espaço. Ao fechar o teclado, a classe é removida pelo detector e o menu reaparece. */
+body.keyboard-nav-hidden #home-nav{display:none!important;visibility:hidden!important;pointer-events:none!important}
 body.keyboard-nav-hidden #bar{display:none!important}
 body.keyboard-nav-hidden{padding-bottom:0!important; background:var(--bg)!important;}
 html.keyboard-nav-hidden,html.keyboard-nav-hidden body{background:var(--bg)!important;}
@@ -838,7 +838,7 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
    O VEN está sendo preparado para atender diferentes pequenos negócios, com gestão de produtos, pedidos, clientes, vendas e relatórios.<br><br>
    <b>Modelo comercial planejado:</b> compra única, sem mensalidade. A demonstração de 7 dias e o desbloqueio permanente dependem da futura integração e validação com o Google Play Billing; ainda não estão ativos nesta versão.<br><br>
    <b>Publicação e redes sociais:</b> em preparação. Os links oficiais serão adicionados quando os perfis e a página da loja estiverem definidos.<br><br>
-   Versão instalada: <b>2.0.0-alpha.17</b>.<br>
+   Versão instalada: <b>2.0.0-alpha.18</b>.<br>
    <span id="ven-update-status">Você pode verificar se há uma versão mais recente.</span>
   </div>
   <div class="settings-actions"><button class="btn pri" id="checkVenUpdate" type="button">Buscar atualização</button><button class="btn" id="closeAbout" type="button">Fechar</button></div>
