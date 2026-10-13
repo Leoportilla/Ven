@@ -583,11 +583,11 @@ public class MainActivity extends FragmentActivity {
         teclado.setOrientation(LinearLayout.VERTICAL);
         teclado.setGravity(Gravity.CENTER);
         String[][] linhas = {{"1","2","3"},{"4","5","6"},{"7","8","9"},{"","0","⌫"}};
+        final AlertDialog[] dialogRef = new AlertDialog[1];
         for (String[] linha : linhas) {
             LinearLayout row = new LinearLayout(this);
             row.setGravity(Gravity.CENTER);
-            final AlertDialog[] dialogRef = new AlertDialog[1];
-        for (String tecla : linha) {
+            for (String tecla : linha) {
                 TextView b = new TextView(this);
                 b.setText(tecla.equals("⌫") ? "⌫" : tecla);
                 b.setTextColor(tecla.isEmpty() ? Color.TRANSPARENT : texto);
