@@ -200,8 +200,8 @@ public class MainActivity extends FragmentActivity {
     private TextView tituloDialogo(String titulo) {
         TextView t = new TextView(this);
         t.setText(titulo);
-        t.setTextColor(("Desbloquear VEN".equals(titulo) || "Ativar impressão digital".equals(titulo))
-                ? Color.rgb(255, 145, 45) : Color.WHITE);
+        // Cor de destaque consistente com a identidade visual do VEN.
+        t.setTextColor(Color.rgb(255, 145, 45));
         t.setTextSize(20);
         t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         int h = (int)(22 * getResources().getDisplayMetrics().density);
@@ -227,6 +227,46 @@ public class MainActivity extends FragmentActivity {
                 dialog.getWindow().setLayout((int)(Math.min(360*d, getResources().getDisplayMetrics().widthPixels - 40*d)), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
             }
         });
+    }
+
+    private void estilizarPainelPin(AlertDialog dialog) {
+        if (dialog == null) return;
+        float d = getResources().getDisplayMetrics().density;
+        int fundo = Color.rgb(18, 28, 43);
+        int texto = Color.rgb(238, 243, 250);
+        int azul = Color.rgb(45, 145, 205);
+        int laranja = Color.rgb(255, 145, 45);
+        try {
+            TextView msg = dialog.findViewById(android.R.id.message);
+            if (msg != null) {
+                msg.setTextColor(texto);
+                msg.setTextSize(16);
+                msg.setPadding((int)(20*d), (int)(8*d), (int)(20*d), (int)(12*d));
+            }
+            int[] ids = {android.R.id.parentPanel, android.R.id.topPanel, android.R.id.contentPanel,
+                    android.R.id.customPanel, android.R.id.buttonPanel, android.R.id.scrollView};
+            for (int id : ids) {
+                android.view.View panel = dialog.findViewById(id);
+                if (panel != null) panel.setBackgroundColor(fundo);
+            }
+            if (dialog.getButton(AlertDialog.BUTTON_POSITIVE) != null)
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(laranja);
+            if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null)
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(azul);
+            if (dialog.getButton(AlertDialog.BUTTON_NEUTRAL) != null)
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(azul);
+            if (dialog.getWindow() != null) {
+                GradientDrawable bg = new GradientDrawable();
+                bg.setColor(fundo);
+                bg.setCornerRadius(22*d);
+                bg.setStroke(Math.max(1, (int)d), azul);
+                dialog.getWindow().setBackgroundDrawable(bg);
+                dialog.getWindow().setLayout((int)Math.min(380*d, getResources().getDisplayMetrics().widthPixels - 32*d),
+                        android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+            }
+        } catch (Exception e) {
+            android.util.Log.w("VEN_PIN_STYLE", "Falha ao aplicar estilo do PIN", e);
+        }
     }
 
     private int disponibilidadeBiometria() {
@@ -461,7 +501,9 @@ public class MainActivity extends FragmentActivity {
                 .setMessage("Escolha um PIN numérico de 4 a 6 dígitos.")
                 .setView(primeiro).setNegativeButton("Cancelar", null).setPositiveButton("Continuar", null).create();
         aplicarEstiloVen(dialog, "Cadastrar PIN");
-        dialog.setOnShowListener(v -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
+        dialog.setOnShowListener(v -> {
+            estilizarPainelPin(dialog);
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
             String pin = primeiro.getText().toString();
             if (!pin.matches("[0-9]{4,6}")) { primeiro.setError("Use de 4 a 6 dígitos"); return; }
             dialog.dismiss();
@@ -470,13 +512,17 @@ public class MainActivity extends FragmentActivity {
                     .setMessage("Digite novamente o mesmo PIN.")
                     .setView(confirmar).setNegativeButton("Cancelar", null).setPositiveButton("Ativar proteção", null).create();
             aplicarEstiloVen(confirmDialog, "Confirmar PIN");
-            confirmDialog.setOnShowListener(vv -> confirmDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(b -> {
-                if (!pin.equals(confirmar.getText().toString())) { confirmar.setText(""); confirmar.setError("Os PINs não coincidem"); return; }
-                confirmDialog.dismiss(); salvarPin(pin);
-            }));
+            confirmDialog.setOnShowListener(vv -> {
+                estilizarPainelPin(confirmDialog);
+                confirmDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(b -> {
+                    if (!pin.equals(confirmar.getText().toString())) { confirmar.setText(""); confirmar.setError("Os PINs não coincidem"); return; }
+                    confirmDialog.dismiss(); salvarPin(pin);
+                });
+            });
             confirmDialog.show();
-        }));
+        });
         dialog.show();
+        estilizarPainelPin(dialog);
     }
 
     // Encaminha a verificacao automatica para a rotina do bridge nativo.
