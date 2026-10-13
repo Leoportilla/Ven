@@ -243,12 +243,8 @@ public class MainActivity extends FragmentActivity {
                 msg.setTextSize(16);
                 msg.setPadding((int)(20*d), (int)(8*d), (int)(20*d), (int)(12*d));
             }
-            int[] ids = {android.R.id.parentPanel, android.R.id.topPanel, android.R.id.contentPanel,
-                    android.R.id.customPanel, android.R.id.buttonPanel, android.R.id.scrollView};
-            for (int id : ids) {
-                android.view.View panel = dialog.findViewById(id);
-                if (panel != null) panel.setBackgroundColor(fundo);
-            }
+            // Não acessar IDs internos do AlertDialog: eles não fazem parte da API pública Android.
+            // O fundo e o contorno são aplicados à janela abaixo; a mensagem e os botões são estilizados aqui.
             if (dialog.getButton(AlertDialog.BUTTON_POSITIVE) != null)
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(laranja);
             if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null)
