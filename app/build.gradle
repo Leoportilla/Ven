@@ -6,8 +6,8 @@ android {
         applicationId 'br.com.ven.app'
         minSdk 23
         targetSdk 34
-        versionCode 51
-        versionName '2.0.0-alpha.50'
+        versionCode 52
+        versionName '2.0.0-alpha.51'
     }
     buildFeatures { buildConfig true }
     signingConfigs {

@@ -218,8 +218,13 @@ public class MainActivity extends FragmentActivity {
             if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null) dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(45,145,205));
             if (dialog.getButton(AlertDialog.BUTTON_NEUTRAL) != null) dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(Color.rgb(11,42,102));
             if (dialog.getWindow() != null) {
-                GradientDrawable bg = new GradientDrawable(); bg.setColor(Color.WHITE); bg.setCornerRadius(18 * getResources().getDisplayMetrics().density);
+                float d = getResources().getDisplayMetrics().density;
+                GradientDrawable bg = new GradientDrawable();
+                bg.setColor(Color.rgb(18, 28, 43));
+                bg.setCornerRadius(22 * d);
+                bg.setStroke(Math.max(1, (int)d), Color.rgb(45, 145, 205));
                 dialog.getWindow().setBackgroundDrawable(bg);
+                dialog.getWindow().setLayout((int)(Math.min(360*d, getResources().getDisplayMetrics().widthPixels - 40*d)), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
             }
         });
     }
