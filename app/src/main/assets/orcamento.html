@@ -849,6 +849,31 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
 #main .saved-actions .crm-brand-action.whatsapp svg path:first-child{stroke-width:3.4!important;fill:none!important}
 #main .saved-actions .crm-brand-action.waze svg.crm-car-icon{width:36px!important;height:36px!important}
 @media(max-width:380px){#main .saved-actions{gap:5px}#main .saved-actions>.crm-icon-action,#main .saved-actions>.crm-brand-action{height:48px!important;min-height:48px!important;border-radius:15px!important}}
+
+
+/* alpha.52 — CSS inserido no bloco de estilos correto */
+/* alpha.52 — ajuste pontual do tamanho dos cadastros no Android */
+#customer-overlay.crm-modal, #sale-overlay.crm-modal, #product-overlay{
+  box-sizing:border-box!important; padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom))!important;
+  align-items:center!important; justify-content:center!important;
+}
+#customer-overlay .crm-box, #sale-overlay .crm-box{
+  box-sizing:border-box!important; width:100%!important; max-width:520px!important;
+  max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  overflow-y:auto!important; border-radius:22px!important; padding:20px!important;
+}
+#product-overlay #product-box{
+  box-sizing:border-box!important; width:100%!important; max-width:520px!important;
+  max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  border-radius:22px!important;
+}
+@media(max-width:520px){
+ #customer-overlay .crm-box, #sale-overlay .crm-box{padding:18px!important}
+ #product-overlay #product-box{max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important}
+}
+
+</html>
+
 </style>
 </head>
 <body>
@@ -2041,26 +2066,5 @@ function handleAndroidBack(){
 }
 </script>
 </body>
-
-
-/* alpha.51 — ajuste pontual do tamanho dos cadastros no Android */
-#customer-overlay.crm-modal, #sale-overlay.crm-modal, #product-overlay{
-  box-sizing:border-box!important; padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom))!important;
-  align-items:center!important; justify-content:center!important;
-}
-#customer-overlay .crm-box, #sale-overlay .crm-box{
-  box-sizing:border-box!important; width:100%!important; max-width:520px!important;
-  max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
-  overflow-y:auto!important; border-radius:22px!important; padding:20px!important;
-}
-#product-overlay #product-box{
-  box-sizing:border-box!important; width:100%!important; max-width:520px!important;
-  max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
-  border-radius:22px!important;
-}
-@media(max-width:520px){
- #customer-overlay .crm-box, #sale-overlay .crm-box{padding:18px!important}
- #product-overlay #product-box{max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important}
-}
 
 </html>
