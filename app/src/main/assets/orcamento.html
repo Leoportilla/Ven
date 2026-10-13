@@ -152,8 +152,8 @@ body.settings-overlay-open{overflow:hidden}
 .product-thumb{width:58px;height:58px;object-fit:contain;border-radius:9px;background:#fff;flex:none;padding:3px}
 .product-admin-actions{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
 .product-admin-actions .btn{padding:6px 9px;font-size:12px}
-#product-overlay{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:16px;background:#000b;backdrop-filter:blur(4px)}
-#product-box{width:100%;max-width:480px;max-height:92vh;overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:22px;padding:20px;box-shadow:0 18px 60px #0009}
+#product-overlay{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));background:#000b;backdrop-filter:blur(4px);overflow-y:auto;overscroll-behavior:contain}
+#product-box{width:100%;max-width:480px;max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:22px;padding:20px;box-shadow:0 18px 60px #0009}
 #product-box h2{font-size:20px;margin:0 0 6px}
 #product-box p{font-size:13px;color:var(--mut);margin:0 0 14px;line-height:1.4}
 .product-image-preview{max-width:100%;width:100%;height:130px;object-fit:contain;background:#fff;border-radius:12px;padding:5px;display:none;margin:8px 0}
@@ -174,8 +174,10 @@ body.settings-overlay-open{overflow:hidden}
 .crm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .crm-address-block{grid-column:1/-1;border:1px solid var(--bd);border-radius:13px;padding:12px;margin-top:8px}.crm-address-heading{font-weight:800;color:var(--tx);font-size:14px;margin-bottom:6px}.crm-waze-preview{margin-top:8px;padding:10px;border-radius:10px;background:color-mix(in srgb,#33a852 12%,var(--card));font-size:13px}.crm-waze-preview a,.crm-waze-link{display:inline-flex;align-items:center;gap:6px;color:#16833d;font-weight:800;text-decoration:none;margin-top:4px}.crm-waze-link{border:1px solid color-mix(in srgb,#16833d 35%,var(--bd));border-radius:9px;padding:8px 10px}.crm-address-text{white-space:normal;overflow-wrap:anywhere}
 .crm-grid .wide{grid-column:1/-1}
-.crm-modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:16px;background:#000a;overflow:auto}
-.crm-box{width:100%;max-width:520px;max-height:92vh;overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:20px;padding:20px;box-shadow:0 20px 70px #0008}
+.crm-modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));background:#000a;overflow-y:auto;overscroll-behavior:contain}
+.crm-modal[style*="display: flex"]{align-items:center}
+@supports(height:100dvh){.crm-modal{padding-top:calc(18px + env(safe-area-inset-top));padding-bottom:calc(18px + env(safe-area-inset-bottom))}}
+.crm-box{width:100%;max-width:520px;max-height:calc(100vh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:20px;padding:20px;box-shadow:0 20px 70px #0008}
 .crm-box h2{margin:0 0 6px;font-size:21px;color:var(--pri)}
 .crm-box p{margin:0 0 16px;color:var(--mut);font-size:13px}
 .crm-field{display:grid;gap:4px;font-size:13px;color:var(--mut);margin:10px 0}
@@ -925,7 +927,7 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
    O VEN está sendo preparado para atender diferentes pequenos negócios, com gestão de produtos, pedidos, clientes, vendas e relatórios.<br><br>
    <b>Modelo comercial planejado:</b> compra única, sem mensalidade. A demonstração de 7 dias e o desbloqueio permanente dependem da futura integração e validação com o Google Play Billing; ainda não estão ativos nesta versão.<br><br>
    <b>Publicação e redes sociais:</b> em preparação. Os links oficiais serão adicionados quando os perfis e a página da loja estiverem definidos.<br><br>
-   Versão instalada: <b>2.0.0-alpha.24</b>.<br>
+   Versão instalada: <b id="ven-installed-version">consultando…</b>.<br>
    <span id="ven-update-status">Você pode verificar se há uma versão mais recente.</span>
   </div>
   <div class="settings-actions"><button class="btn pri" id="checkVenUpdate" type="button">Buscar atualização</button><button class="btn" id="closeAbout" type="button">Fechar</button></div>
@@ -1616,7 +1618,7 @@ function fecharSettings(){document.body.classList.remove('settings-overlay-open'
 function abrirVisual(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='block';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none';settingsOverlay.style.display='flex';aplicarVisual()}
 function preencherEmpresaForm(){carregarEmpresa();document.getElementById('companyName').value=EMPRESA.nome||'';document.getElementById('companyTrade').value=EMPRESA.fantasia||'';document.getElementById('companyTax').value=EMPRESA.cnpj||'';document.getElementById('companyAddress').value=EMPRESA.end||'';document.getElementById('companyPhone').value=EMPRESA.telefone||'';document.getElementById('companyEmail').value=EMPRESA.email||'';const p=document.getElementById('companyLogoPreview');if(EMPRESA.logo){p.src=EMPRESA.logo;p.style.display='block'}else{p.removeAttribute('src');p.style.display='none'}document.getElementById('companyLogoFile').value=''}
 function abrirEmpresa(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='block';document.getElementById('about-box').style.display='none';preencherEmpresaForm();settingsOverlay.style.display='flex'}
-function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex'}
+function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex';const v=document.getElementById('ven-installed-version');if(v){try{v.textContent=(window.Android&&Android.getInstalledVersion)?Android.getInstalledVersion():'disponível no aplicativo Android'}catch(e){v.textContent='indisponível'}}}
 document.getElementById('openVisual').addEventListener('click',abrirVisual);document.getElementById('openCompany').addEventListener('click',abrirEmpresa);document.getElementById('openAbout').addEventListener('click',abrirSobre);document.getElementById('closeAbout').addEventListener('click',fecharSettings);
 document.getElementById('checkVenUpdate').addEventListener('click',()=>{const el=document.getElementById('ven-update-status');el.textContent='Consultando atualizações…';try{if(window.Android&&Android.checkForUpdates)Android.checkForUpdates();else el.textContent='A busca de atualização só está disponível no aplicativo Android.'}catch(e){el.textContent='Não foi possível iniciar a consulta.'}});
 window.venUpdateResult=function(raw){let r;try{r=typeof raw==='string'?JSON.parse(raw):raw}catch(e){r={message:'Resposta de atualização inválida.'}}const el=document.getElementById('ven-update-status');if(!el)return;if(r&&r.available){el.textContent='Nova versão disponível: '+(r.versionName||'atualização')+'. Abrindo a página para baixar.';if(window.Android&&Android.openUpdateUrl&&r.url)Android.openUpdateUrl(r.url)}else{el.textContent=(r&&r.message)||'Seu VEN já está atualizado.'}};

@@ -210,7 +210,7 @@ public class MainActivity extends FragmentActivity {
         dialog.setCustomTitle(tituloDialogo(titulo));
         dialog.setOnShowListener(v -> {
             if (dialog.getButton(AlertDialog.BUTTON_POSITIVE) != null) dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.rgb(245,130,32));
-            if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null) dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(11,42,102));
+            if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null) dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(45,145,205));
             if (dialog.getButton(AlertDialog.BUTTON_NEUTRAL) != null) dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(Color.rgb(11,42,102));
             if (dialog.getWindow() != null) {
                 GradientDrawable bg = new GradientDrawable(); bg.setColor(Color.WHITE); bg.setCornerRadius(18 * getResources().getDisplayMetrics().density);
@@ -310,20 +310,23 @@ public class MainActivity extends FragmentActivity {
         float d = getResources().getDisplayMetrics().density;
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
-        content.setPadding((int)(22*d), (int)(10*d), (int)(22*d), (int)(8*d));
-        content.setBackgroundColor(Color.WHITE);
+        content.setPadding((int)(20*d), (int)(12*d), (int)(20*d), (int)(8*d));
+        content.setBackgroundColor(Color.rgb(26, 29, 34));
 
         TextView mensagem = new TextView(this);
         mensagem.setText("Digite seu PIN para acessar o VEN");
-        mensagem.setTextColor(Color.rgb(32, 45, 66));
+        mensagem.setTextColor(Color.rgb(232, 237, 244));
         mensagem.setTextSize(15);
         mensagem.setPadding(0, 0, 0, (int)(8*d));
         content.addView(mensagem);
 
         EditText input = campoPin();
         input.setHint("PIN de 4 a 6 dígitos");
-        input.setPadding((int)(10*d), (int)(10*d), (int)(10*d), (int)(10*d));
-        content.addView(input, new LinearLayout.LayoutParams(-1, (int)(52*d)));
+        input.setPadding((int)(14*d), (int)(10*d), (int)(14*d), (int)(10*d));
+        input.setTextColor(Color.rgb(245, 247, 250));
+        input.setHintTextColor(Color.rgb(163, 172, 184));
+        if (Build.VERSION.SDK_INT >= 21) input.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(245, 130, 32)));
+        content.addView(input, new LinearLayout.LayoutParams(-1, (int)(50*d)));
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(content)
@@ -339,7 +342,7 @@ public class MainActivity extends FragmentActivity {
                 else { input.setText(""); input.setError("PIN incorreto"); }
             });
             if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null) {
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(11,42,102));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(45,145,205));
                 dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(btn -> {
                     if (biometriaAtiva() && disponibilidadeBiometria() == BiometricManager.BIOMETRIC_SUCCESS) {
                         dialog.dismiss(); autenticarBiometria();
@@ -350,15 +353,15 @@ public class MainActivity extends FragmentActivity {
             }
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.rgb(245,130,32));
             if (dialog.getWindow() != null) {
-                GradientDrawable bg = new GradientDrawable(); bg.setColor(Color.WHITE); bg.setCornerRadius(18*d);
+                GradientDrawable bg = new GradientDrawable(); bg.setColor(Color.rgb(26,29,34)); bg.setCornerRadius(24*d);
                 dialog.getWindow().setBackgroundDrawable(bg);
-                dialog.getWindow().setLayout((int)(340*d), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().setLayout((int)(320*d), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
                 dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             }
         });
         dialog.setOnKeyListener((di, keyCode, event) -> keyCode == android.view.KeyEvent.KEYCODE_BACK);
         dialog.show();
-        if (dialog.getWindow() != null) dialog.getWindow().setLayout((int)(340*d), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+        if (dialog.getWindow() != null) dialog.getWindow().setLayout((int)(320*d), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
     }
 
     private void liberarPagina() {
@@ -535,6 +538,9 @@ public class MainActivity extends FragmentActivity {
     }
 
     public class AndroidBridge {
+        @JavascriptInterface
+        public String getInstalledVersion() { return BuildConfig.VERSION_NAME; }
+
         @JavascriptInterface
         public void gerenciarPin() { MainActivity.this.gerenciarPin(); }
 
