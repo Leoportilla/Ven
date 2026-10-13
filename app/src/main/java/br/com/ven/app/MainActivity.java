@@ -33,8 +33,9 @@ import android.app.Dialog;
 import android.widget.TextView;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
-import android.hardware.biometrics.BiometricPrompt;
-import android.os.CancellationSignal;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.fragment.app.FragmentActivity;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.security.SecureRandom;
@@ -56,11 +57,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
     private WebView webView;
     private WebView printWebView; // mantem referencia enquanto a impressao esta aberta
     private boolean paginaLiberada = false;
-    private CancellationSignal biometricCancellation;
     private ValueCallback<Uri[]> filePathCallback;
     private static final int FILE_CHOOSER_REQUEST = 1001;
     private static String destinoPendente = "";
@@ -218,33 +218,63 @@ public class MainActivity extends Activity {
         });
     }
 
+    private int disponibilidadeBiometria() {
+        try {
+            return BiometricManager.from(this).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK);
+        } catch (Exception e) {
+            return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE;
+        }
+    }
+
+    private void mostrarErroBiometria(int resultado) {
+        String mensagem;
+        switch (resultado) {
+            case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+                mensagem = "Este aparelho não disponibilizou um sensor biométrico para o VEN."; break;
+            case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+                mensagem = "O sensor biométrico está temporariamente indisponível. Tente novamente."; break;
+            case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
+                mensagem = "Nenhuma digital está cadastrada para uso em aplicativos. Confira a segurança do Android."; break;
+            default:
+                mensagem = "A biometria não está disponível agora. Use o PIN do VEN."; break;
+        }
+        Toast.makeText(this, mensagem, Toast.LENGTH_LONG).show();
+    }
+
+    private BiometricPrompt.PromptInfo criarPromptBiometrico(String titulo, String subtitulo) {
+        return new BiometricPrompt.PromptInfo.Builder()
+                .setTitle(titulo)
+                .setSubtitle(subtitulo)
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK)
+                .setNegativeButtonText("Usar PIN")
+                .build();
+    }
+
     private void autenticarBiometria() {
-        if (Build.VERSION.SDK_INT < 28) {
-            Toast.makeText(this, "A impressão digital exige Android 9 ou superior nesta versão.", Toast.LENGTH_LONG).show();
+        int status = disponibilidadeBiometria();
+        if (status != BiometricManager.BIOMETRIC_SUCCESS) {
+            mostrarErroBiometria(status);
             return;
         }
         try {
-            BiometricPrompt prompt = new BiometricPrompt.Builder(this)
-                    .setTitle("Desbloquear VEN")
-                    .setSubtitle("Confirme sua identidade com a biometria do aparelho")
-                    .setDescription("Sua impressão digital não é armazenada pelo VEN.")
-                    .setNegativeButton("Usar PIN", getMainExecutor(), (d, w) -> {})
-                    .build();
-            biometricCancellation = new CancellationSignal();
-            prompt.authenticate(biometricCancellation, getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
+            BiometricPrompt prompt = new BiometricPrompt(this, getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
                 @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
                     runOnUiThread(() -> liberarPagina());
                 }
                 @Override public void onAuthenticationFailed() {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Biometria não reconhecida. Tente novamente ou use o PIN.", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Digital não reconhecida. Tente novamente ou use o PIN.", Toast.LENGTH_SHORT).show());
                 }
-                @Override public void onAuthenticationError(int errorCode, CharSequence errString) {
-                    if (errorCode != 13 && errorCode != BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED) {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, errString, Toast.LENGTH_SHORT).show());
+                @Override public void onAuthenticationError(int code, CharSequence message) {
+                    if (code != BiometricPrompt.ERROR_NEGATIVE_BUTTON && code != BiometricPrompt.ERROR_USER_CANCELED) {
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show());
                     }
                 }
             });
-        } catch (Exception e) { Toast.makeText(this, "Não foi possível iniciar a biometria. Use o PIN.", Toast.LENGTH_LONG).show(); }
+            prompt.authenticate(criarPromptBiometrico("Desbloquear VEN", "Confirme sua identidade com a biometria do aparelho"));
+        } catch (Exception e) {
+            Toast.makeText(this, "Não foi possível iniciar a biometria. O PIN continua disponível.", Toast.LENGTH_LONG).show();
+            android.util.Log.e("VEN_BIOMETRIA", "Falha ao iniciar autenticação biométrica", e);
+        }
     }
 
     private EditText campoPin() {
@@ -324,10 +354,6 @@ public class MainActivity extends Activity {
     }
 
     private void configurarBiometria() {
-        if (Build.VERSION.SDK_INT < 28) {
-            Toast.makeText(this, "A impressão digital exige Android 9 ou superior nesta versão.", Toast.LENGTH_LONG).show();
-            return;
-        }
         if (biometriaAtiva()) {
             pinPrefs().edit().putBoolean("biometric_enabled", false).apply();
             Toast.makeText(this, "Impressão digital desativada.", Toast.LENGTH_SHORT).show();
@@ -337,25 +363,32 @@ public class MainActivity extends Activity {
             Toast.makeText(this, "Cadastre um PIN antes de ativar a impressão digital.", Toast.LENGTH_LONG).show();
             return;
         }
+        int status = disponibilidadeBiometria();
+        if (status != BiometricManager.BIOMETRIC_SUCCESS) {
+            mostrarErroBiometria(status);
+            return;
+        }
         new AlertDialog.Builder(this).setCustomTitle(tituloDialogo("Ativar impressão digital"))
-                .setMessage("A biometria usa o recurso de segurança do Android. Mantenha o PIN como alternativa de acesso.")
+                .setMessage("O VEN usará a biometria do Android. Sua digital não é armazenada pelo aplicativo; o PIN continuará como alternativa.")
                 .setNegativeButton("Cancelar", null)
                 .setPositiveButton("Continuar", (d, w) -> {
                     try {
-                        BiometricPrompt prompt = new BiometricPrompt.Builder(this).setTitle("Confirmar impressão digital")
-                                .setSubtitle("Confirme para ativar o desbloqueio do VEN")
-                                .setNegativeButton("Cancelar", getMainExecutor(), (dd, ww) -> {})
-                                .build();
-                        prompt.authenticate(new CancellationSignal(), getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
+                        BiometricPrompt prompt = new BiometricPrompt(this, getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
                             @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
                                 pinPrefs().edit().putBoolean("biometric_enabled", true).apply();
                                 runOnUiThread(() -> Toast.makeText(MainActivity.this, "Impressão digital ativada.", Toast.LENGTH_LONG).show());
                             }
                             @Override public void onAuthenticationError(int code, CharSequence message) {
-                                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Não foi possível ativar: " + message, Toast.LENGTH_LONG).show());
+                                if (code != BiometricPrompt.ERROR_NEGATIVE_BUTTON && code != BiometricPrompt.ERROR_USER_CANCELED) {
+                                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Não foi possível ativar: " + message, Toast.LENGTH_LONG).show());
+                                }
                             }
                         });
-                    } catch (Exception e) { Toast.makeText(this, "Biometria indisponível. Confira o bloqueio de tela e as digitais cadastradas no Android.", Toast.LENGTH_LONG).show(); }
+                        prompt.authenticate(criarPromptBiometrico("Confirmar impressão digital", "Confirme para ativar o desbloqueio do VEN"));
+                    } catch (Exception e) {
+                        android.util.Log.e("VEN_BIOMETRIA", "Falha ao configurar biometria", e);
+                        Toast.makeText(this, "Não foi possível iniciar a biometria. O PIN continua disponível.", Toast.LENGTH_LONG).show();
+                    }
                 }).show();
     }
 

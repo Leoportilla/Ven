@@ -6,8 +6,8 @@ android {
         applicationId 'br.com.ven.app'
         minSdk 23
         targetSdk 34
-        versionCode 43
-        versionName '2.0.0-alpha.42'
+        versionCode 45
+        versionName '2.0.0-alpha.44'
     }
     buildFeatures { buildConfig true }
     signingConfigs {
@@ -33,4 +33,5 @@ android {
 }
 dependencies {
     implementation 'com.google.android.gms:play-services-code-scanner:16.1.0'
+    implementation 'androidx.biometric:biometric:1.1.0'
 }
