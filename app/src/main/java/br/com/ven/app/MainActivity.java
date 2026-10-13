@@ -372,6 +372,85 @@ public class MainActivity extends FragmentActivity {
         mostrarDialogoPinCompacto();
     }
 
+    // Libera o conteúdo principal somente depois de passar pela proteção configurada.
+    private void liberarPagina() {
+        if (paginaLiberada || webView == null) return;
+        paginaLiberada = true;
+        webView.loadUrl("file:///android_asset/orcamento.html");
+    }
+
+    // Entrada usada pelo menu Segurança do VEN, exposta ao HTML pelo AndroidBridge.
+    private void gerenciarPin() {
+        runOnUiThread(() -> {
+            if (pinAtivo()) pedirPinAtualParaGerenciar();
+            else pedirNovoPin();
+        });
+    }
+
+    private void pedirPinAtualParaGerenciar() {
+        mostrarTecladoPin("Segurança do VEN", "Digite seu PIN atual para continuar.", "Continuar", false, pin -> {
+            if (!conferirPin(pin)) {
+                Toast.makeText(this, "PIN incorreto.", Toast.LENGTH_LONG).show();
+                pedirPinAtualParaGerenciar();
+                return;
+            }
+            new AlertDialog.Builder(this)
+                    .setTitle("Segurança do VEN")
+                    .setItems(new String[]{"Alterar PIN", biometriaAtiva() ? "Desativar impressão digital" : "Ativar impressão digital", "Desativar PIN"}, (d, which) -> {
+                        if (which == 0) pedirNovoPin();
+                        else if (which == 1) configurarBiometria();
+                        else new AlertDialog.Builder(this)
+                                .setTitle("Desativar PIN?")
+                                .setMessage("O VEN deixará de pedir o PIN ao abrir.")
+                                .setNegativeButton("Manter proteção", null)
+                                .setPositiveButton("Desativar", (dd, ww) -> {
+                                    pinPrefs().edit().clear().apply();
+                                    Toast.makeText(this, "PIN desativado.", Toast.LENGTH_LONG).show();
+                                }).show();
+                    }).setNegativeButton("Cancelar", null).show();
+        });
+    }
+
+    private void configurarBiometria() {
+        if (biometriaAtiva()) {
+            pinPrefs().edit().putBoolean("biometric_enabled", false).apply();
+            Toast.makeText(this, "Impressão digital desativada.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!pinAtivo()) {
+            Toast.makeText(this, "Cadastre um PIN antes de ativar a impressão digital.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        int status = disponibilidadeBiometria();
+        if (status != BiometricManager.BIOMETRIC_SUCCESS) {
+            mostrarErroBiometria(status);
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Ativar impressão digital")
+                .setMessage("O VEN usará a biometria do Android. Sua digital não é armazenada pelo aplicativo; o PIN continuará como alternativa.")
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Continuar", (d, w) -> {
+                    try {
+                        BiometricPrompt prompt = new BiometricPrompt(this, getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
+                            @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                                pinPrefs().edit().putBoolean("biometric_enabled", true).apply();
+                                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Impressão digital ativada.", Toast.LENGTH_LONG).show());
+                            }
+                            @Override public void onAuthenticationError(int code, CharSequence message) {
+                                if (code != BiometricPrompt.ERROR_NEGATIVE_BUTTON && code != BiometricPrompt.ERROR_USER_CANCELED) {
+                                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Não foi possível ativar: " + message, Toast.LENGTH_LONG).show());
+                                }
+                            }
+                        });
+                        prompt.authenticate(criarPromptBiometrico("Confirmar impressão digital", "Confirme para ativar o desbloqueio do VEN"));
+                    } catch (Exception e) {
+                        android.util.Log.e("VEN_BIOMETRIA", "Falha ao configurar biometria", e);
+                        Toast.makeText(this, "Não foi possível iniciar a biometria. O PIN continua disponível.", Toast.LENGTH_LONG).show();
+                    }
+                }).show();
+    }
+
     private interface PinDigitadoCallback { void onPin(String pin); }
 
     // Teclado numérico próprio do VEN: compacto, com seis posições e cores adaptadas ao tema.
