@@ -28,6 +28,7 @@ import android.widget.Toast;
 import android.widget.EditText;
 import android.text.InputType;
 import android.view.Gravity;
+import android.view.View;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.widget.TextView;
@@ -503,114 +504,144 @@ public class MainActivity extends FragmentActivity {
 
     private interface PinDigitadoCallback { void onPin(String pin); }
 
-    // Teclado numérico próprio do VEN: compacto, com seis posições e cores adaptadas ao tema.
+    // Teclado numérico próprio do VEN (alpha.62): tela cheia, degradê, bolinhas laranja e teclas redondas.
     private void mostrarTecladoPin(String titulo, String mensagem, String acao,
                                    boolean permitirBiometria, PinDigitadoCallback callback) {
         if (isFinishing()) return;
         final float d = getResources().getDisplayMetrics().density;
         final boolean escuro = temaEscuroAtivo();
-        final int fundo = escuro ? Color.rgb(11, 14, 18) : Color.rgb(13, 105, 157);
-        final int superficie = escuro ? Color.rgb(25, 29, 35) : Color.rgb(255, 255, 255);
-        final int texto = escuro ? Color.rgb(245, 247, 250) : Color.rgb(255, 255, 255);
-        final int secundario = escuro ? Color.rgb(160, 169, 181) : Color.rgb(211, 229, 240);
-        final int azul = escuro ? Color.rgb(48, 151, 211) : Color.rgb(255, 255, 255);
-        final int laranja = Color.rgb(255, 145, 45);
+        final boolean desbloqueioTelaCheia = titulo.startsWith("Desbloquear VEN");
+        final int fundoTopo = escuro ? Color.rgb(21, 27, 35) : Color.rgb(11, 115, 176);
+        final int fundoBase = escuro ? Color.rgb(11, 14, 18) : Color.rgb(8, 90, 138);
+        final int texto = escuro ? Color.rgb(242, 245, 248) : Color.WHITE;
+        final int secundario = escuro ? Color.rgb(152, 162, 174) : Color.argb(200, 255, 255, 255);
+        final int laranja = Color.rgb(255, 146, 43);
+        final int corTecla = escuro ? Color.argb(13, 255, 255, 255) : Color.argb(36, 255, 255, 255);
+        final int bordaTecla = escuro ? Color.argb(26, 255, 255, 255) : Color.argb(56, 255, 255, 255);
+        final int contornoPonto = escuro ? Color.argb(64, 255, 255, 255) : Color.argb(90, 255, 255, 255);
         final StringBuilder valor = new StringBuilder();
+        final Dialog[] dialogRef = new Dialog[1];
+
+        // Tamanho das teclas conforme a altura da tela (telas baixas usam teclas menores).
+        final float alturaDp = getResources().getDisplayMetrics().heightPixels / d;
+        final int tecla = (int)((alturaDp >= 780 ? 76 : alturaDp >= 690 ? 66 : 56) * d);
+        final int folga = (int)((alturaDp >= 780 ? 12 : 8) * d);
 
         LinearLayout raiz = new LinearLayout(this);
-        final boolean desbloqueioTelaCheia = titulo.startsWith("Desbloquear VEN");
         raiz.setOrientation(LinearLayout.VERTICAL);
-        raiz.setGravity(Gravity.CENTER);
-        if (desbloqueioTelaCheia) raiz.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
-        raiz.setPadding((int)((desbloqueioTelaCheia ? 28 : 18)*d), (int)(18*d), (int)((desbloqueioTelaCheia ? 28 : 18)*d), (int)(16*d));
-        GradientDrawable painel = new GradientDrawable();
-        painel.setColor(fundo);
-        painel.setCornerRadius(desbloqueioTelaCheia ? 0 : 28*d);
-        painel.setStroke(desbloqueioTelaCheia ? 0 : Math.max(1, (int)d), escuro ? Color.rgb(43, 49, 58) : Color.rgb(35, 132, 183));
-        raiz.setBackground(painel);
+        raiz.setGravity(Gravity.CENTER_HORIZONTAL);
+        raiz.setPadding((int)(28*d), (int)(36*d), (int)(28*d), (int)(22*d));
 
-        // Usa o ícone oficial do aplicativo, em vez de desenhar um V genérico.
+        // Marca do aplicativo no topo.
         ImageView logo = new ImageView(this);
         logo.setImageResource(R.mipmap.ic_launcher);
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         GradientDrawable logoBg = new GradientDrawable();
-        logoBg.setColor(escuro ? Color.rgb(30, 34, 41) : Color.rgb(39, 128, 174));
-        logoBg.setCornerRadius(18*d);
-        logoBg.setStroke(Math.max(1, (int)d), escuro ? Color.rgb(51, 58, 68) : Color.rgb(92, 166, 204));
+        logoBg.setColor(corTecla); logoBg.setCornerRadius(22*d);
+        logoBg.setStroke(Math.max(1, (int)d), bordaTecla);
         logo.setBackground(logoBg);
-        logo.setPadding((int)(8*d), (int)(8*d), (int)(8*d), (int)(8*d));
-        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams((int)(58*d), (int)(58*d));
-        lpLogo.bottomMargin = (int)(10*d);
+        logo.setPadding((int)(9*d), (int)(9*d), (int)(9*d), (int)(9*d));
+        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams((int)(66*d), (int)(66*d));
         raiz.addView(logo, lpLogo);
 
         TextView cabecalho = new TextView(this);
         cabecalho.setText(titulo);
         cabecalho.setTextColor(texto);
-        cabecalho.setTextSize(23);
+        cabecalho.setTextSize(24);
         cabecalho.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         cabecalho.setGravity(Gravity.CENTER);
-        raiz.addView(cabecalho, new LinearLayout.LayoutParams(-1, -2));
+        LinearLayout.LayoutParams lpTit = new LinearLayout.LayoutParams(-1, -2);
+        lpTit.topMargin = (int)(16*d);
+        raiz.addView(cabecalho, lpTit);
 
         TextView descricao = new TextView(this);
         descricao.setText("Escolha de 4 a 6 dígitos".equals(mensagem) || mensagem.startsWith("Escolha um PIN")
                 ? "Escolha de 4 a 6 dígitos" : mensagem);
         descricao.setTextColor(secundario);
-        descricao.setTextSize(14);
+        descricao.setTextSize(15);
         descricao.setGravity(Gravity.CENTER);
-        descricao.setPadding((int)(2*d), (int)(4*d), (int)(2*d), (int)(12*d));
-        raiz.addView(descricao, new LinearLayout.LayoutParams(-1, -2));
+        LinearLayout.LayoutParams lpDesc = new LinearLayout.LayoutParams(-1, -2);
+        lpDesc.topMargin = (int)(6*d);
+        raiz.addView(descricao, lpDesc);
 
-        TextView pontos = new TextView(this);
-        pontos.setText("○   ○   ○   ○   ○   ○");
-        pontos.setTextColor(secundario);
-        pontos.setTextSize(22);
+        // Seis bolinhas: vazias com contorno; as digitadas ficam laranja com preenchimento.
+        LinearLayout pontos = new LinearLayout(this);
+        pontos.setOrientation(LinearLayout.HORIZONTAL);
         pontos.setGravity(Gravity.CENTER);
-        pontos.setLetterSpacing(0.02f);
-        LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(-1, (int)(30*d));
-        pp.bottomMargin = (int)(2*d);
-        raiz.addView(pontos, pp);
+        for (int i = 0; i < 6; i++) {
+            View ponto = new View(this);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams((int)(16*d), (int)(16*d));
+            lp.setMargins((int)(8*d), 0, (int)(8*d), 0);
+            pontos.addView(ponto, lp);
+        }
+        LinearLayout.LayoutParams lpPontos = new LinearLayout.LayoutParams(-2, -2);
+        lpPontos.topMargin = (int)(28*d);
+        raiz.addView(pontos, lpPontos);
 
         TextView estado = new TextView(this);
-        estado.setText("Digite de 4 a 6 dígitos");
-        estado.setTextColor(secundario);
-        estado.setTextSize(12);
+        estado.setTextSize(13);
         estado.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams ep = new LinearLayout.LayoutParams(-1, -2);
-        ep.bottomMargin = (int)(10*d);
+        ep.topMargin = (int)(12*d);
         raiz.addView(estado, ep);
+
+        // Atualiza bolinhas e texto de apoio.
+        final Runnable atualizar = () -> {
+            for (int i = 0; i < 6; i++) {
+                GradientDrawable g = new GradientDrawable();
+                g.setShape(GradientDrawable.OVAL);
+                if (i < valor.length()) { g.setColor(laranja); g.setStroke((int)(2*d), laranja); }
+                else { g.setColor(Color.TRANSPARENT); g.setStroke((int)(2*d), contornoPonto); }
+                pontos.getChildAt(i).setBackground(g);
+            }
+            estado.setText(valor.length() >= 4 ? valor.length() + " dígitos digitados · já pode continuar" : "Digite de 4 a 6 dígitos");
+            estado.setTextColor(valor.length() >= 4 ? laranja : secundario);
+        };
+        atualizar.run();
+
+        // Espaço flexível: empurra o teclado e os botões para baixo em telas altas.
+        View espaco = new View(this);
+        raiz.addView(espaco, new LinearLayout.LayoutParams(1, 0, 1f));
 
         LinearLayout teclado = new LinearLayout(this);
         teclado.setOrientation(LinearLayout.VERTICAL);
         teclado.setGravity(Gravity.CENTER);
         String[][] linhas = {{"1","2","3"},{"4","5","6"},{"7","8","9"},{"","0","⌫"}};
-        final AlertDialog[] dialogRef = new AlertDialog[1];
         for (String[] linha : linhas) {
             LinearLayout row = new LinearLayout(this);
             row.setGravity(Gravity.CENTER);
-            for (String tecla : linha) {
+            for (String t : linha) {
+                final boolean vazia = t.isEmpty();
+                final boolean apagar = t.equals("⌫");
                 TextView b = new TextView(this);
-                b.setText(tecla.equals("⌫") ? "⌫" : tecla);
-                b.setTextColor(tecla.isEmpty() ? Color.TRANSPARENT : texto);
-                b.setTextSize(tecla.equals("⌫") ? 25 : 22);
-                b.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                b.setText(t);
+                b.setTextColor(apagar ? secundario : texto);
+                b.setTextSize(apagar ? 28 : 28);
+                b.setTypeface(Typeface.DEFAULT, apagar ? Typeface.NORMAL : Typeface.BOLD);
                 b.setGravity(Gravity.CENTER);
-                GradientDrawable db = new GradientDrawable();
-                db.setShape(GradientDrawable.OVAL);
-                db.setColor(escuro ? Color.rgb(25, 29, 35) : Color.rgb(48, 128, 171));
-                db.setStroke(Math.max(1, (int)d), escuro ? Color.rgb(48, 54, 63) : Color.rgb(101, 166, 201));
-                b.setBackground(db);
-                LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams((int)(56*d), (int)(56*d));
-                bp.setMargins((int)(7*d), (int)(4*d), (int)(7*d), (int)(4*d));
+                if (!vazia && !apagar) {
+                    GradientDrawable normal = new GradientDrawable();
+                    normal.setShape(GradientDrawable.OVAL);
+                    normal.setColor(corTecla);
+                    normal.setStroke(Math.max(1, (int)d), bordaTecla);
+                    GradientDrawable pressionada = new GradientDrawable();
+                    pressionada.setShape(GradientDrawable.OVAL);
+                    pressionada.setColor(Color.argb(110, 255, 146, 43));
+                    pressionada.setStroke(Math.max(1, (int)d), laranja);
+                    android.graphics.drawable.StateListDrawable sel = new android.graphics.drawable.StateListDrawable();
+                    sel.addState(new int[]{android.R.attr.state_pressed}, pressionada);
+                    sel.addState(new int[]{}, normal);
+                    b.setBackground(sel);
+                }
+                LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(tecla, tecla);
+                bp.setMargins((int)(11*d), folga/2, (int)(11*d), folga/2);
                 row.addView(b, bp);
-                b.setEnabled(!tecla.isEmpty());
+                b.setEnabled(!vazia);
                 b.setOnClickListener(v -> {
-                    if (tecla.equals("⌫")) { if (valor.length() > 0) valor.deleteCharAt(valor.length()-1); }
-                    else if (!tecla.isEmpty() && valor.length() < 6) { valor.append(tecla); }
-                    StringBuilder display = new StringBuilder();
-                    for (int i=0; i<6; i++) display.append(i < valor.length() ? "●" : "○").append(i == 5 ? "" : "   ");
-                    pontos.setText(display.toString());
-                    estado.setText(valor.length() >= 4 ? valor.length() + " dígitos digitados · já pode continuar" : "Digite de 4 a 6 dígitos");
-                    estado.setTextColor(valor.length() >= 4 ? laranja : secundario);
+                    v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP);
+                    if (apagar) { if (valor.length() > 0) valor.deleteCharAt(valor.length()-1); }
+                    else if (valor.length() < 6) { valor.append(t); }
+                    atualizar.run();
                     // Na tela de desbloqueio, libera assim que o PIN correto (4, 5 ou 6 dígitos) for completado.
                     if (desbloqueioTelaCheia && valor.length() >= 4 && conferirPin(valor.toString())) {
                         if (dialogRef[0] != null) dialogRef[0].dismiss();
@@ -620,20 +651,21 @@ public class MainActivity extends FragmentActivity {
             }
             teclado.addView(row, new LinearLayout.LayoutParams(-2, -2));
         }
-        raiz.addView(teclado);
+        raiz.addView(teclado, new LinearLayout.LayoutParams(-2, -2));
 
         TextView continuar = new TextView(this);
         continuar.setText(acao.toUpperCase(java.util.Locale.ROOT));
-        continuar.setTextColor(Color.rgb(28, 34, 40));
-        continuar.setTextSize(15);
+        continuar.setTextColor(Color.rgb(26, 26, 26));
+        continuar.setTextSize(16);
         continuar.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        continuar.setLetterSpacing(0.04f);
         continuar.setGravity(Gravity.CENTER);
         GradientDrawable botao = new GradientDrawable();
         botao.setColor(laranja);
         botao.setCornerRadius(30*d);
         continuar.setBackground(botao);
-        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(-1, (int)(48*d));
-        cp.topMargin = (int)(14*d);
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(-1, (int)(54*d));
+        cp.topMargin = (int)(18*d);
         raiz.addView(continuar, cp);
         continuar.setOnClickListener(v -> {
             if (valor.length() < 4 || valor.length() > 6) {
@@ -645,40 +677,50 @@ public class MainActivity extends FragmentActivity {
             callback.onPin(pin);
         });
 
+        final boolean comDigital = permitirBiometria && biometriaAtiva();
+        TextView digital = null;
+        if (comDigital) {
+            digital = new TextView(this);
+            digital.setText("Usar impressão digital");
+            digital.setTextColor(laranja);
+            digital.setTextSize(14);
+            digital.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            digital.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams dp = new LinearLayout.LayoutParams(-1, (int)(40*d));
+            dp.topMargin = (int)(4*d);
+            raiz.addView(digital, dp);
+        }
+
         TextView cancelar = new TextView(this);
         cancelar.setText("Cancelar");
         cancelar.setTextColor(secundario);
-        cancelar.setTextSize(14);
+        cancelar.setTextSize(15);
+        cancelar.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         cancelar.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams cancelLp = new LinearLayout.LayoutParams(-1, (int)(34*d));
-        cancelLp.topMargin = (int)(2*d);
+        LinearLayout.LayoutParams cancelLp = new LinearLayout.LayoutParams(-1, (int)(44*d));
+        cancelLp.topMargin = (int)(4*d);
         raiz.addView(cancelar, cancelLp);
 
-        AlertDialog dialog = new AlertDialog.Builder(this).setView(raiz).create();
+        // Tela cheia com degradê; rolagem só entra em ação em telas muito baixas.
+        GradientDrawable fundo = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{fundoTopo, fundoBase});
+        android.widget.ScrollView rolagem = new android.widget.ScrollView(this);
+        rolagem.setFillViewport(true);
+        rolagem.setBackground(fundo);
+        rolagem.addView(raiz, new android.widget.FrameLayout.LayoutParams(-1, -2));
+
+        Dialog dialog = new Dialog(this, android.R.style.Theme_Material_NoActionBar);
         dialogRef[0] = dialog;
+        dialog.setContentView(rolagem);
         cancelar.setOnClickListener(v -> dialog.dismiss());
-        if (permitirBiometria && biometriaAtiva()) {
-            TextView digital = new TextView(this);
-            digital.setText("Usar impressão digital");
-            digital.setTextColor(azul);
-            digital.setTextSize(13);
-            digital.setGravity(Gravity.CENTER);
-            raiz.addView(digital);
-            digital.setOnClickListener(v -> { dialog.dismiss(); autenticarBiometria(); });
-        }
-        dialog.setOnCancelListener(v -> { });
+        if (digital != null) digital.setOnClickListener(v -> { dialog.dismiss(); autenticarBiometria(); });
         dialog.show();
         if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-            if (desbloqueioTelaCheia) {
-                dialog.getWindow().setLayout(android.view.WindowManager.LayoutParams.MATCH_PARENT,
-                        android.view.WindowManager.LayoutParams.MATCH_PARENT);
-                dialog.getWindow().setDimAmount(0f);
-                dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-            } else {
-                dialog.getWindow().setLayout((int)Math.min(360*d, getResources().getDisplayMetrics().widthPixels - 28*d),
-                        android.view.WindowManager.LayoutParams.WRAP_CONTENT);
-            }
+            android.view.Window w = dialog.getWindow();
+            w.setLayout(android.view.WindowManager.LayoutParams.MATCH_PARENT, android.view.WindowManager.LayoutParams.MATCH_PARENT);
+            w.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(fundoBase));
+            w.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            w.setStatusBarColor(fundoTopo);
+            w.setNavigationBarColor(fundoBase);
         }
     }
 
