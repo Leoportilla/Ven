@@ -197,17 +197,23 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    private boolean temaEscuroAtivo() {
+        int modo = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+        return modo == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+    }
+
     private TextView tituloDialogo(String titulo) {
         TextView t = new TextView(this);
         t.setText(titulo);
-        // Cor de destaque consistente com a identidade visual do VEN.
+        // Identidade VEN com contraste adaptado ao tema do aparelho.
         t.setTextColor(Color.rgb(255, 145, 45));
         t.setTextSize(20);
         t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         int h = (int)(22 * getResources().getDisplayMetrics().density);
         int v = (int)(18 * getResources().getDisplayMetrics().density);
         t.setPadding(h, v, h, v);
-        t.setBackgroundColor(Color.rgb(11, 42, 102));
+        t.setBackgroundColor(temaEscuroAtivo() ? Color.rgb(11, 42, 102) : Color.rgb(235, 245, 252));
+        if (!temaEscuroAtivo()) t.setTextColor(Color.rgb(11, 42, 102));
         return t;
     }
 
@@ -220,7 +226,7 @@ public class MainActivity extends FragmentActivity {
             if (dialog.getWindow() != null) {
                 float d = getResources().getDisplayMetrics().density;
                 GradientDrawable bg = new GradientDrawable();
-                bg.setColor(Color.rgb(18, 28, 43));
+                bg.setColor(temaEscuroAtivo() ? Color.rgb(18, 28, 43) : Color.rgb(255, 255, 255));
                 bg.setCornerRadius(22 * d);
                 bg.setStroke(Math.max(1, (int)d), Color.rgb(45, 145, 205));
                 dialog.getWindow().setBackgroundDrawable(bg);
@@ -232,8 +238,9 @@ public class MainActivity extends FragmentActivity {
     private void estilizarPainelPin(AlertDialog dialog) {
         if (dialog == null) return;
         float d = getResources().getDisplayMetrics().density;
-        int fundo = Color.rgb(18, 28, 43);
-        int texto = Color.rgb(238, 243, 250);
+        boolean escuro = temaEscuroAtivo();
+        int fundo = escuro ? Color.rgb(18, 28, 43) : Color.rgb(255, 255, 255);
+        int texto = escuro ? Color.rgb(238, 243, 250) : Color.rgb(31, 41, 55);
         int azul = Color.rgb(45, 145, 205);
         int laranja = Color.rgb(255, 145, 45);
         try {
@@ -330,18 +337,20 @@ public class MainActivity extends FragmentActivity {
         EditText input = new EditText(this);
         input.setSingleLine(true);
         input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-        input.setHint("PIN de 4 a 6 dígitos");
+        input.setHint("PIN (4–6 dígitos)");
         input.setGravity(Gravity.CENTER);
-        input.setLetterSpacing(0.12f);
+        input.setTextSize(18);
+        input.setLetterSpacing(0.04f);
         input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(6)});
-        // Cores explícitas para manter contraste no diálogo tanto no tema claro quanto no escuro.
-        input.setTextColor(Color.rgb(245, 247, 250));
-        input.setHintTextColor(Color.rgb(174, 188, 207));
+        // Campo compacto com paleta coerente com o tema claro/escuro do aparelho.
+        boolean escuro = temaEscuroAtivo();
+        input.setTextColor(escuro ? Color.rgb(245, 247, 250) : Color.rgb(31, 41, 55));
+        input.setHintTextColor(escuro ? Color.rgb(174, 188, 207) : Color.rgb(112, 128, 144));
         float d = getResources().getDisplayMetrics().density;
-        int pad = (int)(16 * d);
-        input.setPadding(pad, (int)(10*d), pad, (int)(10*d));
+        int pad = (int)(12 * d);
+        input.setPadding(pad, (int)(6*d), pad, (int)(6*d));
         GradientDrawable campo = new GradientDrawable();
-        campo.setColor(Color.rgb(27, 45, 70));
+        campo.setColor(escuro ? Color.rgb(27, 45, 70) : Color.rgb(245, 249, 252));
         campo.setCornerRadius(12*d);
         campo.setStroke(Math.max(1, (int)d), Color.rgb(45, 145, 205));
         input.setBackground(campo);
@@ -369,22 +378,24 @@ public class MainActivity extends FragmentActivity {
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding((int)(20*d), (int)(12*d), (int)(20*d), (int)(8*d));
-        content.setBackgroundColor(Color.rgb(26, 29, 34));
+        content.setBackgroundColor(temaEscuroAtivo() ? Color.rgb(18, 28, 43) : Color.rgb(255, 255, 255));
 
         TextView mensagem = new TextView(this);
         mensagem.setText("Digite seu PIN para acessar o VEN");
-        mensagem.setTextColor(Color.rgb(232, 237, 244));
+        mensagem.setTextColor(temaEscuroAtivo() ? Color.rgb(232, 237, 244) : Color.rgb(31, 41, 55));
         mensagem.setTextSize(15);
         mensagem.setPadding(0, 0, 0, (int)(8*d));
         content.addView(mensagem);
 
         EditText input = campoPin();
-        input.setHint("PIN de 4 a 6 dígitos");
-        input.setPadding((int)(14*d), (int)(10*d), (int)(14*d), (int)(10*d));
-        input.setTextColor(Color.rgb(245, 247, 250));
-        input.setHintTextColor(Color.rgb(163, 172, 184));
-        if (Build.VERSION.SDK_INT >= 21) input.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(245, 130, 32)));
-        content.addView(input, new LinearLayout.LayoutParams(-1, (int)(50*d)));
+        input.setHint("PIN (4–6 dígitos)");
+        input.setPadding((int)(12*d), (int)(6*d), (int)(12*d), (int)(6*d));
+        input.setTextSize(18);
+        input.setLetterSpacing(0.04f);
+        input.setTextColor(temaEscuroAtivo() ? Color.rgb(245, 247, 250) : Color.rgb(31, 41, 55));
+        input.setHintTextColor(temaEscuroAtivo() ? Color.rgb(163, 172, 184) : Color.rgb(112, 128, 144));
+        if (Build.VERSION.SDK_INT >= 21) input.setBackgroundTintList(null);
+        content.addView(input, new LinearLayout.LayoutParams(-1, (int)(44*d)));
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(content)
@@ -413,7 +424,7 @@ public class MainActivity extends FragmentActivity {
             if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null) dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(45,145,205));
             if (dialog.getWindow() != null) {
                 GradientDrawable bg = new GradientDrawable();
-                bg.setColor(Color.rgb(18, 28, 43));
+                bg.setColor(temaEscuroAtivo() ? Color.rgb(18, 28, 43) : Color.rgb(255, 255, 255));
                 bg.setCornerRadius(26*d);
                 bg.setStroke(Math.max(1, (int)(1*d)), Color.rgb(45, 145, 205));
                 dialog.getWindow().setBackgroundDrawable(bg);
