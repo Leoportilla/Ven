@@ -29,6 +29,14 @@ import android.widget.EditText;
 import android.text.InputType;
 import android.view.Gravity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.widget.TextView;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.hardware.biometrics.BiometricPrompt;
+import android.os.CancellationSignal;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import javax.crypto.SecretKeyFactory;
@@ -52,6 +60,7 @@ public class MainActivity extends Activity {
     private WebView webView;
     private WebView printWebView; // mantem referencia enquanto a impressao esta aberta
     private boolean paginaLiberada = false;
+    private CancellationSignal biometricCancellation;
     private ValueCallback<Uri[]> filePathCallback;
     private static final int FILE_CHOOSER_REQUEST = 1001;
     private static String destinoPendente = "";
@@ -152,6 +161,7 @@ public class MainActivity extends Activity {
     private SharedPreferences pinPrefs() { return getSharedPreferences("ven_security", MODE_PRIVATE); }
 
     private boolean pinAtivo() { return pinPrefs().getBoolean("pin_enabled", false); }
+    private boolean biometriaAtiva() { return pinPrefs().getBoolean("biometric_enabled", false); }
 
     private String derivarPin(String pin, String salt) throws Exception {
         byte[] saltBytes = Base64.decode(salt, Base64.NO_WRAP);
@@ -182,6 +192,61 @@ public class MainActivity extends Activity {
         }
     }
 
+    private TextView tituloDialogo(String titulo) {
+        TextView t = new TextView(this);
+        t.setText(titulo);
+        t.setTextColor(Color.WHITE);
+        t.setTextSize(20);
+        t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        int h = (int)(22 * getResources().getDisplayMetrics().density);
+        int v = (int)(18 * getResources().getDisplayMetrics().density);
+        t.setPadding(h, v, h, v);
+        t.setBackgroundColor(Color.rgb(11, 42, 102));
+        return t;
+    }
+
+    private void aplicarEstiloVen(AlertDialog dialog, String titulo) {
+        dialog.setCustomTitle(tituloDialogo(titulo));
+        dialog.setOnShowListener(v -> {
+            if (dialog.getButton(AlertDialog.BUTTON_POSITIVE) != null) dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.rgb(245,130,32));
+            if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null) dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(11,42,102));
+            if (dialog.getButton(AlertDialog.BUTTON_NEUTRAL) != null) dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(Color.rgb(11,42,102));
+            if (dialog.getWindow() != null) {
+                GradientDrawable bg = new GradientDrawable(); bg.setColor(Color.WHITE); bg.setCornerRadius(18 * getResources().getDisplayMetrics().density);
+                dialog.getWindow().setBackgroundDrawable(bg);
+            }
+        });
+    }
+
+    private void autenticarBiometria() {
+        if (Build.VERSION.SDK_INT < 28) {
+            Toast.makeText(this, "A impressão digital exige Android 9 ou superior nesta versão.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        try {
+            BiometricPrompt prompt = new BiometricPrompt.Builder(this)
+                    .setTitle("Desbloquear VEN")
+                    .setSubtitle("Confirme sua identidade com a biometria do aparelho")
+                    .setDescription("Sua impressão digital não é armazenada pelo VEN.")
+                    .setNegativeButton("Usar PIN", getMainExecutor(), (d, w) -> {})
+                    .build();
+            biometricCancellation = new CancellationSignal();
+            prompt.authenticate(biometricCancellation, getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
+                @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                    runOnUiThread(() -> liberarPagina());
+                }
+                @Override public void onAuthenticationFailed() {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Biometria não reconhecida. Tente novamente ou use o PIN.", Toast.LENGTH_SHORT).show());
+                }
+                @Override public void onAuthenticationError(int errorCode, CharSequence errString) {
+                    if (errorCode != BiometricPrompt.BIOMETRIC_ERROR_NEGATIVE_BUTTON && errorCode != BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED) {
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, errString, Toast.LENGTH_SHORT).show());
+                    }
+                }
+            });
+        } catch (Exception e) { Toast.makeText(this, "Não foi possível iniciar a biometria. Use o PIN.", Toast.LENGTH_LONG).show(); }
+    }
+
     private EditText campoPin() {
         EditText input = new EditText(this);
         input.setSingleLine(true);
@@ -200,12 +265,13 @@ public class MainActivity extends Activity {
         if (!pinAtivo()) { liberarPagina(); return; }
         EditText input = campoPin();
         AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Desbloquear VEN")
                 .setMessage("Digite seu PIN para acessar o aplicativo.")
                 .setView(input)
                 .setCancelable(false)
                 .setPositiveButton("Desbloquear", null)
+                .setNeutralButton(biometriaAtiva() && Build.VERSION.SDK_INT >= 28 ? "Impressão digital" : null, null)
                 .create();
+        aplicarEstiloVen(dialog, "Desbloquear VEN");
         dialog.setOnShowListener(v -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
             String pin = input.getText().toString();
             if (conferirPin(pin)) { dialog.dismiss(); liberarPagina(); }
@@ -213,6 +279,9 @@ public class MainActivity extends Activity {
         }));
         dialog.setOnKeyListener((d, keyCode, event) -> keyCode == android.view.KeyEvent.KEYCODE_BACK);
         dialog.show();
+        if (biometriaAtiva() && Build.VERSION.SDK_INT >= 28) {
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(btn -> { dialog.dismiss(); autenticarBiometria(); });
+        }
         dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
@@ -234,12 +303,14 @@ public class MainActivity extends Activity {
         AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Confirmar PIN atual")
                 .setMessage("Digite seu PIN para alterar ou desativar a proteção.")
                 .setView(input).setNegativeButton("Cancelar", null).setPositiveButton("Continuar", null).create();
+        aplicarEstiloVen(dialog, "Confirmar PIN atual");
         dialog.setOnShowListener(v -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
             if (!conferirPin(input.getText().toString())) { input.setText(""); input.setError("PIN incorreto"); return; }
             dialog.dismiss();
-            new AlertDialog.Builder(this).setTitle("Segurança com PIN")
-                    .setItems(new String[]{"Alterar PIN", "Desativar PIN"}, (d, which) -> {
+            new AlertDialog.Builder(this).setCustomTitle(tituloDialogo("Segurança do VEN"))
+                    .setItems(new String[]{"Alterar PIN", biometriaAtiva() ? "Desativar impressão digital" : "Ativar impressão digital", "Desativar PIN"}, (d, which) -> {
                         if (which == 0) pedirNovoPin();
+                        else if (which == 1) configurarBiometria();
                         else new AlertDialog.Builder(this).setTitle("Desativar PIN?")
                                 .setMessage("O VEN deixará de pedir o PIN ao abrir.")
                                 .setNegativeButton("Manter proteção", null)
@@ -252,19 +323,57 @@ public class MainActivity extends Activity {
         dialog.show();
     }
 
+    private void configurarBiometria() {
+        if (Build.VERSION.SDK_INT < 28) {
+            Toast.makeText(this, "A impressão digital exige Android 9 ou superior nesta versão.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (biometriaAtiva()) {
+            pinPrefs().edit().putBoolean("biometric_enabled", false).apply();
+            Toast.makeText(this, "Impressão digital desativada.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!pinAtivo()) {
+            Toast.makeText(this, "Cadastre um PIN antes de ativar a impressão digital.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        new AlertDialog.Builder(this).setCustomTitle(tituloDialogo("Ativar impressão digital"))
+                .setMessage("A biometria usa o recurso de segurança do Android. Mantenha o PIN como alternativa de acesso.")
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Continuar", (d, w) -> {
+                    try {
+                        BiometricPrompt prompt = new BiometricPrompt.Builder(this).setTitle("Confirmar impressão digital")
+                                .setSubtitle("Confirme para ativar o desbloqueio do VEN")
+                                .setNegativeButton("Cancelar", getMainExecutor(), (dd, ww) -> {})
+                                .build();
+                        prompt.authenticate(new CancellationSignal(), getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
+                            @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                                pinPrefs().edit().putBoolean("biometric_enabled", true).apply();
+                                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Impressão digital ativada.", Toast.LENGTH_LONG).show());
+                            }
+                            @Override public void onAuthenticationError(int code, CharSequence message) {
+                                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Não foi possível ativar: " + message, Toast.LENGTH_LONG).show());
+                            }
+                        });
+                    } catch (Exception e) { Toast.makeText(this, "Biometria indisponível. Confira o bloqueio de tela e as digitais cadastradas no Android.", Toast.LENGTH_LONG).show(); }
+                }).show();
+    }
+
     private void pedirNovoPin() {
         EditText primeiro = campoPin();
-        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Cadastrar PIN")
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setMessage("Escolha um PIN numérico de 4 a 6 dígitos.")
                 .setView(primeiro).setNegativeButton("Cancelar", null).setPositiveButton("Continuar", null).create();
+        aplicarEstiloVen(dialog, "Cadastrar PIN");
         dialog.setOnShowListener(v -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
             String pin = primeiro.getText().toString();
             if (!pin.matches("[0-9]{4,6}")) { primeiro.setError("Use de 4 a 6 dígitos"); return; }
             dialog.dismiss();
             EditText confirmar = campoPin();
-            AlertDialog confirmDialog = new AlertDialog.Builder(this).setTitle("Confirmar PIN")
+            AlertDialog confirmDialog = new AlertDialog.Builder(this)
                     .setMessage("Digite novamente o mesmo PIN.")
                     .setView(confirmar).setNegativeButton("Cancelar", null).setPositiveButton("Ativar proteção", null).create();
+            aplicarEstiloVen(confirmDialog, "Confirmar PIN");
             confirmDialog.setOnShowListener(vv -> confirmDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(b -> {
                 if (!pin.equals(confirmar.getText().toString())) { confirmar.setText(""); confirmar.setError("Os PINs não coincidem"); return; }
                 confirmDialog.dismiss(); salvarPin(pin);
