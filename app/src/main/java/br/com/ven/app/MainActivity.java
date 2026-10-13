@@ -239,7 +239,7 @@ public class MainActivity extends Activity {
                     runOnUiThread(() -> Toast.makeText(MainActivity.this, "Biometria não reconhecida. Tente novamente ou use o PIN.", Toast.LENGTH_SHORT).show());
                 }
                 @Override public void onAuthenticationError(int errorCode, CharSequence errString) {
-                    if (errorCode != BiometricPrompt.BIOMETRIC_ERROR_NEGATIVE_BUTTON && errorCode != BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED) {
+                    if (errorCode != 13 && errorCode != BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED) {
                         runOnUiThread(() -> Toast.makeText(MainActivity.this, errString, Toast.LENGTH_SHORT).show());
                     }
                 }
