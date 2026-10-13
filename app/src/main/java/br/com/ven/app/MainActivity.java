@@ -32,6 +32,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.widget.TextView;
 import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import androidx.biometric.BiometricManager;
@@ -190,7 +191,7 @@ public class MainActivity extends FragmentActivity {
             new SecureRandom().nextBytes(saltBytes);
             String salt = Base64.encodeToString(saltBytes, Base64.NO_WRAP);
             String hash = derivarPin(pin, salt);
-            pinPrefs().edit().putString("pin_salt", salt).putString("pin_hash", hash).putBoolean("pin_enabled", true).apply();
+            pinPrefs().edit().putString("pin_salt", salt).putString("pin_hash", hash).putInt("pin_length", pin.length()).putBoolean("pin_enabled", true).apply();
             Toast.makeText(this, "PIN ativado com sucesso.", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             Toast.makeText(this, "Não foi possível configurar o PIN neste aparelho.", Toast.LENGTH_LONG).show();
@@ -394,21 +395,70 @@ public class MainActivity extends FragmentActivity {
                 pedirPinAtualParaGerenciar();
                 return;
             }
-            new AlertDialog.Builder(this)
-                    .setTitle("Segurança do VEN")
-                    .setItems(new String[]{"Alterar PIN", biometriaAtiva() ? "Desativar impressão digital" : "Ativar impressão digital", "Desativar PIN"}, (d, which) -> {
-                        if (which == 0) pedirNovoPin();
-                        else if (which == 1) configurarBiometria();
-                        else new AlertDialog.Builder(this)
-                                .setTitle("Desativar PIN?")
-                                .setMessage("O VEN deixará de pedir o PIN ao abrir.")
-                                .setNegativeButton("Manter proteção", null)
-                                .setPositiveButton("Desativar", (dd, ww) -> {
-                                    pinPrefs().edit().clear().apply();
-                                    Toast.makeText(this, "PIN desativado.", Toast.LENGTH_LONG).show();
-                                }).show();
-                    }).setNegativeButton("Cancelar", null).show();
+            mostrarMenuSegurancaPin();
         });
+    }
+
+    private void mostrarMenuSegurancaPin() {
+        final float d = getResources().getDisplayMetrics().density;
+        final boolean escuro = temaEscuroAtivo();
+        final int fundo = escuro ? Color.rgb(13, 16, 21) : Color.rgb(245, 249, 252);
+        final int superficie = escuro ? Color.rgb(25, 29, 35) : Color.WHITE;
+        final int texto = escuro ? Color.rgb(242, 245, 249) : Color.rgb(25, 39, 52);
+        final int secundario = escuro ? Color.rgb(164, 174, 187) : Color.rgb(83, 102, 118);
+        final int laranja = Color.rgb(255, 145, 45);
+        LinearLayout painel = new LinearLayout(this);
+        painel.setOrientation(LinearLayout.VERTICAL);
+        painel.setPadding((int)(20*d), (int)(18*d), (int)(20*d), (int)(12*d));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(fundo); bg.setCornerRadius(24*d);
+        bg.setStroke(Math.max(1, (int)d), escuro ? Color.rgb(48, 58, 70) : Color.rgb(207, 222, 233));
+        painel.setBackground(bg);
+        TextView titulo = new TextView(this);
+        titulo.setText("Segurança do VEN"); titulo.setTextColor(texto); titulo.setTextSize(22);
+        titulo.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        titulo.setPadding((int)(4*d), (int)(4*d), (int)(4*d), (int)(12*d));
+        painel.addView(titulo);
+        String[] opcoes = {"Alterar PIN", biometriaAtiva() ? "Desativar impressão digital" : "Ativar impressão digital", "Desativar PIN"};
+        final AlertDialog[] ref = new AlertDialog[1];
+        for (int i=0; i<opcoes.length; i++) {
+            final int indice = i;
+            TextView item = new TextView(this);
+            item.setText(opcoes[i]); item.setTextColor(texto); item.setTextSize(17);
+            item.setGravity(Gravity.CENTER_VERTICAL);
+            item.setPadding((int)(14*d), 0, (int)(12*d), 0);
+            GradientDrawable itemBg = new GradientDrawable(); itemBg.setColor(superficie); itemBg.setCornerRadius(14*d);
+            item.setBackground(itemBg);
+            LinearLayout.LayoutParams ip = new LinearLayout.LayoutParams(-1, (int)(54*d)); ip.bottomMargin=(int)(7*d);
+            painel.addView(item, ip);
+            item.setOnClickListener(v -> {
+                if (ref[0] != null) ref[0].dismiss();
+                if (indice == 0) pedirNovoPin();
+                else if (indice == 1) configurarBiometria();
+                else {
+                    AlertDialog confirmar = new AlertDialog.Builder(this)
+                        .setTitle("Desativar PIN?")
+                        .setMessage("O VEN deixará de pedir o PIN ao abrir.")
+                        .setNegativeButton("Manter proteção", null)
+                        .setPositiveButton("Desativar", (dd, ww) -> {
+                            pinPrefs().edit().clear().apply();
+                            Toast.makeText(this, "PIN desativado.", Toast.LENGTH_LONG).show();
+                        }).create();
+                    confirmar.setOnShowListener(vv -> aplicarEstiloVen(confirmar, "Desativar PIN?"));
+                    confirmar.show();
+                }
+            });
+        }
+        TextView cancelar = new TextView(this); cancelar.setText("Cancelar"); cancelar.setTextColor(laranja);
+        cancelar.setTextSize(15); cancelar.setGravity(Gravity.CENTER); cancelar.setPadding(0, (int)(8*d), 0, (int)(8*d));
+        painel.addView(cancelar, new LinearLayout.LayoutParams(-1, (int)(42*d)));
+        AlertDialog menu = new AlertDialog.Builder(this).setView(painel).create(); ref[0]=menu;
+        cancelar.setOnClickListener(v -> menu.dismiss());
+        menu.show();
+        if (menu.getWindow()!=null) {
+            menu.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            menu.getWindow().setLayout((int)Math.min(390*d, getResources().getDisplayMetrics().widthPixels-(28*d)), -2);
+        }
     }
 
     private void configurarBiometria() {
@@ -468,27 +518,27 @@ public class MainActivity extends FragmentActivity {
         final StringBuilder valor = new StringBuilder();
 
         LinearLayout raiz = new LinearLayout(this);
+        final boolean desbloqueioTelaCheia = titulo.startsWith("Desbloquear VEN");
         raiz.setOrientation(LinearLayout.VERTICAL);
-        raiz.setGravity(Gravity.CENTER_HORIZONTAL);
-        raiz.setPadding((int)(18*d), (int)(18*d), (int)(18*d), (int)(16*d));
+        raiz.setGravity(Gravity.CENTER);
+        if (desbloqueioTelaCheia) raiz.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
+        raiz.setPadding((int)((desbloqueioTelaCheia ? 28 : 18)*d), (int)(18*d), (int)((desbloqueioTelaCheia ? 28 : 18)*d), (int)(16*d));
         GradientDrawable painel = new GradientDrawable();
         painel.setColor(fundo);
-        painel.setCornerRadius(28*d);
-        painel.setStroke(Math.max(1, (int)d), escuro ? Color.rgb(43, 49, 58) : Color.rgb(35, 132, 183));
+        painel.setCornerRadius(desbloqueioTelaCheia ? 0 : 28*d);
+        painel.setStroke(desbloqueioTelaCheia ? 0 : Math.max(1, (int)d), escuro ? Color.rgb(43, 49, 58) : Color.rgb(35, 132, 183));
         raiz.setBackground(painel);
 
-        // Marca VEN em forma de V, no topo do painel de PIN.
-        TextView logo = new TextView(this);
-        logo.setText("V");
-        logo.setTextColor(laranja);
-        logo.setTextSize(30);
-        logo.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        logo.setGravity(Gravity.CENTER);
+        // Usa o ícone oficial do aplicativo, em vez de desenhar um V genérico.
+        ImageView logo = new ImageView(this);
+        logo.setImageResource(R.mipmap.ic_launcher);
+        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         GradientDrawable logoBg = new GradientDrawable();
         logoBg.setColor(escuro ? Color.rgb(30, 34, 41) : Color.rgb(39, 128, 174));
         logoBg.setCornerRadius(18*d);
         logoBg.setStroke(Math.max(1, (int)d), escuro ? Color.rgb(51, 58, 68) : Color.rgb(92, 166, 204));
         logo.setBackground(logoBg);
+        logo.setPadding((int)(8*d), (int)(8*d), (int)(8*d), (int)(8*d));
         LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams((int)(58*d), (int)(58*d));
         lpLogo.bottomMargin = (int)(10*d);
         raiz.addView(logo, lpLogo);
@@ -560,6 +610,11 @@ public class MainActivity extends FragmentActivity {
                     pontos.setText(display.toString());
                     estado.setText(valor.length() >= 4 ? valor.length() + " dígitos digitados · já pode continuar" : "Digite de 4 a 6 dígitos");
                     estado.setTextColor(valor.length() >= 4 ? laranja : secundario);
+                    // Na tela de desbloqueio, libera assim que o PIN correto (4, 5 ou 6 dígitos) for completado.
+                    if (desbloqueioTelaCheia && valor.length() >= 4 && conferirPin(valor.toString())) {
+                        if (dialogRef[0] != null) dialogRef[0].dismiss();
+                        callback.onPin(valor.toString());
+                    }
                 });
             }
             teclado.addView(row, new LinearLayout.LayoutParams(-2, -2));
@@ -615,8 +670,15 @@ public class MainActivity extends FragmentActivity {
         dialog.show();
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-            dialog.getWindow().setLayout((int)Math.min(360*d, getResources().getDisplayMetrics().widthPixels - 28*d),
-                    android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+            if (desbloqueioTelaCheia) {
+                dialog.getWindow().setLayout(android.view.WindowManager.LayoutParams.MATCH_PARENT,
+                        android.view.WindowManager.LayoutParams.MATCH_PARENT);
+                dialog.getWindow().setDimAmount(0f);
+                dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            } else {
+                dialog.getWindow().setLayout((int)Math.min(360*d, getResources().getDisplayMetrics().widthPixels - 28*d),
+                        android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+            }
         }
     }
 
