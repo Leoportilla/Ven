@@ -334,7 +334,7 @@ public class MainActivity extends FragmentActivity {
                 .setPositiveButton("Desbloquear", null)
                 .setNegativeButton(biometriaAtiva() ? "Usar digital" : null, null)
                 .create();
-        aplicarEstiloVen(dialog, "Desbloquear VEN");
+        dialog.setCustomTitle(tituloDialogo("Desbloquear VEN"));
         dialog.setOnShowListener(v -> {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
                 String pin = input.getText().toString();
@@ -352,8 +352,12 @@ public class MainActivity extends FragmentActivity {
                 });
             }
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.rgb(245,130,32));
+            if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null) dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(45,145,205));
             if (dialog.getWindow() != null) {
-                GradientDrawable bg = new GradientDrawable(); bg.setColor(Color.rgb(26,29,34)); bg.setCornerRadius(24*d);
+                GradientDrawable bg = new GradientDrawable();
+                bg.setColor(Color.rgb(18, 28, 43));
+                bg.setCornerRadius(26*d);
+                bg.setStroke(Math.max(1, (int)(1*d)), Color.rgb(45, 145, 205));
                 dialog.getWindow().setBackgroundDrawable(bg);
                 dialog.getWindow().setLayout((int)(320*d), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
                 dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
