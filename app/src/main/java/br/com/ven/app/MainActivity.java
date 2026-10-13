@@ -586,7 +586,8 @@ public class MainActivity extends FragmentActivity {
         for (String[] linha : linhas) {
             LinearLayout row = new LinearLayout(this);
             row.setGravity(Gravity.CENTER);
-            for (String tecla : linha) {
+            final AlertDialog[] dialogRef = new AlertDialog[1];
+        for (String tecla : linha) {
                 TextView b = new TextView(this);
                 b.setText(tecla.equals("⌫") ? "⌫" : tecla);
                 b.setTextColor(tecla.isEmpty() ? Color.TRANSPARENT : texto);
@@ -621,7 +622,6 @@ public class MainActivity extends FragmentActivity {
         }
         raiz.addView(teclado);
 
-        final AlertDialog[] dialogRef = new AlertDialog[1];
         TextView continuar = new TextView(this);
         continuar.setText(acao.toUpperCase(java.util.Locale.ROOT));
         continuar.setTextColor(Color.rgb(28, 34, 40));
