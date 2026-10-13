@@ -520,6 +520,7 @@ public class MainActivity extends FragmentActivity {
                 });
             });
             confirmDialog.show();
+            });
         });
         dialog.show();
         estilizarPainelPin(dialog);
