@@ -31,6 +31,7 @@ import android.view.Gravity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import androidx.biometric.BiometricManager;
@@ -265,7 +266,9 @@ public class MainActivity extends FragmentActivity {
                     runOnUiThread(() -> Toast.makeText(MainActivity.this, "Digital não reconhecida. Tente novamente ou use o PIN.", Toast.LENGTH_SHORT).show());
                 }
                 @Override public void onAuthenticationError(int code, CharSequence message) {
-                    if (code != BiometricPrompt.ERROR_NEGATIVE_BUTTON && code != BiometricPrompt.ERROR_USER_CANCELED) {
+                    if (code == BiometricPrompt.ERROR_NEGATIVE_BUTTON || code == BiometricPrompt.ERROR_USER_CANCELED) {
+                        runOnUiThread(() -> { if (!paginaLiberada) mostrarDialogoPinCompacto(); });
+                    } else {
                         runOnUiThread(() -> Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show());
                     }
                 }
@@ -293,26 +296,69 @@ public class MainActivity extends FragmentActivity {
     private void solicitarPinAoAbrir() {
         if (paginaLiberada || webView == null) return;
         if (!pinAtivo()) { liberarPagina(); return; }
+        // Quando a biometria foi ativada, ela é a primeira opção ao abrir o VEN.
+        if (biometriaAtiva() && Build.VERSION.SDK_INT >= 28
+                && disponibilidadeBiometria() == BiometricManager.BIOMETRIC_SUCCESS) {
+            autenticarBiometria();
+            return;
+        }
+        mostrarDialogoPinCompacto();
+    }
+
+    private void mostrarDialogoPinCompacto() {
+        if (paginaLiberada || isFinishing()) return;
+        float d = getResources().getDisplayMetrics().density;
+        LinearLayout content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setPadding((int)(22*d), (int)(10*d), (int)(22*d), (int)(8*d));
+        content.setBackgroundColor(Color.WHITE);
+
+        TextView mensagem = new TextView(this);
+        mensagem.setText("Digite seu PIN para acessar o VEN");
+        mensagem.setTextColor(Color.rgb(32, 45, 66));
+        mensagem.setTextSize(15);
+        mensagem.setPadding(0, 0, 0, (int)(8*d));
+        content.addView(mensagem);
+
         EditText input = campoPin();
+        input.setHint("PIN de 4 a 6 dígitos");
+        input.setPadding((int)(10*d), (int)(10*d), (int)(10*d), (int)(10*d));
+        content.addView(input, new LinearLayout.LayoutParams(-1, (int)(52*d)));
+
         AlertDialog dialog = new AlertDialog.Builder(this)
-                .setMessage("Digite seu PIN para acessar o aplicativo.")
-                .setView(input)
+                .setView(content)
                 .setCancelable(false)
                 .setPositiveButton("Desbloquear", null)
-                .setNeutralButton(biometriaAtiva() && Build.VERSION.SDK_INT >= 28 ? "Impressão digital" : null, null)
+                .setNegativeButton(biometriaAtiva() ? "Usar digital" : null, null)
                 .create();
         aplicarEstiloVen(dialog, "Desbloquear VEN");
-        dialog.setOnShowListener(v -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
-            String pin = input.getText().toString();
-            if (conferirPin(pin)) { dialog.dismiss(); liberarPagina(); }
-            else { input.setText(""); input.setError("PIN incorreto"); }
-        }));
-        dialog.setOnKeyListener((d, keyCode, event) -> keyCode == android.view.KeyEvent.KEYCODE_BACK);
+        dialog.setOnShowListener(v -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
+                String pin = input.getText().toString();
+                if (conferirPin(pin)) { dialog.dismiss(); liberarPagina(); }
+                else { input.setText(""); input.setError("PIN incorreto"); }
+            });
+            if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null) {
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.rgb(11,42,102));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(btn -> {
+                    if (biometriaAtiva() && disponibilidadeBiometria() == BiometricManager.BIOMETRIC_SUCCESS) {
+                        dialog.dismiss(); autenticarBiometria();
+                    } else {
+                        mostrarErroBiometria(disponibilidadeBiometria());
+                    }
+                });
+            }
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.rgb(245,130,32));
+            if (dialog.getWindow() != null) {
+                GradientDrawable bg = new GradientDrawable(); bg.setColor(Color.WHITE); bg.setCornerRadius(18*d);
+                dialog.getWindow().setBackgroundDrawable(bg);
+                dialog.getWindow().setLayout((int)(340*d), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            }
+        });
+        dialog.setOnKeyListener((di, keyCode, event) -> keyCode == android.view.KeyEvent.KEYCODE_BACK);
         dialog.show();
-        if (biometriaAtiva() && Build.VERSION.SDK_INT >= 28) {
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(btn -> { dialog.dismiss(); autenticarBiometria(); });
-        }
-        dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        if (dialog.getWindow() != null) dialog.getWindow().setLayout((int)(340*d), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
     }
 
     private void liberarPagina() {
