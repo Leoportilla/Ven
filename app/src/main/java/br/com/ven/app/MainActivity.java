@@ -200,6 +200,15 @@ public class MainActivity extends FragmentActivity {
     }
 
     private boolean temaEscuroAtivo() {
+        // Prioriza o tema escolhido dentro do VEN (cor do cabeçalho salva por setTema); cai no tema do sistema se ainda não houver.
+        try {
+            String salvo = getSharedPreferences("ven", MODE_PRIVATE).getString("cromo", null);
+            if (salvo != null) {
+                int c = Color.parseColor(salvo.trim());
+                double lum = (0.299 * Color.red(c) + 0.587 * Color.green(c) + 0.114 * Color.blue(c)) / 255.0;
+                return lum < 0.25;
+            }
+        } catch (Exception ignorado) { }
         int modo = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
         return modo == android.content.res.Configuration.UI_MODE_NIGHT_YES;
     }
@@ -437,16 +446,11 @@ public class MainActivity extends FragmentActivity {
                 if (indice == 0) pedirNovoPin();
                 else if (indice == 1) configurarBiometria();
                 else {
-                    AlertDialog confirmar = new AlertDialog.Builder(this)
-                        .setTitle("Desativar PIN?")
-                        .setMessage("O VEN deixará de pedir o PIN ao abrir.")
-                        .setNegativeButton("Manter proteção", null)
-                        .setPositiveButton("Desativar", (dd, ww) -> {
+                    mostrarDialogoVen("Desativar PIN?", "O VEN deixará de pedir o PIN ao abrir.",
+                        "Manter proteção", "Desativar", () -> {
                             pinPrefs().edit().clear().apply();
                             Toast.makeText(this, "PIN desativado.", Toast.LENGTH_LONG).show();
-                        }).create();
-                    confirmar.setOnShowListener(vv -> aplicarEstiloVen(confirmar, "Desativar PIN?"));
-                    confirmar.show();
+                        });
                 }
             });
         }
@@ -459,6 +463,77 @@ public class MainActivity extends FragmentActivity {
         if (menu.getWindow()!=null) {
             menu.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
             menu.getWindow().setLayout((int)Math.min(390*d, getResources().getDisplayMetrics().widthPixels-(28*d)), -2);
+        }
+    }
+
+    // Diálogo de confirmação no padrão VEN (substitui o balão branco do Android).
+    private void mostrarDialogoVen(String titulo, String mensagem, String textoNegativo, String textoPositivo, Runnable aoConfirmar) {
+        if (isFinishing()) return;
+        final float d = getResources().getDisplayMetrics().density;
+        final boolean escuro = temaEscuroAtivo();
+        final int fundo = escuro ? Color.rgb(18, 22, 28) : Color.WHITE;
+        final int borda = escuro ? Color.rgb(48, 54, 63) : Color.rgb(216, 226, 236);
+        final int texto = escuro ? Color.rgb(245, 247, 250) : Color.rgb(25, 39, 52);
+        final int secundario = escuro ? Color.rgb(160, 169, 181) : Color.rgb(83, 102, 118);
+        final int laranja = Color.rgb(255, 146, 43);
+
+        LinearLayout painel = new LinearLayout(this);
+        painel.setOrientation(LinearLayout.VERTICAL);
+        painel.setPadding((int)(24*d), (int)(24*d), (int)(24*d), (int)(18*d));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(fundo); bg.setCornerRadius(26*d);
+        bg.setStroke(Math.max(1, (int)d), borda);
+        painel.setBackground(bg);
+
+        TextView t = new TextView(this);
+        t.setText(titulo); t.setTextColor(texto); t.setTextSize(21);
+        t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        painel.addView(t, new LinearLayout.LayoutParams(-1, -2));
+
+        TextView m = new TextView(this);
+        m.setText(mensagem); m.setTextColor(secundario); m.setTextSize(15);
+        m.setLineSpacing(0, 1.15f);
+        LinearLayout.LayoutParams mp = new LinearLayout.LayoutParams(-1, -2);
+        mp.topMargin = (int)(10*d);
+        painel.addView(m, mp);
+
+        LinearLayout botoes = new LinearLayout(this);
+        botoes.setOrientation(LinearLayout.HORIZONTAL);
+        botoes.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
+        LinearLayout.LayoutParams bl = new LinearLayout.LayoutParams(-1, -2);
+        bl.topMargin = (int)(22*d);
+        painel.addView(botoes, bl);
+
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+
+        TextView neg = new TextView(this);
+        neg.setText(textoNegativo); neg.setTextColor(secundario); neg.setTextSize(15);
+        neg.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        neg.setGravity(Gravity.CENTER);
+        neg.setPadding((int)(16*d), 0, (int)(16*d), 0);
+        botoes.addView(neg, new LinearLayout.LayoutParams(-2, (int)(46*d)));
+        neg.setOnClickListener(v -> dialog.dismiss());
+
+        TextView pos = new TextView(this);
+        pos.setText(textoPositivo); pos.setTextColor(Color.rgb(26, 26, 26)); pos.setTextSize(15);
+        pos.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        pos.setGravity(Gravity.CENTER);
+        pos.setPadding((int)(22*d), 0, (int)(22*d), 0);
+        GradientDrawable pb = new GradientDrawable();
+        pb.setColor(laranja); pb.setCornerRadius(24*d);
+        pos.setBackground(pb);
+        LinearLayout.LayoutParams pl = new LinearLayout.LayoutParams(-2, (int)(46*d));
+        pl.leftMargin = (int)(8*d);
+        botoes.addView(pos, pl);
+        pos.setOnClickListener(v -> { dialog.dismiss(); if (aoConfirmar != null) aoConfirmar.run(); });
+
+        dialog.setContentView(painel);
+        dialog.show();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setLayout((int)Math.min(360*d, getResources().getDisplayMetrics().widthPixels - 40*d),
+                    android.view.WindowManager.LayoutParams.WRAP_CONTENT);
         }
     }
 
@@ -477,11 +552,9 @@ public class MainActivity extends FragmentActivity {
             mostrarErroBiometria(status);
             return;
         }
-        new AlertDialog.Builder(this)
-                .setTitle("Ativar impressão digital")
-                .setMessage("O VEN usará a biometria do Android. Sua digital não é armazenada pelo aplicativo; o PIN continuará como alternativa.")
-                .setNegativeButton("Cancelar", null)
-                .setPositiveButton("Continuar", (d, w) -> {
+        mostrarDialogoVen("Ativar impressão digital",
+                "O VEN usará a biometria do Android. Sua digital não é armazenada pelo aplicativo; o PIN continuará como alternativa.",
+                "Cancelar", "Continuar", () -> {
                     try {
                         BiometricPrompt prompt = new BiometricPrompt(this, getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
                             @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
@@ -499,7 +572,7 @@ public class MainActivity extends FragmentActivity {
                         android.util.Log.e("VEN_BIOMETRIA", "Falha ao configurar biometria", e);
                         Toast.makeText(this, "Não foi possível iniciar a biometria. O PIN continua disponível.", Toast.LENGTH_LONG).show();
                     }
-                }).show();
+                });
     }
 
     private interface PinDigitadoCallback { void onPin(String pin); }
@@ -511,14 +584,16 @@ public class MainActivity extends FragmentActivity {
         final float d = getResources().getDisplayMetrics().density;
         final boolean escuro = temaEscuroAtivo();
         final boolean desbloqueioTelaCheia = titulo.startsWith("Desbloquear VEN");
-        final int fundoTopo = escuro ? Color.rgb(21, 27, 35) : Color.rgb(11, 115, 176);
-        final int fundoBase = escuro ? Color.rgb(11, 14, 18) : Color.rgb(8, 90, 138);
-        final int texto = escuro ? Color.rgb(242, 245, 248) : Color.WHITE;
-        final int secundario = escuro ? Color.rgb(152, 162, 174) : Color.argb(200, 255, 255, 255);
+        // Escuro: mantém o visual aprovado. Claro: usa as cores do tema claro do VEN.
+        final int fundoTopo = escuro ? Color.rgb(11, 14, 18) : Color.rgb(244, 247, 251);
+        final int fundoBase = fundoTopo;
+        final int texto = escuro ? Color.rgb(245, 247, 250) : Color.rgb(25, 39, 52);
+        final int secundario = escuro ? Color.rgb(160, 169, 181) : Color.rgb(83, 102, 118);
         final int laranja = Color.rgb(255, 146, 43);
-        final int corTecla = escuro ? Color.argb(13, 255, 255, 255) : Color.argb(36, 255, 255, 255);
-        final int bordaTecla = escuro ? Color.argb(26, 255, 255, 255) : Color.argb(56, 255, 255, 255);
-        final int contornoPonto = escuro ? Color.argb(64, 255, 255, 255) : Color.argb(90, 255, 255, 255);
+        final int corTecla = escuro ? Color.rgb(25, 29, 35) : Color.WHITE;
+        final int bordaTecla = escuro ? Color.rgb(48, 54, 63) : Color.rgb(216, 226, 236);
+        final int contornoPonto = escuro ? Color.rgb(110, 119, 131) : Color.rgb(160, 176, 190);
+        final int corLogoBg = escuro ? Color.rgb(30, 34, 41) : Color.WHITE;
         final StringBuilder valor = new StringBuilder();
         final Dialog[] dialogRef = new Dialog[1];
 
@@ -537,7 +612,7 @@ public class MainActivity extends FragmentActivity {
         logo.setImageResource(R.mipmap.ic_launcher);
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         GradientDrawable logoBg = new GradientDrawable();
-        logoBg.setColor(corTecla); logoBg.setCornerRadius(22*d);
+        logoBg.setColor(corLogoBg); logoBg.setCornerRadius(22*d);
         logoBg.setStroke(Math.max(1, (int)d), bordaTecla);
         logo.setBackground(logoBg);
         logo.setPadding((int)(9*d), (int)(9*d), (int)(9*d), (int)(9*d));
@@ -615,18 +690,18 @@ public class MainActivity extends FragmentActivity {
                 final boolean apagar = t.equals("⌫");
                 TextView b = new TextView(this);
                 b.setText(t);
-                b.setTextColor(apagar ? secundario : texto);
+                b.setTextColor(texto);
                 b.setTextSize(apagar ? 28 : 28);
                 b.setTypeface(Typeface.DEFAULT, apagar ? Typeface.NORMAL : Typeface.BOLD);
                 b.setGravity(Gravity.CENTER);
-                if (!vazia && !apagar) {
+                if (!vazia) {
                     GradientDrawable normal = new GradientDrawable();
                     normal.setShape(GradientDrawable.OVAL);
                     normal.setColor(corTecla);
                     normal.setStroke(Math.max(1, (int)d), bordaTecla);
                     GradientDrawable pressionada = new GradientDrawable();
                     pressionada.setShape(GradientDrawable.OVAL);
-                    pressionada.setColor(Color.argb(110, 255, 146, 43));
+                    pressionada.setColor(Color.argb(escuro ? 110 : 70, 255, 146, 43));
                     pressionada.setStroke(Math.max(1, (int)d), laranja);
                     android.graphics.drawable.StateListDrawable sel = new android.graphics.drawable.StateListDrawable();
                     sel.addState(new int[]{android.R.attr.state_pressed}, pressionada);
@@ -721,6 +796,11 @@ public class MainActivity extends FragmentActivity {
             w.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             w.setStatusBarColor(fundoTopo);
             w.setNavigationBarColor(fundoBase);
+            if (!escuro && Build.VERSION.SDK_INT >= 23) {
+                int flags = w.getDecorView().getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                if (Build.VERSION.SDK_INT >= 26) flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                w.getDecorView().setSystemUiVisibility(flags);
+            }
         }
     }
 
