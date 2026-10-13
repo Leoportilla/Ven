@@ -25,6 +25,15 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+import android.widget.EditText;
+import android.text.InputType;
+import android.view.Gravity;
+import android.app.AlertDialog;
+import java.security.SecureRandom;
+import java.security.spec.KeySpec;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import android.util.Base64;
 
 
 import com.google.mlkit.vision.barcode.common.Barcode;
@@ -42,6 +51,7 @@ import java.net.URL;
 public class MainActivity extends Activity {
     private WebView webView;
     private WebView printWebView; // mantem referencia enquanto a impressao esta aberta
+    private boolean paginaLiberada = false;
     private ValueCallback<Uri[]> filePathCallback;
     private static final int FILE_CHOOSER_REQUEST = 1001;
     private static String destinoPendente = "";
@@ -136,7 +146,132 @@ public class MainActivity extends Activity {
             }
         });
         setContentView(webView);
+        solicitarPinAoAbrir();
+    }
+
+    private SharedPreferences pinPrefs() { return getSharedPreferences("ven_security", MODE_PRIVATE); }
+
+    private boolean pinAtivo() { return pinPrefs().getBoolean("pin_enabled", false); }
+
+    private String derivarPin(String pin, String salt) throws Exception {
+        byte[] saltBytes = Base64.decode(salt, Base64.NO_WRAP);
+        KeySpec spec = new PBEKeySpec(pin.toCharArray(), saltBytes, 120000, 256);
+        byte[] hash = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).getEncoded();
+        return Base64.encodeToString(hash, Base64.NO_WRAP);
+    }
+
+    private boolean conferirPin(String pin) {
+        try {
+            String salt = pinPrefs().getString("pin_salt", "");
+            String esperado = pinPrefs().getString("pin_hash", "");
+            if (salt.isEmpty() || esperado.isEmpty()) return false;
+            return java.security.MessageDigest.isEqual(derivarPin(pin, salt).getBytes("UTF-8"), esperado.getBytes("UTF-8"));
+        } catch (Exception e) { return false; }
+    }
+
+    private void salvarPin(String pin) {
+        try {
+            byte[] saltBytes = new byte[16];
+            new SecureRandom().nextBytes(saltBytes);
+            String salt = Base64.encodeToString(saltBytes, Base64.NO_WRAP);
+            String hash = derivarPin(pin, salt);
+            pinPrefs().edit().putString("pin_salt", salt).putString("pin_hash", hash).putBoolean("pin_enabled", true).apply();
+            Toast.makeText(this, "PIN ativado com sucesso.", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Não foi possível configurar o PIN neste aparelho.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private EditText campoPin() {
+        EditText input = new EditText(this);
+        input.setSingleLine(true);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        input.setHint("PIN de 4 a 6 dígitos");
+        input.setGravity(Gravity.CENTER);
+        input.setLetterSpacing(0.25f);
+        input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(6)});
+        int pad = (int)(24 * getResources().getDisplayMetrics().density);
+        input.setPadding(pad, pad / 2, pad, pad / 2);
+        return input;
+    }
+
+    private void solicitarPinAoAbrir() {
+        if (paginaLiberada || webView == null) return;
+        if (!pinAtivo()) { liberarPagina(); return; }
+        EditText input = campoPin();
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Desbloquear VEN")
+                .setMessage("Digite seu PIN para acessar o aplicativo.")
+                .setView(input)
+                .setCancelable(false)
+                .setPositiveButton("Desbloquear", null)
+                .create();
+        dialog.setOnShowListener(v -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
+            String pin = input.getText().toString();
+            if (conferirPin(pin)) { dialog.dismiss(); liberarPagina(); }
+            else { input.setText(""); input.setError("PIN incorreto"); }
+        }));
+        dialog.setOnKeyListener((d, keyCode, event) -> keyCode == android.view.KeyEvent.KEYCODE_BACK);
+        dialog.show();
+        dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    private void liberarPagina() {
+        if (paginaLiberada || webView == null) return;
+        paginaLiberada = true;
         webView.loadUrl("file:///android_asset/orcamento.html");
+    }
+
+    private void gerenciarPin() {
+        runOnUiThread(() -> {
+            if (pinAtivo()) pedirPinAtualParaGerenciar();
+            else pedirNovoPin();
+        });
+    }
+
+    private void pedirPinAtualParaGerenciar() {
+        EditText input = campoPin();
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Confirmar PIN atual")
+                .setMessage("Digite seu PIN para alterar ou desativar a proteção.")
+                .setView(input).setNegativeButton("Cancelar", null).setPositiveButton("Continuar", null).create();
+        dialog.setOnShowListener(v -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
+            if (!conferirPin(input.getText().toString())) { input.setText(""); input.setError("PIN incorreto"); return; }
+            dialog.dismiss();
+            new AlertDialog.Builder(this).setTitle("Segurança com PIN")
+                    .setItems(new String[]{"Alterar PIN", "Desativar PIN"}, (d, which) -> {
+                        if (which == 0) pedirNovoPin();
+                        else new AlertDialog.Builder(this).setTitle("Desativar PIN?")
+                                .setMessage("O VEN deixará de pedir o PIN ao abrir.")
+                                .setNegativeButton("Manter proteção", null)
+                                .setPositiveButton("Desativar", (dd, ww) -> {
+                                    pinPrefs().edit().clear().apply();
+                                    Toast.makeText(this, "PIN desativado.", Toast.LENGTH_LONG).show();
+                                }).show();
+                    }).show();
+        }));
+        dialog.show();
+    }
+
+    private void pedirNovoPin() {
+        EditText primeiro = campoPin();
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Cadastrar PIN")
+                .setMessage("Escolha um PIN numérico de 4 a 6 dígitos.")
+                .setView(primeiro).setNegativeButton("Cancelar", null).setPositiveButton("Continuar", null).create();
+        dialog.setOnShowListener(v -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
+            String pin = primeiro.getText().toString();
+            if (!pin.matches("[0-9]{4,6}")) { primeiro.setError("Use de 4 a 6 dígitos"); return; }
+            dialog.dismiss();
+            EditText confirmar = campoPin();
+            AlertDialog confirmDialog = new AlertDialog.Builder(this).setTitle("Confirmar PIN")
+                    .setMessage("Digite novamente o mesmo PIN.")
+                    .setView(confirmar).setNegativeButton("Cancelar", null).setPositiveButton("Ativar proteção", null).create();
+            confirmDialog.setOnShowListener(vv -> confirmDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(b -> {
+                if (!pin.equals(confirmar.getText().toString())) { confirmar.setText(""); confirmar.setError("Os PINs não coincidem"); return; }
+                confirmDialog.dismiss(); salvarPin(pin);
+            }));
+            confirmDialog.show();
+        }));
+        dialog.show();
     }
 
     // Encaminha a verificacao automatica para a rotina do bridge nativo.
@@ -212,6 +347,12 @@ public class MainActivity extends Activity {
     }
 
     public class AndroidBridge {
+        @JavascriptInterface
+        public void gerenciarPin() { MainActivity.this.gerenciarPin(); }
+
+        @JavascriptInterface
+        public boolean pinAtivo() { return MainActivity.this.pinAtivo(); }
+
         // Vibracao curta de confirmacao (ex.: ao tocar no +).
         @JavascriptInterface
         public void vibrar(final int ms) {
