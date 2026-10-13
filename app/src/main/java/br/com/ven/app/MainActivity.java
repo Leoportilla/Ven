@@ -332,10 +332,22 @@ public class MainActivity extends FragmentActivity {
         input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
         input.setHint("PIN de 4 a 6 dígitos");
         input.setGravity(Gravity.CENTER);
-        input.setLetterSpacing(0.25f);
+        input.setLetterSpacing(0.12f);
         input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(6)});
-        int pad = (int)(24 * getResources().getDisplayMetrics().density);
-        input.setPadding(pad, pad / 2, pad, pad / 2);
+        // Cores explícitas para manter contraste no diálogo tanto no tema claro quanto no escuro.
+        input.setTextColor(Color.rgb(245, 247, 250));
+        input.setHintTextColor(Color.rgb(174, 188, 207));
+        float d = getResources().getDisplayMetrics().density;
+        int pad = (int)(16 * d);
+        input.setPadding(pad, (int)(10*d), pad, (int)(10*d));
+        GradientDrawable campo = new GradientDrawable();
+        campo.setColor(Color.rgb(27, 45, 70));
+        campo.setCornerRadius(12*d);
+        campo.setStroke(Math.max(1, (int)d), Color.rgb(45, 145, 205));
+        input.setBackground(campo);
+        if (Build.VERSION.SDK_INT >= 21) {
+            input.setBackgroundTintList(null);
+        }
         return input;
     }
 
