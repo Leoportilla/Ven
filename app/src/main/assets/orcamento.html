@@ -140,6 +140,16 @@ body.settings-overlay-open{overflow:hidden}
 .settings-box p{font-size:13px;line-height:1.45;color:var(--mut);margin:0 0 14px}
 .settings-field{display:grid;gap:5px;margin:11px 0;font-size:13px;color:var(--mut)}
 .settings-field input{width:100%;min-width:0;padding:11px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
+
+.update-preference{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:16px 0 4px;padding:14px;border:1px solid var(--bd);border-radius:16px;background:var(--bg);color:var(--tx);cursor:pointer}
+.update-preference-copy{display:grid;gap:5px;min-width:0}
+.update-preference-copy strong{font-size:14px;color:var(--tx)}
+.update-preference-copy small{font-size:12px;line-height:1.45;color:var(--mut)}
+#ven-auto-updates{appearance:none;-webkit-appearance:none;position:relative;flex:none;width:48px;height:28px;border:1px solid var(--bd);border-radius:999px;background:#7b8490;cursor:pointer;transition:background .18s,border-color .18s}
+#ven-auto-updates::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:transform .18s}
+#ven-auto-updates:checked{background:#2589c9;border-color:#2589c9}
+#ven-auto-updates:checked::after{transform:translateX(20px)}
+#ven-auto-updates:focus-visible{outline:3px solid #f58220;outline-offset:2px}
 .settings-actions{display:flex;gap:8px;margin-top:16px}
 .settings-actions button{flex:1}
 .theme-options{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}
@@ -930,6 +940,10 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
    Versão instalada: <b id="ven-installed-version">consultando…</b>.<br>
    <span id="ven-update-status">Você pode verificar se há uma versão mais recente.</span>
   </div>
+  <label class="update-preference" for="ven-auto-updates">
+   <span class="update-preference-copy"><strong>Atualizações automáticas</strong><small>Consultar novas versões automaticamente, no máximo uma vez por dia. A instalação continua dependendo da sua confirmação.</small></span>
+   <input id="ven-auto-updates" type="checkbox" role="switch" aria-label="Ativar atualizações automáticas">
+  </label>
   <div class="settings-actions"><button class="btn pri" id="checkVenUpdate" type="button">Buscar atualização</button><button class="btn" id="closeAbout" type="button">Fechar</button></div>
  </section>
 </div>
@@ -1517,7 +1531,45 @@ function imprimir(){
   ${cfg.obs?'<p>'+esc(cfg.obs)+'</p>':''}`;
   if(window.Android && Android.printHtml){
     const css='body{font:14px/1.4 sans-serif;color:#000;background:#fff;margin:16px}h2{color:#e56a00;margin:0 0 4px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border-bottom:1px solid #bbb;padding:6px 4px;text-align:left}th{border-bottom:2px solid #e56a00}.r{text-align:right}.sum{margin-top:12px;text-align:right}';
-    Android.printHtml('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><style>'+css+'</style></head><body>'+$('#imp').innerHTML+'</body></html>');
+    Android.printHtml('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><style>'+css+'
+/* VEN alpha.49 — correções visuais finais: formulários e overlays */
+#product-overlay,
+.crm-modal#customer-overlay,
+.crm-modal#product-modal,
+.crm-modal#service-overlay{
+  box-sizing:border-box!important;
+  padding-top:calc(37px + env(safe-area-inset-top))!important;
+  padding-bottom:calc(37px + env(safe-area-inset-bottom))!important;
+  padding-left:14px!important;padding-right:14px!important;
+  align-items:center!important;justify-content:center!important;
+}
+#product-box,
+.crm-modal#customer-overlay .crm-box,
+.crm-modal#product-modal .crm-box,
+.crm-modal#service-overlay .crm-box{
+  max-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  overflow-y:auto!important;overscroll-behavior:contain!important;
+  margin-top:0!important;margin-bottom:0!important;
+}
+@media(max-width:520px){
+  #product-overlay,
+  .crm-modal#customer-overlay,
+  .crm-modal#product-modal,
+  .crm-modal#service-overlay{
+    padding-top:calc(37px + env(safe-area-inset-top))!important;
+    padding-bottom:calc(37px + env(safe-area-inset-bottom))!important;
+    padding-left:12px!important;padding-right:12px!important;
+  }
+  #product-box,
+  .crm-modal#customer-overlay .crm-box,
+  .crm-modal#product-modal .crm-box,
+  .crm-modal#service-overlay .crm-box{
+    width:100%!important;max-width:520px!important;
+    max-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+    padding:17px!important;border-radius:22px!important;
+  }
+}
+</style></head><body>'+$('#imp').innerHTML+'</body></html>');
   } else if(window.Android && Android.printQuote){ Android.printQuote(); } else { window.print(); }
 }
 
@@ -1618,8 +1670,9 @@ function fecharSettings(){document.body.classList.remove('settings-overlay-open'
 function abrirVisual(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='block';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none';settingsOverlay.style.display='flex';aplicarVisual()}
 function preencherEmpresaForm(){carregarEmpresa();document.getElementById('companyName').value=EMPRESA.nome||'';document.getElementById('companyTrade').value=EMPRESA.fantasia||'';document.getElementById('companyTax').value=EMPRESA.cnpj||'';document.getElementById('companyAddress').value=EMPRESA.end||'';document.getElementById('companyPhone').value=EMPRESA.telefone||'';document.getElementById('companyEmail').value=EMPRESA.email||'';const p=document.getElementById('companyLogoPreview');if(EMPRESA.logo){p.src=EMPRESA.logo;p.style.display='block'}else{p.removeAttribute('src');p.style.display='none'}document.getElementById('companyLogoFile').value=''}
 function abrirEmpresa(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='block';document.getElementById('about-box').style.display='none';preencherEmpresaForm();settingsOverlay.style.display='flex'}
-function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex';const v=document.getElementById('ven-installed-version');if(v){try{v.textContent=(window.Android&&Android.getInstalledVersion)?Android.getInstalledVersion():'disponível no aplicativo Android'}catch(e){v.textContent='indisponível'}}}
+function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex';const v=document.getElementById('ven-installed-version');if(v){try{v.textContent=(window.Android&&Android.getInstalledVersion)?Android.getInstalledVersion():'disponível no aplicativo Android'}catch(e){v.textContent='indisponível'}}const auto=document.getElementById('ven-auto-updates');if(auto){try{auto.checked=!!(window.Android&&Android.isAutoUpdateEnabled&&Android.isAutoUpdateEnabled())}catch(e){auto.checked=true}}}
 document.getElementById('openVisual').addEventListener('click',abrirVisual);document.getElementById('openCompany').addEventListener('click',abrirEmpresa);document.getElementById('openAbout').addEventListener('click',abrirSobre);document.getElementById('closeAbout').addEventListener('click',fecharSettings);
+document.getElementById('ven-auto-updates').addEventListener('change',e=>{try{if(window.Android&&Android.setAutoUpdateEnabled){Android.setAutoUpdateEnabled(!!e.target.checked);const status=document.getElementById('ven-update-status');if(status)status.textContent=e.target.checked?'Consulta automática ativada. A instalação sempre dependerá da sua confirmação.':'Consulta automática desativada. Você ainda pode buscar atualizações manualmente.'}else{e.target.checked=false;notificar('Esta opção só está disponível no aplicativo Android.','error')}}catch(err){e.target.checked=false;notificar('Não foi possível salvar a preferência de atualização.','error')}});
 document.getElementById('checkVenUpdate').addEventListener('click',()=>{const el=document.getElementById('ven-update-status');el.textContent='Consultando atualizações…';try{if(window.Android&&Android.checkForUpdates)Android.checkForUpdates();else el.textContent='A busca de atualização só está disponível no aplicativo Android.'}catch(e){el.textContent='Não foi possível iniciar a consulta.'}});
 window.venUpdateResult=function(raw){let r;try{r=typeof raw==='string'?JSON.parse(raw):raw}catch(e){r={message:'Resposta de atualização inválida.'}}const el=document.getElementById('ven-update-status');if(!el)return;if(r&&r.available){el.textContent='Nova versão disponível: '+(r.versionName||'atualização')+'. Abrindo a página para baixar.';if(window.Android&&Android.openUpdateUrl&&r.url)Android.openUpdateUrl(r.url)}else{el.textContent=(r&&r.message)||'Seu VEN já está atualizado.'}};
 document.getElementById('closeVisual').addEventListener('click',fecharSettings);document.getElementById('cancelCompany').addEventListener('click',fecharSettings);

@@ -133,7 +133,11 @@ public class MainActivity extends FragmentActivity {
                 SharedPreferences prefs = getSharedPreferences("ven_updates", MODE_PRIVATE);
                 long last = prefs.getLong("last_check", 0L);
                 if (prefs.getBoolean("auto", true) && System.currentTimeMillis() - last > 24L * 60L * 60L * 1000L) {
-                    new android.os.Handler(getMainLooper()).postDelayed(() -> verificarAtualizacao(false), 2500L);
+                    new android.os.Handler(getMainLooper()).postDelayed(() -> {
+                        if (getSharedPreferences("ven_updates", MODE_PRIVATE).getBoolean("auto", true)) {
+                            verificarAtualizacao(false);
+                        }
+                    }, 2500L);
                 }
             }
         });
@@ -359,13 +363,13 @@ public class MainActivity extends FragmentActivity {
                 bg.setCornerRadius(26*d);
                 bg.setStroke(Math.max(1, (int)(1*d)), Color.rgb(45, 145, 205));
                 dialog.getWindow().setBackgroundDrawable(bg);
-                dialog.getWindow().setLayout((int)(320*d), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().setLayout((int)(Math.min(320*d, getResources().getDisplayMetrics().widthPixels - 40*d)), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
                 dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             }
         });
         dialog.setOnKeyListener((di, keyCode, event) -> keyCode == android.view.KeyEvent.KEYCODE_BACK);
         dialog.show();
-        if (dialog.getWindow() != null) dialog.getWindow().setLayout((int)(320*d), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+        if (dialog.getWindow() != null) dialog.getWindow().setLayout((int)(Math.min(320*d, getResources().getDisplayMetrics().widthPixels - 40*d)), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
     }
 
     private void liberarPagina() {
@@ -679,6 +683,11 @@ public class MainActivity extends FragmentActivity {
                     Toast.makeText(MainActivity.this, "Não foi possível abrir o compartilhamento.", Toast.LENGTH_LONG).show();
                 }
             });
+        }
+
+        @JavascriptInterface
+        public boolean isAutoUpdateEnabled() {
+            return getSharedPreferences("ven_updates", MODE_PRIVATE).getBoolean("auto", true);
         }
 
         @JavascriptInterface
