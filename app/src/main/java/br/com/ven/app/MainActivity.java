@@ -200,7 +200,8 @@ public class MainActivity extends FragmentActivity {
     private TextView tituloDialogo(String titulo) {
         TextView t = new TextView(this);
         t.setText(titulo);
-        t.setTextColor(Color.WHITE);
+        t.setTextColor(("Desbloquear VEN".equals(titulo) || "Ativar impressão digital".equals(titulo))
+                ? Color.rgb(255, 145, 45) : Color.WHITE);
         t.setTextSize(20);
         t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         int h = (int)(22 * getResources().getDisplayMetrics().density);
@@ -363,13 +364,13 @@ public class MainActivity extends FragmentActivity {
                 bg.setCornerRadius(26*d);
                 bg.setStroke(Math.max(1, (int)(1*d)), Color.rgb(45, 145, 205));
                 dialog.getWindow().setBackgroundDrawable(bg);
-                dialog.getWindow().setLayout((int)(Math.min(320*d, getResources().getDisplayMetrics().widthPixels - 40*d)), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().setLayout((int)(Math.min(360*d, getResources().getDisplayMetrics().widthPixels - 40*d)), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
                 dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             }
         });
         dialog.setOnKeyListener((di, keyCode, event) -> keyCode == android.view.KeyEvent.KEYCODE_BACK);
         dialog.show();
-        if (dialog.getWindow() != null) dialog.getWindow().setLayout((int)(Math.min(320*d, getResources().getDisplayMetrics().widthPixels - 40*d)), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+        if (dialog.getWindow() != null) dialog.getWindow().setLayout((int)(Math.min(360*d, getResources().getDisplayMetrics().widthPixels - 40*d)), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
     }
 
     private void liberarPagina() {

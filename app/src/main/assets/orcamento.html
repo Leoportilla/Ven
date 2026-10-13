@@ -1531,45 +1531,7 @@ function imprimir(){
   ${cfg.obs?'<p>'+esc(cfg.obs)+'</p>':''}`;
   if(window.Android && Android.printHtml){
     const css='body{font:14px/1.4 sans-serif;color:#000;background:#fff;margin:16px}h2{color:#e56a00;margin:0 0 4px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border-bottom:1px solid #bbb;padding:6px 4px;text-align:left}th{border-bottom:2px solid #e56a00}.r{text-align:right}.sum{margin-top:12px;text-align:right}';
-    Android.printHtml('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><style>'+css+'
-/* VEN alpha.49 — correções visuais finais: formulários e overlays */
-#product-overlay,
-.crm-modal#customer-overlay,
-.crm-modal#product-modal,
-.crm-modal#service-overlay{
-  box-sizing:border-box!important;
-  padding-top:calc(37px + env(safe-area-inset-top))!important;
-  padding-bottom:calc(37px + env(safe-area-inset-bottom))!important;
-  padding-left:14px!important;padding-right:14px!important;
-  align-items:center!important;justify-content:center!important;
-}
-#product-box,
-.crm-modal#customer-overlay .crm-box,
-.crm-modal#product-modal .crm-box,
-.crm-modal#service-overlay .crm-box{
-  max-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
-  overflow-y:auto!important;overscroll-behavior:contain!important;
-  margin-top:0!important;margin-bottom:0!important;
-}
-@media(max-width:520px){
-  #product-overlay,
-  .crm-modal#customer-overlay,
-  .crm-modal#product-modal,
-  .crm-modal#service-overlay{
-    padding-top:calc(37px + env(safe-area-inset-top))!important;
-    padding-bottom:calc(37px + env(safe-area-inset-bottom))!important;
-    padding-left:12px!important;padding-right:12px!important;
-  }
-  #product-box,
-  .crm-modal#customer-overlay .crm-box,
-  .crm-modal#product-modal .crm-box,
-  .crm-modal#service-overlay .crm-box{
-    width:100%!important;max-width:520px!important;
-    max-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
-    padding:17px!important;border-radius:22px!important;
-  }
-}
-</style></head><body>'+$('#imp').innerHTML+'</body></html>');
+    Android.printHtml('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><style>'+css+'</style></head><body>'+$('#imp').innerHTML+'</body></html>');
   } else if(window.Android && Android.printQuote){ Android.printQuote(); } else { window.print(); }
 }
 
