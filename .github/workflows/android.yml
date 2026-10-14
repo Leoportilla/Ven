@@ -69,6 +69,7 @@ jobs:
       - name: Publicar Release alfa da versão
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: v${{ steps.appver.outputs.version_name }}
           name: VEN ${{ steps.appver.outputs.version_name }} (ALFA)
           target_commitish: ${{ github.sha }}
@@ -85,6 +86,7 @@ jobs:
       - name: Atualizar canal latest-alpha usado pelo app
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: latest-alpha
           name: VEN ${{ steps.appver.outputs.version_name }} (alfa mais recente)
           target_commitish: ${{ github.sha }}

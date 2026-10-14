@@ -1805,13 +1805,14 @@ $('#resetAppData').addEventListener('click',()=>{fecharMenu();confirmar('Zerar t
 • vendas, pagamentos e vencimentos
 • orçamento em andamento e numerações
 
-O nome, CNPJ, endereço, logotipo e aparência do aplicativo serão mantidos. Faça uma cópia de segurança antes de continuar.`,()=>{
+Os dados da empresa (nome, nome fantasia, CNPJ/CPF, endereço, telefone, e-mail e logotipo) também serão apagados. A aparência escolhida será mantida. Faça uma cópia de segurança antes de continuar.`,()=>{
  store.set('ven_catalogoImportado',null);store.set('ven_catalogoLimpo',true);store.set('ven_produtosManuais',[]);
  store.set('ven_cart',[]);store.set('ven_cfg',{cli:'',desc:'',tipo:'%',obs:'Orçamento válido por 5 dias.'});
  store.set('ven_orcamentosSalvos',[]);store.set('ven_clientes',[]);store.set('ven_vendas',[]);
  store.set('ven_ultimoNumeroOrcamento',0);store.set('ven_ultimoNumeroVenda',0);
+ dbRaw.set('ven_empresa',JSON.stringify(EMPRESA_PADRAO));EMPRESA={...EMPRESA_PADRAO};
  produtosImportados=[];ven_produtosManuais=[];cart=[];cfg={cli:'',desc:'',tipo:'%',obs:'Orçamento válido por 5 dias.'};orcamentos=[];clientes=[];vendas=[];editingCustomerId=null;quoteForSale=null;
- reconstruirProdutos();salvar();view='home';limite=50;$('#q').value='';render();scrollTo(0,0);notificar('Aplicativo zerado. Produtos, clientes, orçamentos e vendas foram removidos. Dados da empresa e aparência foram mantidos.','success');
+ reconstruirProdutos();salvar();view='home';limite=50;$('#q').value='';render();scrollTo(0,0);notificar('Aplicativo zerado. Os dados comerciais e da empresa foram apagados; a aparência foi mantida.','success');
 })});
 
 document.addEventListener('click',e=>{
