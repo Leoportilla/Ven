@@ -5,9 +5,11 @@ android {
     defaultConfig {
         applicationId 'br.com.ven.app'
         minSdk 23
-        targetSdk 34
-        versionCode 58
-        versionName '2.0.0-alpha.57'
+        targetSdk 35
+        versionCode 67
+        versionName '2.0.0-alpha.66'
+        // Atualizador via GitHub: só ligado no APK de uso próprio (-PgithubUpdater=true). Na versão da Google Play fica desligado.
+        buildConfigField 'boolean', 'GITHUB_UPDATER', project.hasProperty('githubUpdater') ? 'true' : 'false'
     }
     buildFeatures { buildConfig true }
     signingConfigs {
@@ -22,7 +24,8 @@ android {
     }
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            // Com a chave fixa (Secrets do GitHub) assina como release; sem ela, cai no debug para não quebrar o build local.
+            signingConfig file('keystore.jks').exists() ? signingConfigs.release : signingConfigs.debug
             minifyEnabled false
         }
     }
@@ -34,4 +37,6 @@ android {
 dependencies {
     implementation 'com.google.android.gms:play-services-code-scanner:16.1.0'
     implementation 'androidx.biometric:biometric:1.1.0'
+    // Google Play Billing: ainda sem uso no código; já habilita o envio e o cadastro do produto de desbloqueio no Play Console.
+    implementation 'com.android.billingclient:billing:8.0.0'
 }

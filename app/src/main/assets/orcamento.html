@@ -954,22 +954,23 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
   <div class="settings-actions"><button class="btn" id="cancelCompany" type="button">Cancelar</button><button class="btn pri" id="saveCompany" type="button">Salvar dados</button></div>
  </section>
  <section id="about-box" class="settings-box" style="display:none">
-  <h2>Sobre o VEN</h2><p><strong>VEN — Vendas sem complicação</strong></p>
+  <h2>Sobre o VEN</h2><p><strong>VEN — Orçamentos e vendas sem complicação</strong></p>
   <div class="settings-note" style="line-height:1.65">
-   <b>Aplicativo desenvolvido por Leonardo Portilla</b><br>
-   E-mail: <a href="mailto:Leoportillagraf@gmail.com">Leoportillagraf@gmail.com</a><br>
-   Porto Alegre — Rio Grande do Sul, Brasil<br><br>
-   O VEN está sendo preparado para atender diferentes pequenos negócios, com gestão de produtos, pedidos, clientes, vendas e relatórios.<br><br>
-   <b>Modelo comercial planejado:</b> compra única, sem mensalidade. A demonstração de 7 dias e o desbloqueio permanente dependem da futura integração e validação com o Google Play Billing; ainda não estão ativos nesta versão.<br><br>
-   <b>Publicação e redes sociais:</b> em preparação. Os links oficiais serão adicionados quando os perfis e a página da loja estiverem definidos.<br><br>
-   Versão instalada: <b id="ven-installed-version">consultando…</b>.<br>
-   <span id="ven-update-status">Você pode verificar se há uma versão mais recente.</span>
+   Controle de produtos, clientes, orçamentos, vendas e relatórios, feito para pequenos negócios.<br><br>
+   <b>Desenvolvido por Leonardo Portilla</b><br>
+   Porto Alegre — Rio Grande do Sul, Brasil<br>
+   Suporte: <a style="color:#168bd0;font-weight:600" href="mailto:leoportilladev@gmail.com">leoportilladev@gmail.com</a><br><br>
+   <b>Seus dados ficam no seu aparelho.</b> O VEN não exige cadastro e não envia produtos, clientes, orçamentos ou vendas para nenhum servidor. Use “Baixar backup” para guardar uma cópia.<br><br>
+   <a style="color:#168bd0;font-weight:600" href="https://leoportilla.github.io/Ven/privacidade.html">Política de privacidade</a> · <a style="color:#168bd0;font-weight:600" href="https://leoportilla.github.io/Ven/termos.html">Termos de uso</a><br><br>
+   Versão instalada: <b id="ven-installed-version">consultando…</b><br>
+   <span id="ven-update-status" class="gh-update-only" style="display:none">Você pode verificar se há uma versão mais recente.</span>
+   <small style="display:block;margin-top:10px;opacity:.75">Componentes de terceiros: Google ML Kit (leitor de código de barras) e AndroidX (Google), sob licença Apache 2.0.</small>
   </div>
-  <label class="update-preference" for="ven-auto-updates">
+  <label class="update-preference gh-update-only" for="ven-auto-updates" style="display:none">
    <span class="update-preference-copy"><strong>Atualizações automáticas</strong><small>Consultar novas versões automaticamente, no máximo uma vez por dia. A instalação continua dependendo da sua confirmação.</small></span>
    <input id="ven-auto-updates" type="checkbox" role="switch" aria-label="Ativar atualizações automáticas">
   </label>
-  <div class="settings-actions"><button class="btn pri" id="checkVenUpdate" type="button">Buscar atualização</button><button class="btn" id="closeAbout" type="button">Fechar</button></div>
+  <div class="settings-actions"><button class="btn pri gh-update-only" id="checkVenUpdate" type="button" style="display:none">Buscar atualização</button><button class="btn" id="closeAbout" type="button">Fechar</button></div>
  </section>
 </div>
 <div id="customer-overlay" class="crm-modal" role="dialog" aria-modal="true" aria-labelledby="customerTitle">
@@ -1657,7 +1658,7 @@ function fecharSettings(){document.body.classList.remove('settings-overlay-open'
 function abrirVisual(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='block';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none';settingsOverlay.style.display='flex';aplicarVisual()}
 function preencherEmpresaForm(){carregarEmpresa();document.getElementById('companyName').value=EMPRESA.nome||'';document.getElementById('companyTrade').value=EMPRESA.fantasia||'';document.getElementById('companyTax').value=EMPRESA.cnpj||'';document.getElementById('companyAddress').value=EMPRESA.end||'';document.getElementById('companyPhone').value=EMPRESA.telefone||'';document.getElementById('companyEmail').value=EMPRESA.email||'';const p=document.getElementById('companyLogoPreview');if(EMPRESA.logo){p.src=EMPRESA.logo;p.style.display='block'}else{p.removeAttribute('src');p.style.display='none'}document.getElementById('companyLogoFile').value=''}
 function abrirEmpresa(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='block';document.getElementById('about-box').style.display='none';preencherEmpresaForm();settingsOverlay.style.display='flex'}
-function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex';const v=document.getElementById('ven-installed-version');if(v){try{v.textContent=(window.Android&&Android.getInstalledVersion)?Android.getInstalledVersion():'disponível no aplicativo Android'}catch(e){v.textContent='indisponível'}}const auto=document.getElementById('ven-auto-updates');if(auto){try{auto.checked=!!(window.Android&&Android.isAutoUpdateEnabled&&Android.isAutoUpdateEnabled())}catch(e){auto.checked=true}}}
+function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex';const v=document.getElementById('ven-installed-version');if(v){try{v.textContent=(window.Android&&Android.getInstalledVersion)?Android.getInstalledVersion():'disponível no aplicativo Android'}catch(e){v.textContent='indisponível'}}const gh=!!(window.Android&&Android.isGithubUpdater&&Android.isGithubUpdater());document.querySelectorAll('#about-box .gh-update-only').forEach(e=>{e.style.display=gh?'':'none'});const auto=document.getElementById('ven-auto-updates');if(auto){try{auto.checked=!!(window.Android&&Android.isAutoUpdateEnabled&&Android.isAutoUpdateEnabled())}catch(e){auto.checked=true}}}
 document.getElementById('openVisual').addEventListener('click',abrirVisual);document.getElementById('openCompany').addEventListener('click',abrirEmpresa);document.getElementById('openAbout').addEventListener('click',abrirSobre);document.getElementById('closeAbout').addEventListener('click',fecharSettings);
 document.getElementById('ven-auto-updates').addEventListener('change',e=>{try{if(window.Android&&Android.setAutoUpdateEnabled){Android.setAutoUpdateEnabled(!!e.target.checked);const status=document.getElementById('ven-update-status');if(status)status.textContent=e.target.checked?'Consulta automática ativada. A instalação sempre dependerá da sua confirmação.':'Consulta automática desativada. Você ainda pode buscar atualizações manualmente.'}else{e.target.checked=false;notificar('Esta opção só está disponível no aplicativo Android.','error')}}catch(err){e.target.checked=false;notificar('Não foi possível salvar a preferência de atualização.','error')}});
 document.getElementById('checkVenUpdate').addEventListener('click',()=>{const el=document.getElementById('ven-update-status');el.textContent='Consultando atualizações…';try{if(window.Android&&Android.checkForUpdates)Android.checkForUpdates();else el.textContent='A busca de atualização só está disponível no aplicativo Android.'}catch(e){el.textContent='Não foi possível iniciar a consulta.'}});

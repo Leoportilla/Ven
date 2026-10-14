@@ -140,6 +140,16 @@ body.settings-overlay-open{overflow:hidden}
 .settings-box p{font-size:13px;line-height:1.45;color:var(--mut);margin:0 0 14px}
 .settings-field{display:grid;gap:5px;margin:11px 0;font-size:13px;color:var(--mut)}
 .settings-field input{width:100%;min-width:0;padding:11px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
+
+.update-preference{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:16px 0 4px;padding:14px;border:1px solid var(--bd);border-radius:16px;background:var(--bg);color:var(--tx);cursor:pointer}
+.update-preference-copy{display:grid;gap:5px;min-width:0}
+.update-preference-copy strong{font-size:14px;color:var(--tx)}
+.update-preference-copy small{font-size:12px;line-height:1.45;color:var(--mut)}
+#ven-auto-updates{appearance:none;-webkit-appearance:none;position:relative;flex:none;width:48px;height:28px;border:1px solid var(--bd);border-radius:999px;background:#7b8490;cursor:pointer;transition:background .18s,border-color .18s}
+#ven-auto-updates::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:transform .18s}
+#ven-auto-updates:checked{background:#2589c9;border-color:#2589c9}
+#ven-auto-updates:checked::after{transform:translateX(20px)}
+#ven-auto-updates:focus-visible{outline:3px solid #f58220;outline-offset:2px}
 .settings-actions{display:flex;gap:8px;margin-top:16px}
 .settings-actions button{flex:1}
 .theme-options{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}
@@ -152,8 +162,8 @@ body.settings-overlay-open{overflow:hidden}
 .product-thumb{width:58px;height:58px;object-fit:contain;border-radius:9px;background:#fff;flex:none;padding:3px}
 .product-admin-actions{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
 .product-admin-actions .btn{padding:6px 9px;font-size:12px}
-#product-overlay{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:16px;background:#000b;backdrop-filter:blur(4px)}
-#product-box{width:100%;max-width:480px;max-height:92vh;overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:22px;padding:20px;box-shadow:0 18px 60px #0009}
+#product-overlay{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:calc(37px + env(safe-area-inset-top)) 14px calc(37px + env(safe-area-inset-bottom));background:#000b;backdrop-filter:blur(4px);overflow-y:auto;overscroll-behavior:contain}
+#product-box{width:100%;max-width:480px;max-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:22px;padding:20px;box-shadow:0 18px 60px #0009}
 #product-box h2{font-size:20px;margin:0 0 6px}
 #product-box p{font-size:13px;color:var(--mut);margin:0 0 14px;line-height:1.4}
 .product-image-preview{max-width:100%;width:100%;height:130px;object-fit:contain;background:#fff;border-radius:12px;padding:5px;display:none;margin:8px 0}
@@ -174,8 +184,10 @@ body.settings-overlay-open{overflow:hidden}
 .crm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .crm-address-block{grid-column:1/-1;border:1px solid var(--bd);border-radius:13px;padding:12px;margin-top:8px}.crm-address-heading{font-weight:800;color:var(--tx);font-size:14px;margin-bottom:6px}.crm-waze-preview{margin-top:8px;padding:10px;border-radius:10px;background:color-mix(in srgb,#33a852 12%,var(--card));font-size:13px}.crm-waze-preview a,.crm-waze-link{display:inline-flex;align-items:center;gap:6px;color:#16833d;font-weight:800;text-decoration:none;margin-top:4px}.crm-waze-link{border:1px solid color-mix(in srgb,#16833d 35%,var(--bd));border-radius:9px;padding:8px 10px}.crm-address-text{white-space:normal;overflow-wrap:anywhere}
 .crm-grid .wide{grid-column:1/-1}
-.crm-modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:16px;background:#000a;overflow:auto}
-.crm-box{width:100%;max-width:520px;max-height:92vh;overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:20px;padding:20px;box-shadow:0 20px 70px #0008}
+.crm-modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:calc(37px + env(safe-area-inset-top)) 14px calc(37px + env(safe-area-inset-bottom));background:#000a;overflow-y:auto;overscroll-behavior:contain}
+.crm-modal[style*="display: flex"]{align-items:center}
+@supports(height:100dvh){.crm-modal{padding-top:calc(37px + env(safe-area-inset-top));padding-bottom:calc(37px + env(safe-area-inset-bottom))}}
+.crm-box{width:100%;max-width:520px;max-height:calc(100vh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom));max-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:20px;padding:20px;box-shadow:0 20px 70px #0008}
 .crm-box h2{margin:0 0 6px;font-size:21px;color:var(--pri)}
 .crm-box p{margin:0 0 16px;color:var(--mut);font-size:13px}
 .crm-field{display:grid;gap:4px;font-size:13px;color:var(--mut);margin:10px 0}
@@ -837,6 +849,31 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
 #main .saved-actions .crm-brand-action.whatsapp svg path:first-child{stroke-width:3.4!important;fill:none!important}
 #main .saved-actions .crm-brand-action.waze svg.crm-car-icon{width:36px!important;height:36px!important}
 @media(max-width:380px){#main .saved-actions{gap:5px}#main .saved-actions>.crm-icon-action,#main .saved-actions>.crm-brand-action{height:48px!important;min-height:48px!important;border-radius:15px!important}}
+
+
+/* alpha.52 — CSS inserido no bloco de estilos correto */
+/* alpha.52 — ajuste pontual do tamanho dos cadastros no Android */
+#customer-overlay.crm-modal, #sale-overlay.crm-modal, #product-overlay{
+  box-sizing:border-box!important; padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom))!important;
+  align-items:center!important; justify-content:center!important;
+}
+#customer-overlay .crm-box, #sale-overlay .crm-box{
+  box-sizing:border-box!important; width:100%!important; max-width:520px!important;
+  max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  overflow-y:auto!important; border-radius:22px!important; padding:20px!important;
+}
+#product-overlay #product-box{
+  box-sizing:border-box!important; width:100%!important; max-width:520px!important;
+  max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  border-radius:22px!important;
+}
+@media(max-width:520px){
+ #customer-overlay .crm-box, #sale-overlay .crm-box{padding:18px!important}
+ #product-overlay #product-box{max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important}
+}
+
+</html>
+
 </style>
 </head>
 <body>
@@ -889,7 +926,7 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
   <div><div class="mg-kicker">AJUSTES</div><h2>Configurações</h2><p>Aparência, catálogo e backup</p></div>
   <button id="menuClose" aria-label="Fechar menu">×</button>
  </div>
-  <div class="mg-title">APARÊNCIA E EMPRESA</div><div class="mg "><button class="menu-action" id="openVisual"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z"/></svg></span><span>Visual<small>Cores e modo claro ou escuro</small></span></button><button class="menu-action" id="openCompany"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span><span>Dados da empresa<small>Nome, CNPJ, endereço e logotipo</small></span></button></div><div class="mg-title">BACKUP E SEGURANÇA</div><div class="mg "><button class="menu-action" id="exportBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m-5 5 5-5 5 5"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg></span><span>Baixar backup<small>Salvar catálogo, clientes e pedidos em arquivo</small></span></button><button class="menu-action" id="importBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m-5-5 5 5 5-5"/><path d="M4 16v4h16v-4"/></svg></span><span>Restaurar backup<small>Recuperar dados de um arquivo salvo</small></span></button><button class="menu-action" id="backupInfo"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><span>Dados e segurança<small>Onde ficam os orçamentos</small></span></button></div><div class="mg-title">SOBRE O APLICATIVO</div><div class="mg"><button class="menu-action" id="openAbout" type="button"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></svg></span><span>Sobre o VEN<small>Autoria, contato e versão</small></span></button></div><div class="mg-title">ZONA DE RISCO</div><div class="mg mg-danger"><button class="menu-action" id="clearCatalog"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M6 5v14h12V5M9 9v6m6-6v6"/><path d="M9 2h6"/></svg></span><span>Limpar banco de dados<small>Apagar produtos importados e cadastrados</small></span></button><button class="menu-action reset-app-action" id="resetAppData"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 1 1 2 6"/><path d="M4 5v6h6"/></svg></span><span>Zerar dados do aplicativo<small>Apagar produtos, clientes, orçamentos e vendas</small></span></button></div><input type="file" id="backupFile" accept=".json,application/json" hidden>
+  <div class="mg-title">APARÊNCIA E EMPRESA</div><div class="mg "><button class="menu-action" id="openVisual"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z"/></svg></span><span>Visual<small>Cores e modo claro ou escuro</small></span></button><button class="menu-action" id="openCompany"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span><span>Dados da empresa<small>Nome, CNPJ, endereço e logotipo</small></span></button></div><div class="mg-title">BACKUP E SEGURANÇA</div><div class="mg "><button class="menu-action" id="managePin"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1"/></svg></span><span>Proteção com PIN<small id="pinStatus">Bloquear o acesso ao abrir o VEN</small></span></button><button class="menu-action" id="exportBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3m-5 5 5-5 5 5"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg></span><span>Baixar backup<small>Salvar catálogo, clientes e pedidos em arquivo</small></span></button><button class="menu-action" id="importBackup"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m-5-5 5 5 5-5"/><path d="M4 16v4h16v-4"/></svg></span><span>Restaurar backup<small>Recuperar dados de um arquivo salvo</small></span></button><button class="menu-action" id="backupInfo"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><span>Dados e segurança<small>Onde ficam os orçamentos</small></span></button></div><div class="mg-title">SOBRE O APLICATIVO</div><div class="mg"><button class="menu-action" id="openAbout" type="button"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></svg></span><span>Sobre o VEN<small>Autoria, contato e versão</small></span></button></div><div class="mg-title">ZONA DE RISCO</div><div class="mg mg-danger"><button class="menu-action" id="clearCatalog"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M6 5v14h12V5M9 9v6m6-6v6"/><path d="M9 2h6"/></svg></span><span>Limpar banco de dados<small>Apagar produtos importados e cadastrados</small></span></button><button class="menu-action reset-app-action" id="resetAppData"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 1 1 2 6"/><path d="M4 5v6h6"/></svg></span><span>Zerar dados do aplicativo<small>Apagar produtos, clientes, orçamentos e vendas</small></span></button></div><input type="file" id="backupFile" accept=".json,application/json" hidden>
  </aside>
 </div>
 <div id="settings-overlay" role="dialog" aria-modal="true" aria-label="Configurações de personalização">
@@ -917,18 +954,23 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
   <div class="settings-actions"><button class="btn" id="cancelCompany" type="button">Cancelar</button><button class="btn pri" id="saveCompany" type="button">Salvar dados</button></div>
  </section>
  <section id="about-box" class="settings-box" style="display:none">
-  <h2>Sobre o VEN</h2><p><strong>VEN — Vendas sem complicação</strong></p>
+  <h2>Sobre o VEN</h2><p><strong>VEN — Orçamentos e vendas sem complicação</strong></p>
   <div class="settings-note" style="line-height:1.65">
-   <b>Aplicativo desenvolvido por Leonardo Portilla</b><br>
-   E-mail: <a href="mailto:Leoportillagraf@gmail.com">Leoportillagraf@gmail.com</a><br>
-   Porto Alegre — Rio Grande do Sul, Brasil<br><br>
-   O VEN está sendo preparado para atender diferentes pequenos negócios, com gestão de produtos, pedidos, clientes, vendas e relatórios.<br><br>
-   <b>Modelo comercial planejado:</b> compra única, sem mensalidade. A demonstração de 7 dias e o desbloqueio permanente dependem da futura integração e validação com o Google Play Billing; ainda não estão ativos nesta versão.<br><br>
-   <b>Publicação e redes sociais:</b> em preparação. Os links oficiais serão adicionados quando os perfis e a página da loja estiverem definidos.<br><br>
-   Versão instalada: <b>2.0.0-alpha.24</b>.<br>
-   <span id="ven-update-status">Você pode verificar se há uma versão mais recente.</span>
+   Controle de produtos, clientes, orçamentos, vendas e relatórios, feito para pequenos negócios.<br><br>
+   <b>Desenvolvido por Leonardo Portilla</b><br>
+   Porto Alegre — Rio Grande do Sul, Brasil<br>
+   Suporte: <a style="color:#168bd0;font-weight:600" href="mailto:leoportilladev@gmail.com">leoportilladev@gmail.com</a><br><br>
+   <b>Seus dados ficam no seu aparelho.</b> O VEN não exige cadastro e não envia produtos, clientes, orçamentos ou vendas para nenhum servidor. Use “Baixar backup” para guardar uma cópia.<br><br>
+   <a style="color:#168bd0;font-weight:600" href="https://leoportilla.github.io/Ven/privacidade.html">Política de privacidade</a> · <a style="color:#168bd0;font-weight:600" href="https://leoportilla.github.io/Ven/termos.html">Termos de uso</a><br><br>
+   Versão instalada: <b id="ven-installed-version">consultando…</b><br>
+   <span id="ven-update-status" class="gh-update-only" style="display:none">Você pode verificar se há uma versão mais recente.</span>
+   <small style="display:block;margin-top:10px;opacity:.75">Componentes de terceiros: Google ML Kit (leitor de código de barras) e AndroidX (Google), sob licença Apache 2.0.</small>
   </div>
-  <div class="settings-actions"><button class="btn pri" id="checkVenUpdate" type="button">Buscar atualização</button><button class="btn" id="closeAbout" type="button">Fechar</button></div>
+  <label class="update-preference gh-update-only" for="ven-auto-updates" style="display:none">
+   <span class="update-preference-copy"><strong>Atualizações automáticas</strong><small>Consultar novas versões automaticamente, no máximo uma vez por dia. A instalação continua dependendo da sua confirmação.</small></span>
+   <input id="ven-auto-updates" type="checkbox" role="switch" aria-label="Ativar atualizações automáticas">
+  </label>
+  <div class="settings-actions"><button class="btn pri gh-update-only" id="checkVenUpdate" type="button" style="display:none">Buscar atualização</button><button class="btn" id="closeAbout" type="button">Fechar</button></div>
  </section>
 </div>
 <div id="customer-overlay" class="crm-modal" role="dialog" aria-modal="true" aria-labelledby="customerTitle">
@@ -1616,8 +1658,9 @@ function fecharSettings(){document.body.classList.remove('settings-overlay-open'
 function abrirVisual(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='block';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='none';settingsOverlay.style.display='flex';aplicarVisual()}
 function preencherEmpresaForm(){carregarEmpresa();document.getElementById('companyName').value=EMPRESA.nome||'';document.getElementById('companyTrade').value=EMPRESA.fantasia||'';document.getElementById('companyTax').value=EMPRESA.cnpj||'';document.getElementById('companyAddress').value=EMPRESA.end||'';document.getElementById('companyPhone').value=EMPRESA.telefone||'';document.getElementById('companyEmail').value=EMPRESA.email||'';const p=document.getElementById('companyLogoPreview');if(EMPRESA.logo){p.src=EMPRESA.logo;p.style.display='block'}else{p.removeAttribute('src');p.style.display='none'}document.getElementById('companyLogoFile').value=''}
 function abrirEmpresa(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='block';document.getElementById('about-box').style.display='none';preencherEmpresaForm();settingsOverlay.style.display='flex'}
-function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex'}
+function abrirSobre(){fecharMenu();document.body.classList.add('settings-overlay-open');document.getElementById('visual-box').style.display='none';document.getElementById('company-box').style.display='none';document.getElementById('about-box').style.display='block';settingsOverlay.style.display='flex';const v=document.getElementById('ven-installed-version');if(v){try{v.textContent=(window.Android&&Android.getInstalledVersion)?Android.getInstalledVersion():'disponível no aplicativo Android'}catch(e){v.textContent='indisponível'}}const gh=!!(window.Android&&Android.isGithubUpdater&&Android.isGithubUpdater());document.querySelectorAll('#about-box .gh-update-only').forEach(e=>{e.style.display=gh?'':'none'});const auto=document.getElementById('ven-auto-updates');if(auto){try{auto.checked=!!(window.Android&&Android.isAutoUpdateEnabled&&Android.isAutoUpdateEnabled())}catch(e){auto.checked=true}}}
 document.getElementById('openVisual').addEventListener('click',abrirVisual);document.getElementById('openCompany').addEventListener('click',abrirEmpresa);document.getElementById('openAbout').addEventListener('click',abrirSobre);document.getElementById('closeAbout').addEventListener('click',fecharSettings);
+document.getElementById('ven-auto-updates').addEventListener('change',e=>{try{if(window.Android&&Android.setAutoUpdateEnabled){Android.setAutoUpdateEnabled(!!e.target.checked);const status=document.getElementById('ven-update-status');if(status)status.textContent=e.target.checked?'Consulta automática ativada. A instalação sempre dependerá da sua confirmação.':'Consulta automática desativada. Você ainda pode buscar atualizações manualmente.'}else{e.target.checked=false;notificar('Esta opção só está disponível no aplicativo Android.','error')}}catch(err){e.target.checked=false;notificar('Não foi possível salvar a preferência de atualização.','error')}});
 document.getElementById('checkVenUpdate').addEventListener('click',()=>{const el=document.getElementById('ven-update-status');el.textContent='Consultando atualizações…';try{if(window.Android&&Android.checkForUpdates)Android.checkForUpdates();else el.textContent='A busca de atualização só está disponível no aplicativo Android.'}catch(e){el.textContent='Não foi possível iniciar a consulta.'}});
 window.venUpdateResult=function(raw){let r;try{r=typeof raw==='string'?JSON.parse(raw):raw}catch(e){r={message:'Resposta de atualização inválida.'}}const el=document.getElementById('ven-update-status');if(!el)return;if(r&&r.available){el.textContent='Nova versão disponível: '+(r.versionName||'atualização')+'. Abrindo a página para baixar.';if(window.Android&&Android.openUpdateUrl&&r.url)Android.openUpdateUrl(r.url)}else{el.textContent=(r&&r.message)||'Seu VEN já está atualizado.'}};
 document.getElementById('closeVisual').addEventListener('click',fecharSettings);document.getElementById('cancelCompany').addEventListener('click',fecharSettings);
@@ -1631,6 +1674,8 @@ function fecharMenu(){drawerBackdrop.style.display='none';document.body.classLis
 function abrirImportacao(){fecharMenu();$('#import-status').textContent='';$('#productsFile').value='';$('#codesFile').value='';importOverlay.style.display='flex'}
 function fecharImportacao(){importOverlay.style.display='none'}
 $('#menuClose').addEventListener('click',fecharMenu);
+document.getElementById('managePin').addEventListener('click',()=>{fecharMenu();try{if(window.Android&&Android.gerenciarPin)Android.gerenciarPin();else notificar('A configuração de PIN está disponível no aplicativo Android.','error')}catch(e){notificar('Não foi possível abrir a configuração de PIN.','error')}});
+try{if(window.Android&&Android.pinAtivo&&Android.pinAtivo())document.getElementById('pinStatus').textContent='PIN ativo — toque para alterar ou desativar';}catch(e){}
 drawerBackdrop.addEventListener('click',e=>{if(e.target===drawerBackdrop)fecharMenu()});
 $('#cancelImport').addEventListener('click',fecharImportacao);
 
@@ -2022,4 +2067,5 @@ function handleAndroidBack(){
 }
 </script>
 </body>
+
 </html>

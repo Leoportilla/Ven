@@ -35,15 +35,29 @@ jobs:
           print("version_name=" + re.search(r"versionName ['\"]([^'\"]+)", text).group(1))
           print("version_code=" + re.search(r"versionCode (\d+)", text).group(1))
           PYVER
-      - name: Compilar APK de teste
-        run: gradle --no-daemon assembleDebug
+      - name: Preparar chave de assinatura fixa
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Secret KEYSTORE_BASE64 não cadastrado. Veja ASSINATURA_FIXA_PASSO_A_PASSO.md"
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > app/keystore.jks
+      - name: Compilar APK assinado (release)
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: gradle --no-daemon assembleRelease -PgithubUpdater=true
       - name: Renomear APK para VEN.apk
-        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/VEN.apk
+        run: cp app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/VEN.apk
       - name: Disponibilizar APK como artefato
         uses: actions/upload-artifact@v4
         with:
           name: VEN-${{ steps.appver.outputs.version_name }}-APK
-          path: app/build/outputs/apk/debug/VEN.apk
+          path: app/build/outputs/apk/release/VEN.apk
           if-no-files-found: error
           retention-days: 30
       - name: Publicar Release alfa da versão
@@ -60,8 +74,8 @@ jobs:
             versionName: ${{ steps.appver.outputs.version_name }}
             versionCode: ${{ steps.appver.outputs.version_code }}
 
-            APK debug de teste. Para atualizações consistentes sobre uma instalação anterior, configure uma chave de assinatura persistente.
-          files: app/build/outputs/apk/debug/VEN.apk
+            APK assinado com chave fixa: pode ser instalado por cima da versão anterior, mantendo os dados.
+          files: app/build/outputs/apk/release/VEN.apk
       - name: Atualizar canal latest-alpha usado pelo app
         uses: softprops/action-gh-release@v2
         with:
@@ -75,4 +89,4 @@ jobs:
             VERSÃO ALFA PARA TESTES — não é uma versão estável.
             versionName: ${{ steps.appver.outputs.version_name }}
             versionCode: ${{ steps.appver.outputs.version_code }}
-          files: app/build/outputs/apk/debug/VEN.apk
+          files: app/build/outputs/apk/release/VEN.apk

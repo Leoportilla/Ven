@@ -1,0 +1,12 @@
+<resources>
+    <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#F58220</item>
+        <item name="android:statusBarColor">#0B3D91</item>
+        <item name="android:navigationBarColor">#071F49</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <!-- Android 15 (targetSdk 35) força tela de borda a borda; mantém o layout atual do VEN. -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+    </style>
+</resources>
