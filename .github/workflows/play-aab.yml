@@ -34,7 +34,13 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: gradle --no-daemon bundleRelease
+        run: |
+          # remove caracteres invisíveis/não ASCII que podem vir ao colar os Secrets
+          export KEYSTORE_PASSWORD="$(printf '%s' "$KEYSTORE_PASSWORD" | LC_ALL=C tr -cd 'A-Za-z0-9')"
+          export KEY_PASSWORD="$(printf '%s' "$KEY_PASSWORD" | LC_ALL=C tr -cd 'A-Za-z0-9')"
+          export KEY_ALIAS="$(printf '%s' "$KEY_ALIAS" | LC_ALL=C tr -cd 'A-Za-z0-9')"
+          echo "Tamanho das senhas (esperado 28): ${#KEYSTORE_PASSWORD} / ${#KEY_PASSWORD}"
+          gradle --no-daemon bundleRelease
       - name: Disponibilizar AAB
         uses: actions/upload-artifact@v4
         with:
