@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - teste-playstore
-      - teste-playstore-v5
+      - teste-playstore-v6
 
 permissions:
   contents: read
@@ -28,7 +28,7 @@ jobs:
       - name: Disponibilizar APK para baixar
         uses: actions/upload-artifact@v4
         with:
-          name: VEN-APK-Teste-v5
+          name: VEN-APK-Teste-v6
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14

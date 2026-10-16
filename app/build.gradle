@@ -6,8 +6,8 @@ android {
         applicationId 'br.com.ven.app'
         minSdk 24
         targetSdk 36
-        versionCode 73
-        versionName '2.0.0-playstore.5'
+        versionCode 74
+        versionName '2.0.0-playstore.6'
         // Atualizador via GitHub: só ligado no APK de uso próprio (-PgithubUpdater=true). Na versão da Google Play fica desligado.
         buildConfigField 'boolean', 'GITHUB_UPDATER', project.hasProperty('githubUpdater') ? 'true' : 'false'
     }

@@ -786,21 +786,29 @@ public class MainActivity extends FragmentActivity {
         Dialog dialog = new Dialog(this, android.R.style.Theme_Material_NoActionBar);
         dialogRef[0] = dialog;
         dialog.setContentView(rolagem);
-        cancelar.setOnClickListener(v -> dialog.dismiss());
-        if (digital != null) digital.setOnClickListener(v -> { dialog.dismiss(); autenticarBiometria(); });
-        dialog.show();
+        // Prepare o fundo e o tamanho antes de exibir a janela para evitar o flash
+        // do tema padrão do Android entre a tela anterior e o PIN.
         if (dialog.getWindow() != null) {
             android.view.Window w = dialog.getWindow();
-            w.setLayout(android.view.WindowManager.LayoutParams.MATCH_PARENT, android.view.WindowManager.LayoutParams.MATCH_PARENT);
             w.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(fundoBase));
+            w.setLayout(android.view.WindowManager.LayoutParams.MATCH_PARENT, android.view.WindowManager.LayoutParams.MATCH_PARENT);
             w.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             w.setStatusBarColor(fundoTopo);
             w.setNavigationBarColor(fundoBase);
+            w.setDimAmount(0f);
             if (!escuro && Build.VERSION.SDK_INT >= 23) {
                 int flags = w.getDecorView().getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
                 if (Build.VERSION.SDK_INT >= 26) flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
                 w.getDecorView().setSystemUiVisibility(flags);
             }
+        }
+        cancelar.setOnClickListener(v -> dialog.dismiss());
+        if (digital != null) digital.setOnClickListener(v -> { dialog.dismiss(); autenticarBiometria(); });
+        dialog.show();
+        if (dialog.getWindow() != null) {
+            // Reaplica dimensões após show() em fabricantes que recalculam o layout.
+            dialog.getWindow().setLayout(android.view.WindowManager.LayoutParams.MATCH_PARENT, android.view.WindowManager.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(fundoBase));
         }
     }
 
