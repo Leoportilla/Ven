@@ -162,6 +162,7 @@ body.settings-overlay-open{overflow:hidden}
 .product-thumb{width:58px;height:58px;object-fit:contain;border-radius:9px;background:#fff;flex:none;padding:3px}
 .product-admin-actions{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
 .product-admin-actions .btn{padding:6px 9px;font-size:12px}
+.crm-modal-title-row,.product-modal-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%}.crm-modal-title-row h2,.product-modal-title-row h2{margin:0;flex:1}.modal-close-x{flex:0 0 40px;width:40px;height:40px;border:1px solid var(--line,#dce3e9);border-radius:12px;background:var(--surface,#fff);color:var(--text,#1f2937);font-size:28px;line-height:1;display:grid;place-items:center;cursor:pointer;transition:background .18s ease,transform .18s ease,border-color .18s ease}.modal-close-x:active{transform:scale(.94)}@media(hover:hover){.modal-close-x:hover{background:var(--soft,#f3f6f9);border-color:var(--accent,#258bc4)}}
 #product-overlay{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:calc(37px + env(safe-area-inset-top)) 14px calc(37px + env(safe-area-inset-bottom));background:#000b;backdrop-filter:blur(4px);overflow-y:auto;overscroll-behavior:contain}
 #product-box{width:100%;max-width:480px;max-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:22px;padding:20px;box-shadow:0 18px 60px #0009}
 #product-box h2{font-size:20px;margin:0 0 6px}
@@ -1006,7 +1007,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
  </section>
 </div>
 <div id="customer-overlay" class="crm-modal" role="dialog" aria-modal="true" aria-labelledby="customerTitle">
- <section class="crm-box"><h2 id="customerTitle">Cadastrar cliente</h2><p>Os dados ficam salvos neste aparelho e podem ser associados aos orçamentos e vendas.</p>
+ <section class="crm-box"><div class="crm-modal-title-row"><h2 id="customerTitle">Cadastrar cliente</h2><button type="button" class="modal-close-x" id="closeCustomerX" aria-label="Fechar cadastro de cliente" title="Fechar">×</button></div><p>Os dados ficam salvos neste aparelho e podem ser associados aos orçamentos e vendas.</p>
   <label class="crm-field">Nome / razão social<input id="custName" maxlength="140" required placeholder="Nome do cliente"></label>
   <div class="crm-grid"><label class="crm-field">CPF / CNPJ<input id="custDoc" maxlength="30" placeholder="Documento"></label><label class="crm-field">Telefone / WhatsApp<input id="custPhone" maxlength="50" placeholder="Telefone"></label>
   <label class="crm-field wide">E-mail<input id="custEmail" type="email" maxlength="120" placeholder="cliente@email.com"></label>
@@ -1049,7 +1050,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 </div>
 <div id="product-overlay" role="dialog" aria-modal="true" aria-labelledby="productTitle">
  <section id="product-box">
-  <div class="pm-head"><h2 id="productTitle">Cadastrar produto</h2><p id="productSub">Preencha os dados abaixo. Campos com preço e nome são obrigatórios.</p></div>
+  <div class="pm-head"><div class="product-modal-title-row"><h2 id="productTitle">Cadastrar produto</h2><button type="button" class="modal-close-x" id="closeProductX" aria-label="Fechar cadastro de produto ou serviço" title="Fechar">×</button></div><p id="productSub">Preencha os dados abaixo. Campos com preço e nome são obrigatórios.</p></div>
   <div class="pm-body">
   <div class="product-form-grid">
    <div class="settings-field full kind-choice-wrap"><div class="seg" id="kindSeg" data-pos="0" role="group" aria-label="Tipo de cadastro"><i class="seg-thumb"></i><button type="button" class="kind-choice-btn is-active" data-kind="product" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg><span>Produto</span></button><button type="button" class="kind-choice-btn" data-kind="service" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg><span>Serviço</span></button></div><select id="prodKind" class="kind-choice-native" aria-hidden="true" tabindex="-1"><option value="product">Produto / material</option><option value="service">Serviço / mão de obra</option></select></div>
@@ -1294,7 +1295,7 @@ function renderSalvos(){
  const ligar=()=>{
   const input=$('#savedOrderSearch');if(input){input.addEventListener('input',()=>{savedOrderSearch=input.value;const pos=input.selectionStart;renderSalvos();const next=$('#savedOrderSearch');if(next){next.focus();next.setSelectionRange(pos,pos)}})}
   $('#clearOrderSearch')?.addEventListener('click',()=>{savedOrderSearch='';renderSalvos()});
-  $('#newOrderFromList')?.addEventListener('click',()=>{if(cart.length){const itens=cart.slice(0,4).map(i=>nomeItem(i)+' × '+(Number(i.q)||0)).join(', ');confirmar('Pedido em andamento encontrado','Existe um rascunho com '+cart.length+' item(ns), total de '+brl(totais().total)+(cfg.cli?', cliente '+cfg.cli:'')+'. Itens: '+itens+(cart.length>4?' e mais '+(cart.length-4)+' item(ns)':'')+'. Se escolher iniciar novo, o rascunho atual será substituído.',()=>{editingOrderNumber=null;cart=[];cfg={cli:'',desc:'',tipo:'%',obs:'Orçamento válido por 5 dias.'};salvar();store.set('ven_draftPedido',{cart:[],cfg,editingOrderNumber:null,updatedAt:new Date().toISOString()});irParaView('orc')});return}iniciarNovoPedido()});
+  $('#newOrderFromList')?.addEventListener('click',()=>iniciarNovoPedido());
  };
  if(!todos.length){
    h+='<div class="empty">Nenhum pedido gravado ainda.<br>Toque em “Novo”, adicione os produtos e escolha “Gravar pedido”.</div>';
@@ -1408,6 +1409,7 @@ function imprimirReciboVenda(numero){const v=vendas.find(x=>Number(x.numero)===N
 document.getElementById('customer-overlay').addEventListener('click',e=>{if(e.target.id==='customer-overlay')fecharCadastroCliente()});
 
 $('#cancelCustomer').addEventListener('click',fecharCadastroCliente);
+$('#closeCustomerX').addEventListener('click',fecharCadastroCliente);
 let cepLookupToken=0;
 async function preencherEnderecoPorCep(cep){
  const token=++cepLookupToken;
@@ -1550,12 +1552,11 @@ function renderHome(){
 
 (function(){const m={home:'home',prod:'box',saved:'clip',orc:'file',sales:'chart',customers:'users'};document.querySelectorAll('#home-nav [data-home-nav]').forEach(b=>{const ic=b.querySelector('.hn-icon');if(ic&&m[b.dataset.homeNav])ic.innerHTML=hmIcon(m[b.dataset.homeNav])})})();
 function iniciarNovoPedido(){
- // A ação Novo Pedido na Home retoma o rascunho em vez de apagá-lo silenciosamente.
- const tinhaRascunho=cart.length>0;
- try{store.set('ven_draftPedido',{cart:cart,cfg:cfg,editingOrderNumber:editingOrderNumber,updatedAt:new Date().toISOString()})}catch(e){}
- view='orc';document.body.classList.remove('keyboard-open');render();window.scrollTo(0,0);
- if(tinhaRascunho)notificar('Pedido em andamento recuperado. Confira os itens e continue de onde parou.');
- else notificar('Novo pedido pronto. Adicione os produtos do catálogo.');
+ // Home e Vendas usam o mesmo fluxo: se há rascunho, confirmar e retomar sem limpar.
+ const temRascunho=Array.isArray(cart)&&cart.length>0;
+ const abrirRascunho=()=>{try{store.set('ven_draftPedido',{cart:cart,cfg:cfg,editingOrderNumber:editingOrderNumber,updatedAt:new Date().toISOString()})}catch(e){}view='orc';document.body.classList.remove('keyboard-open');render();window.scrollTo(0,0);if(temRascunho)notificar('Pedido em andamento recuperado. Continue de onde parou.');else notificar('Novo pedido pronto. Adicione os produtos do catálogo.');};
+ if(temRascunho){const itens=cart.slice(0,4).map(i=>nomeItem(i)+' × '+(Number(i.q)||0)).join(', ');confirmar('Pedido em rascunho encontrado','Há um pedido em andamento com '+cart.length+' item(ns), total de '+brl(totais().total)+(cfg.cli?', cliente '+cfg.cli:'')+'. Itens: '+itens+(cart.length>4?' e mais '+(cart.length-4)+' item(ns)':'')+'. Toque em OK para continuar esse mesmo pedido.',abrirRascunho);const ok=document.getElementById('confirm-ok');if(ok)ok.textContent='OK, continuar';return}
+ abrirRascunho();
 }
 function navegarHome(destino){
  if(destino==='orc'){iniciarNovoPedido();return}
@@ -1840,6 +1841,7 @@ function parseCamposPersonalizados(text){const out={};String(text||'').split(';'
 function fecharCadastroProduto(){productOverlay.style.display='none';editingProductId=null;pendingProductImage=''}
 document.addEventListener('click',e=>{if(e.target.closest('#startFirstProduct')||e.target.closest('#addProductFromCatalog'))abrirCadastroProduto()});
 $('#cancelProduct').addEventListener('click',fecharCadastroProduto);
+$('#closeProductX').addEventListener('click',fecharCadastroProduto);
 productOverlay.addEventListener('click',e=>{if(e.target===productOverlay)fecharCadastroProduto()});
 document.addEventListener('click',e=>{const ed=e.target.closest('[data-edit-product]');if(ed)abrirCadastroProduto(ed.dataset.editProduct)});
 $('#prodImageUrl').addEventListener('input',()=>{const url=$('#prodImageUrl').value.trim();pendingProductImage=url;if(url){$('#productImagePreview').src=url;$('#productImagePreview').style.display='block'}else if(!$('#prodImageFile').files.length){$('#productImagePreview').removeAttribute('src');$('#productImagePreview').style.display='none'}});
