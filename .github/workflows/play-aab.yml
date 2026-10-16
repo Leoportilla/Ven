@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   aab:
-    name: Gerar AAB assinado (sem atualizador do GitHub)
+    name: Gerar AAB Play Store (sem atualizador do GitHub)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,33 +18,43 @@ jobs:
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
-      - name: Preparar chave de envio
+          gradle-version: '8.13'
+      - name: Validar e preparar chave de envio
         shell: bash
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "::error::Secret KEYSTORE_BASE64 não cadastrado. Veja ASSINATURA_FIXA_PASSO_A_PASSO.md"
+          set -euo pipefail
+          if [ -z "${KEYSTORE_BASE64:-}" ]; then
+            echo "::error::Secret KEYSTORE_BASE64 não cadastrado. Consulte ASSINATURA_FIXA_PASSO_A_PASSO.md"
             exit 1
           fi
-          echo "$KEYSTORE_BASE64" | base64 -d > app/keystore.jks
-      - name: Compilar AAB release
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > app/keystore.jks
+          if [ ! -s app/keystore.jks ]; then
+            echo "::error::A chave não foi decodificada ou está vazia."
+            exit 1
+          fi
+      - name: Validar Secrets de assinatura
+        shell: bash
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          # remove caracteres invisíveis/não ASCII que podem vir ao colar os Secrets
-          export KEYSTORE_PASSWORD="$(printf '%s' "$KEYSTORE_PASSWORD" | LC_ALL=C tr -cd 'A-Za-z0-9')"
-          export KEY_PASSWORD="$(printf '%s' "$KEY_PASSWORD" | LC_ALL=C tr -cd 'A-Za-z0-9')"
-          export KEY_ALIAS="$(printf '%s' "$KEY_ALIAS" | LC_ALL=C tr -cd 'A-Za-z0-9')"
-          echo "Tamanho das senhas (esperado 28): ${#KEYSTORE_PASSWORD} / ${#KEY_PASSWORD}"
-          gradle --no-daemon bundleRelease
+          set -euo pipefail
+          [ -n "${KEYSTORE_PASSWORD:-}" ] || { echo "::error::Secret KEYSTORE_PASSWORD ausente."; exit 1; }
+          [ -n "${KEY_ALIAS:-}" ] || { echo "::error::Secret KEY_ALIAS ausente."; exit 1; }
+          [ -n "${KEY_PASSWORD:-}" ] || { echo "::error::Secret KEY_PASSWORD ausente."; exit 1; }
+      - name: Compilar AAB release
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: gradle --no-daemon bundleRelease
       - name: Disponibilizar AAB
         uses: actions/upload-artifact@v4
         with:
-          name: VEN-AAB-Google-Play
+          name: VEN-Playstore-AAB
           path: app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 30

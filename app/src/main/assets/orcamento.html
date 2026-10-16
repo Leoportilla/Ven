@@ -182,7 +182,8 @@ body.settings-overlay-open{overflow:hidden}
 .crm-title{font-weight:800;font-size:16px}
 .crm-meta{font-size:13px;color:var(--mut);margin-top:4px;overflow-wrap:anywhere}
 .crm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.crm-address-block{grid-column:1/-1;border:1px solid var(--bd);border-radius:13px;padding:12px;margin-top:8px}.crm-address-heading{font-weight:800;color:var(--tx);font-size:14px;margin-bottom:6px}.crm-waze-preview{margin-top:8px;padding:10px;border-radius:10px;background:color-mix(in srgb,#33a852 12%,var(--card));font-size:13px}.crm-waze-preview a,.crm-waze-link{display:inline-flex;align-items:center;gap:6px;color:#16833d;font-weight:800;text-decoration:none;margin-top:4px}.crm-waze-link{border:1px solid color-mix(in srgb,#16833d 35%,var(--bd));border-radius:9px;padding:8px 10px}.crm-address-text{white-space:normal;overflow-wrap:anywhere}
+.crm-address-block{grid-column:1/-1;border:1px solid var(--bd);border-radius:13px;padding:12px;margin-top:8px}.cep-label-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.cep-label-row small{font-size:11px;font-weight:500;color:var(--mut);letter-spacing:0}
+.crm-address-heading{font-weight:800;color:var(--tx);font-size:14px;margin-bottom:6px}.crm-waze-preview{margin-top:8px;padding:10px;border-radius:10px;background:color-mix(in srgb,#33a852 12%,var(--card));font-size:13px}.crm-waze-preview a,.crm-waze-link{display:inline-flex;align-items:center;gap:6px;color:#16833d;font-weight:800;text-decoration:none;margin-top:4px}.crm-waze-link{border:1px solid color-mix(in srgb,#16833d 35%,var(--bd));border-radius:9px;padding:8px 10px}.crm-address-text{white-space:normal;overflow-wrap:anywhere}
 .crm-grid .wide{grid-column:1/-1}
 .crm-modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:calc(37px + env(safe-area-inset-top)) 14px calc(37px + env(safe-area-inset-bottom));background:#000a;overflow-y:auto;overscroll-behavior:contain}
 .crm-modal[style*="display: flex"]{align-items:center}
@@ -268,6 +269,11 @@ body{padding-bottom:158px}
 .quote-total-strip strong{font-size:22px}
 }
 .quote-product-picker{border:1px solid var(--bd);background:var(--card);border-radius:16px;padding:14px;margin:12px 0 16px}
+/* Play Store v4 test: catalog stays visually distinct from order lines. */
+.quote-product-picker{background:var(--panel, var(--bg2, var(--card)));border-color:color-mix(in srgb,var(--bd) 78%,var(--accent, #ff8a24));}
+.quote-product-results{max-height:300px;overflow-y:auto;overscroll-behavior:contain;padding:2px;border-radius:12px;}
+.quote-product-results .quote-pick-row{background:var(--card);}
+
 .quote-product-results{margin-top:10px;display:grid;gap:8px;max-height:300px;overflow:auto}
 .quote-pick-row{display:flex;align-items:center;gap:10px;border:1px solid var(--bd);border-radius:12px;padding:10px;background:var(--bg)}
 .quote-pick-row .info{flex:1;min-width:0}
@@ -400,7 +406,7 @@ body.home-mode{padding-bottom:96px!important}
 :root[data-theme="dark"] .drawer{background:#111419;border-color:#303640}
 :root,:root[data-theme="light"]{--chrome:#0b73b0;--chrome-hi:#1a8bcf;--chrome-tx:#fff;--chrome-mut:rgba(255,255,255,.74);--chrome-act:rgba(255,255,255,.17);--chrome-orange:#ffa63d}
 :root[data-theme="dark"]{--chrome:#10151b;--chrome-hi:#1b2531;--chrome-tx:#fff;--chrome-mut:rgba(255,255,255,.66);--chrome-act:rgba(255,255,255,.10);--chrome-orange:#ff922b}
-html[data-theme] #main .screen-head{position:sticky;top:0;z-index:20;overflow:hidden;margin:-14px -16px 14px;padding:16px 18px 18px;border:0;border-radius:0 0 26px 26px;background:var(--chrome);color:var(--chrome-tx);box-shadow:0 8px 20px rgba(0,0,0,.16)}
+html[data-theme] #main .screen-head{position:sticky;top:0;z-index:20;overflow:hidden;margin:-14px -16px 14px;padding:calc(16px + var(--ven-statusbar-inset, 0px)) 18px 18px;border:0;border-radius:0 0 26px 26px;background:var(--chrome);color:var(--chrome-tx);box-shadow:0 8px 20px rgba(0,0,0,.16)}
 html[data-theme] #main .screen-head:before{content:"";position:absolute;left:-14%;top:-60%;width:62%;height:170%;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.12),transparent);pointer-events:none}
 html[data-theme] #main .screen-head:after{width:96px;height:96px;right:-26px;top:auto;bottom:-34px;border:16px solid var(--chrome-orange);opacity:.16}
 html[data-theme] #main .screen-title{color:#fff;font-size:22px}
@@ -984,7 +990,7 @@ body.keyboard-nav-hidden #product-overlay{align-items:flex-start!important;paddi
    <div class="crm-grid"><label class="crm-field">Número<input id="custAddressNumber" maxlength="20" inputmode="text" placeholder="Nº"></label><label class="crm-field">Complemento<input id="custAddressExtra" maxlength="80" placeholder="Apto, casa, sala"></label>
     <label class="crm-field wide">Bairro<input id="custNeighborhood" maxlength="100" autocomplete="address-level3" placeholder="Bairro"></label>
     <label class="crm-field">Cidade<input id="custCity" maxlength="100" autocomplete="address-level2" placeholder="Cidade"></label><label class="crm-field">Estado (UF)<input id="custState" maxlength="2" autocapitalize="characters" autocomplete="address-level1" placeholder="RS"></label>
-    <label class="crm-field wide">CEP<input id="custCep" maxlength="9" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000"></label>
+    <label class="crm-field wide"><span class="cep-label-row"><span>CEP</span><small>Preenchimento automático pelo CEP</small></span><input id="custCep" maxlength="9" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000"></label>
    </div>
    <div id="custWazePreview" class="crm-waze-preview" hidden></div>
   </div>
@@ -1376,7 +1382,22 @@ function imprimirReciboVenda(numero){const v=vendas.find(x=>Number(x.numero)===N
 document.getElementById('customer-overlay').addEventListener('click',e=>{if(e.target.id==='customer-overlay')fecharCadastroCliente()});
 
 $('#cancelCustomer').addEventListener('click',fecharCadastroCliente);
-['custStreet','custAddressNumber','custAddressExtra','custNeighborhood','custCity','custState','custCep'].forEach(id=>$('#'+id).addEventListener('input',()=>{if(id==='custState')$('#custState').value=$('#custState').value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,2);if(id==='custCep'){const n=$('#custCep').value.replace(/\D/g,'').slice(0,8);$('#custCep').value=n.length>5?n.slice(0,5)+'-'+n.slice(5):n;}atualizarPreviaWaze()}));
+let cepLookupToken=0;
+async function preencherEnderecoPorCep(cep){
+ const token=++cepLookupToken;
+ try{
+  const resp=await fetch('https://viacep.com.br/ws/'+cep+'/json/',{headers:{'Accept':'application/json'}});
+  if(!resp.ok)throw new Error('CEP indisponível');
+  const d=await resp.json();
+  if(token!==cepLookupToken||d.erro)return;
+  if(d.logradouro)$('#custStreet').value=d.logradouro;
+  if(d.bairro)$('#custNeighborhood').value=d.bairro;
+  if(d.localidade)$('#custCity').value=d.localidade;
+  if(d.uf)$('#custState').value=d.uf;
+  atualizarPreviaWaze();
+ }catch(_){/* Consulta opcional: mantém o cadastro manual quando offline ou sem resultado. */}
+}
+['custStreet','custAddressNumber','custAddressExtra','custNeighborhood','custCity','custState','custCep'].forEach(id=>$('#'+id).addEventListener('input',()=>{if(id==='custState')$('#custState').value=$('#custState').value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,2);if(id==='custCep'){const n=$('#custCep').value.replace(/\D/g,'').slice(0,8);$('#custCep').value=n.length>5?n.slice(0,5)+'-'+n.slice(5):n;if(n.length===8)preencherEnderecoPorCep(n);}atualizarPreviaWaze()}));
 $('#saveCustomer').addEventListener('click',()=>{const nome=$('#custName').value.trim();if(!nome){notificar('Informe o nome do cliente.','error');$('#custName').focus();return}const endereco=enderecoEstruturadoDoFormulario();const obj={id:editingCustomerId||('CLI-'+Date.now()),nome,doc:$('#custDoc').value.trim(),telefone:$('#custPhone').value.trim(),email:$('#custEmail').value.trim(),...endereco,address:enderecoCliente(endereco),notes:$('#custNotes').value.trim(),atualizado:new Date().toISOString()};if(editingCustomerId)clientes=clientes.map(c=>String(c.id)===String(editingCustomerId)?obj:c);else clientes.push(obj);salvarClientes();fecharCadastroCliente();renderClientes();notificar('Cliente salvo.');});
 document.addEventListener('click',e=>{if(e.target.closest('#saveSalesGoal')){const val=Math.max(0,Number(document.getElementById('salesGoalInput')?.value)||0);const d=new Date();const k='ven_metaVendas_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const ms=store.get('ven_metasVendas',{});ms[k]=val;store.set('ven_metasVendas',ms);renderVendas();notificar('Meta mensal salva.');return}const cem=e.target.closest('[data-customer-email]');if(cem){const c=clientes.find(x=>String(x.id)===String(cem.dataset.customerEmail));if(c)abrirEmailPreparado(c.email,'Contato - '+c.nome,'Olá, '+c.nome+'!');return}const sem=e.target.closest('[data-sale-email]');if(sem){enviarEmailVenda(Number(sem.dataset.saleEmail));return}const wab=e.target.closest('[data-open-wa]');if(wab){const c=clientes.find(x=>String(x.id)===String(wab.dataset.openWa));if(c&&c.telefone){const url=whatsappClienteUrl(c.telefone);if(url){const numero=url.replace(/^https:\/\/wa\.me\//,'');if(window.Android&&Android.abrirWhatsAppContato)Android.abrirWhatsAppContato(numero);else window.open(url,'_blank');}else notificar('Informe um celular com DDD no cadastro do cliente.','error')}return}if(e.target.closest('#newCustomer')){abrirCadastroCliente();return}const edit=e.target.closest('[data-edit-customer]');if(edit){abrirCadastroCliente(edit.dataset.editCustomer);return}const del=e.target.closest('[data-delete-customer]');if(del){const id=del.dataset.deleteCustomer;confirmar('Excluir cliente?','O cadastro será removido. Vendas e orçamentos já registrados manterão os dados históricos.',()=>{clientes=clientes.filter(c=>String(c.id)!==String(id));salvarClientes();renderClientes();notificar('Cliente removido.');});return}const hist=e.target.closest('[data-customer-history]');if(hist){salesCustomerId=String(hist.dataset.customerHistory);salesFilterMode='all';salesFilterFrom='';salesFilterTo='';salesKeepCustomer=true;irParaView('sales');return}const conv=e.target.closest('[data-convert-sale]');if(conv){abrirFechamentoVenda(Number(conv.dataset.convertSale));return}const rec=e.target.closest('[data-sale-receipt]');if(rec){imprimirReciboVenda(Number(rec.dataset.saleReceipt));return}const paid=e.target.closest('[data-sale-paid]');if(paid){const v=vendas.find(x=>Number(x.numero)===Number(paid.dataset.salePaid));if(v){v.status='paid';v.recebido=v.total;v.pagoEm=new Date().toISOString();salvarVendas();renderVendas();notificar('Venda marcada como paga.')}return}const det=e.target.closest('[data-sale-detail]');if(det){const v=vendas.find(x=>Number(x.numero)===Number(det.dataset.saleDetail));if(v)notificar('Venda #'+String(v.numero).padStart(4,'0')+' · '+v.clienteNome+' · '+brl(v.total)+' · '+v.pagamento+' · '+(v.status==='paid'?'Paga':v.status==='partial'?'Parcial':'Pendente'));return}});
 $('#cancelSale').addEventListener('click',fecharVendaModal);$('#confirmSale').addEventListener('click',confirmarFechamentoVenda);document.getElementById('sale-overlay').addEventListener('click',e=>{if(e.target.id==='sale-overlay')fecharVendaModal()});
@@ -1429,7 +1450,6 @@ function renderProdutos(){
 
 function resultadosOrcHtml(){
   const termo=norm($('#quoteProductSearch')?.value||'');
-  if(!termo&&cart.length)return `<div class="ord-hint">Digite o nome, o código ou leia o código de barras para adicionar mais itens.</div>`;
   const todos=prods.filter(p=>!termo||p.s.includes(termo));const lista=todos.slice(0,termo?20:8);
   if(!lista.length)return prods.length?'<div class="ord-hint">Nenhum item corresponde à busca.</div>':'<div class="ord-hint">Seu catálogo está vazio. Cadastre produtos ou serviços para começar.</div>';
   return lista.map(p=>`<div class="quote-pick-row"><div class="info"><div class="nm">${p.kind==='service'?'🛠 ':''}${esc(p.d)}</div><div class="meta">${p.kind==='service'?'Serviço':'Cód. '+esc(p.id)}${p.b&&p.b.length?' · '+esc(p.b[0]):''}</div></div><strong class="pr">${brl(p.p)}${p.kind==='service'&&p.serviceType==='hourly'?' / h':(p.kind==='service'&&p.unit&&p.unit!=='un'?' / '+esc(p.unit):'')}</strong><button type="button" class="add" data-add="${esc(p.id)}" aria-label="Adicionar ${esc(p.d)}">+</button></div>`).join('')+(todos.length>lista.length?`<div class="ord-hint">Mostrando ${lista.length} de ${todos.length}. Digite para refinar.</div>`:'');
@@ -1500,7 +1520,8 @@ function renderHome(){
 
 (function(){const m={home:'home',prod:'box',saved:'clip',orc:'file',sales:'chart',customers:'users'};document.querySelectorAll('#home-nav [data-home-nav]').forEach(b=>{const ic=b.querySelector('.hn-icon');if(ic&&m[b.dataset.homeNav])ic.innerHTML=hmIcon(m[b.dataset.homeNav])})})();
 function iniciarNovoPedido(){
- if(editingOrderNumber!==null){editingOrderNumber=null;cart=[];cfg={cli:'',desc:'',tipo:'%',obs:'Orçamento válido por 5 dias.'};salvar()}
+ // Preserve the in-progress cart and any edit session when navigating between tabs.
+ // The explicit 'Limpar orçamento' action remains responsible for clearing the draft.
  view='orc';document.body.classList.remove('keyboard-open');render();window.scrollTo(0,0);
 }
 function navegarHome(destino){

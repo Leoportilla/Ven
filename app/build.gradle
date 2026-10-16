@@ -1,13 +1,13 @@
 plugins { id 'com.android.application' }
 android {
     namespace 'br.com.ven.app'
-    compileSdk 35
+    compileSdk 36
     defaultConfig {
         applicationId 'br.com.ven.app'
-        minSdk 23
-        targetSdk 35
-        versionCode 68
-        versionName '2.0.0-alpha.67'
+        minSdk 24
+        targetSdk 36
+        versionCode 72
+        versionName '2.0.0-playstore.4'
         // Atualizador via GitHub: só ligado no APK de uso próprio (-PgithubUpdater=true). Na versão da Google Play fica desligado.
         buildConfigField 'boolean', 'GITHUB_UPDATER', project.hasProperty('githubUpdater') ? 'true' : 'false'
     }
